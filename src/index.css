@@ -2,7 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ... */
+/* Hide scrollbar for Chrome, Safari and Opera */
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Custom styles */
+@layer components {
+  /* Base styles */
+  .layout-container {
+    @apply max-w-7xl mx-auto px-6;
+  }
+
+  /* Theme variants */
+  .theme-transition {
+    @apply transition-colors duration-300;
+  }
+
+  .theme-bg {
+    @apply bg-white text-black dark:bg-black dark:text-white;
+  }
+
+  .theme-text {
+    @apply text-black dark:text-white;
+  }
+
+  .theme-border {
+    @apply border-black/20 dark:border-white/20;
+  }
+
+  /* Typography */
+  .heading-primary {
+    @apply text-4xl font-mono font-bold mb-4;
+  }
+
+  .text-body {
+    @apply text-lg font-mono opacity-80;
+  }
+
+  /* Navigation */
+  .nav-link {
+    @apply font-mono text-sm uppercase tracking-wider relative group;
+  }
+
+  .nav-link-underline {
+    @apply absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-700 group-hover:w-full bg-black dark:bg-white;
+  }
+
+  /* Buttons */
+  .btn-icon {
+    @apply w-8 h-8 flex items-center justify-center hover:opacity-60 transition-opacity;
+  }
+
+  /* Containers */
+  .info-container {
+    @apply mt-8 p-6 border rounded-sm border-current/20;
+  }
+}
 
 @layer base {
   :root {

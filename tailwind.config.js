@@ -1,10 +1,12 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  darkMode: ["class"],
-  content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  darkMode: 'class',
   theme: {
     extend: {
-      darkMode: "class", // Habilita el modo oscuro basado en clases
       fontSize: {
         'xs': ['12px', { lineHeight: '16px' }],
         'sm': ['14px', { lineHeight: '20px' }],
@@ -16,6 +18,7 @@ module.exports = {
       },
       fontFamily: {
         'sans': ['Poppins'],
+        'mono': ['JetBrains Mono', 'monospace'],
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -23,13 +26,12 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
-
         // Modo claro
         elementary: "hsl(var(--elementary))",       // Blanco (modo claro) / Negro (modo oscuro)
         void: "hsl(var(--void))",       // Negro (modo claro) / Blanco (modo oscuro)
         cloud: "#d0d0d0",   // Gris claro
         "pampean-sky": "#d4dde1", // Celeste
-        feather: "#2CA798",     // Amarillo
+        feather: "#2ca798",     // Miku
 
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

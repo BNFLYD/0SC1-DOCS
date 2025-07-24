@@ -1,0 +1,51 @@
+@layer components {
+  /* Base styles */
+  .layout-container {
+    @apply max-w-7xl mx-auto px-6;
+  }
+
+  /* Theme variants */
+  .theme-transition {
+    @apply transition-colors duration-300;
+  }
+
+  .theme-bg {
+    @apply bg-theme-light-bg dark:bg-theme-dark-bg;
+  }
+
+  .theme-text {
+    @apply text-theme-light-text dark:text-theme-dark-text;
+  }
+
+  .theme-border {
+    @apply border-theme-light-border dark:border-theme-dark-border;
+  }
+
+  /* Typography */
+  .heading-primary {
+    @apply text-4xl font-mono font-bold mb-4;
+  }
+
+  .text-body {
+    @apply text-lg font-mono opacity-80;
+  }
+
+  /* Navigation */
+  .nav-link {
+    @apply font-mono text-sm uppercase tracking-wider relative group;
+  }
+
+  .nav-link-underline {
+    @apply absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-700 group-hover:w-full;
+  }
+
+  /* Buttons */
+  .btn-icon {
+    @apply w-8 h-8 flex items-center justify-center hover:opacity-60 transition-opacity;
+  }
+
+  /* Containers */
+  .info-container {
+    @apply mt-8 p-6 border rounded-sm;
+  }
+}
