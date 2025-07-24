@@ -12,6 +12,15 @@ import { translations } from "../constants/translations"
 const Home = () => {
   const { language, isDark } = useUser()
   const [activeChannel, setActiveChannel] = useState(null)
+  const [isDistorting, setIsDistorting] = useState(false)
+
+  const handleChannelChange = (channelId) => {
+    setIsDistorting(true) // Iniciar distorsión
+    setTimeout(() => {
+      setActiveChannel(channelId) // Cambiar canal después de que la distorsión comience
+      setIsDistorting(false) // Terminar distorsión
+    }, 250) // Duración de la distorsión (ajustable)
+  }
 
   // Datos de habilidades y capacidades
   const skills = [
@@ -42,11 +51,11 @@ const Home = () => {
     >
 
       {/* Contenido principal */}
-      <main className="flex items-center justify-center">
-        <div className="flex items-start w-full max-w-7xl">
+      <main className="flex items-center justify-center" style={{ height: "calc(65vh)" }}>
+        <div className="flex items-start w-full" style={{ maxWidth: "1440px" }}>
           {/* Monitor CRT (40% del ancho) */}
           <div className="p-4" style={{ width: "40%" }}>
-            <CRTScreen theme={isDark ? "dark" : "light"} activeChannel={activeChannel} />
+            <CRTScreen theme={isDark ? "dark" : "light"} activeChannel={activeChannel} isDistorting={isDistorting} />
           </div>
 
           {/* Sección derecha (60% del ancho) - se ajusta a la altura del monitor */}
@@ -56,7 +65,7 @@ const Home = () => {
               {/* Habilidades (15% del ancho total = 25% de esta sección) */}
               <div className="pt-0 pr-2 pb-0 pl-4" style={{ width: "25%" }}>
                 <SectionFrame title={translations[language].skills.toUpperCase()} theme={isDark ? "dark" : "light"}>
-                  <div className="flex flex-col justify-evenly gap-4 items-center h-full py-0">
+                  <div className="flex flex-col justify-evenly gap-8 items-center h-full py-2">
                     {skills.map((skill) => (
                       <SkillKnob key={skill.name} skill={skill.name} percentage={skill.percentage} theme={isDark ? "dark" : "light"} />
                     ))}
@@ -107,7 +116,7 @@ const Home = () => {
             <div>
               <div className="pr-2 pl-4">
                 <SectionFrame title={translations[language].channels.toUpperCase()} theme={isDark ? "dark" : "light"}>
-                  <ChannelButtons activeChannel={activeChannel} onChannelChange={setActiveChannel} theme={isDark ? "dark" : "light"} />
+                  <ChannelButtons activeChannel={activeChannel} onChannelChange={handleChannelChange} theme={isDark ? "dark" : "light"} />
                 </SectionFrame>
               </div>
             </div>

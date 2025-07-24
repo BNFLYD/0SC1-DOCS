@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react"
 
-const CRTScreen = ({ theme, activeChannel }) => {
+const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
   const canvasRef = useRef(null)
   const animationRef = useRef(null)
 
@@ -16,65 +16,104 @@ const CRTScreen = ({ theme, activeChannel }) => {
     let time = 0
 
     const animate = () => {
-      // Limpiar canvas - fondo negro
-      ctx.fillStyle = isDark ? "#000000" : "#ffffff"
+      // Limpiar canvas - fondo según el tema
+      ctx.fillStyle = theme === "dark" ? "#000000" : "#ffffff"
       ctx.fillRect(0, 0, width, height)
 
-      // Configurar estilo base
-      ctx.strokeStyle = isDark ? "#ffffff" : "#000000"
-      ctx.fillStyle = isDark ? "#ffffff" : "#000000"
-      ctx.font = "12px monospace"
-
-      if (!activeChannel) {
-        // Animación por defecto: onda senoidal
-        ctx.lineWidth = 2
-        ctx.beginPath()
-
-        const amplitude = height * 0.15
-        const frequency = 0.05
-        const centerY = height / 2
-
-        for (let x = 0; x < width; x++) {
-          const y = centerY + Math.sin((x + time) * frequency) * amplitude
-          if (x === 0) {
-            ctx.moveTo(x, y)
-          } else {
-            ctx.lineTo(x, y)
-          }
+      // Si está distorsionando, dibujar efecto de estática/glitch
+      if (isDistorting) {
+        // Color de la estática: blanco si el fondo es oscuro, negro si el fondo es claro
+        ctx.fillStyle = theme === "dark" ? "#ffffff" : "#000000"
+        for (let i = 0; i < 100; i++) {
+          // Dibujar muchas líneas aleatorias
+          ctx.fillRect(Math.random() * width, Math.random() * height, Math.random() * 20 + 5, 1)
         }
-        ctx.stroke()
+        // Añadir un flash rápido
+        if (Math.random() < 0.1) {
+          // 10% de probabilidad de un flash
+          ctx.fillStyle = `rgba(${theme === "dark" ? "255, 255, 255" : "0, 0, 0"}, ${Math.random() * 0.3 + 0.1})`
+          ctx.fillRect(0, 0, width, height)
+        }
       } else {
-        // Contenido según el canal activo
-        ctx.textAlign = "left"
-        ctx.textBaseline = "top"
+        // Lógica de dibujo normal (onda senoidal o contenido del canal)
+        ctx.strokeStyle = theme === "dark" ? "#ffffff" : "#000000"
+        ctx.fillStyle = theme === "dark" ? "#ffffff" : "#000000"
+        ctx.font = "12px monospace"
 
-        switch (activeChannel) {
-          case "whoami":
-            ctx.fillText("> whoami", 20, 20)
-            ctx.fillText("Desarrollador Full Stack", 20, 40)
-            ctx.fillText("Especialista en React & Node.js", 20, 60)
-            ctx.fillText("Apasionado por la tecnología", 20, 80)
-            ctx.fillText("y el código limpio", 20, 100)
-            break
-          case "projects":
-            ctx.fillText("> ls projects/", 20, 20)
-            ctx.fillText("• E-commerce Platform", 20, 40)
-            ctx.fillText("• Task Management App", 20, 60)
-            ctx.fillText("• Weather Dashboard", 20, 80)
-            ctx.fillText("• Portfolio Website", 20, 100)
-            break
-          case "blog":
-            ctx.fillText("> cat blog/README.md", 20, 20)
-            ctx.fillText("Escribo sobre:", 20, 40)
-            ctx.fillText("• Desarrollo web moderno", 20, 60)
-            ctx.fillText("• Mejores prácticas", 20, 80)
-            ctx.fillText("• Nuevas tecnologías", 20, 100)
-            break
+        if (!activeChannel) {
+          // Animación por defecto: onda senoidal
+          ctx.lineWidth = 2
+          ctx.beginPath()
+
+          const amplitude = height * 0.15
+          const frequency = 0.05
+          const centerY = height / 2
+
+          for (let x = 0; x < width; x++) {
+            const y = centerY + Math.sin((x + time) * frequency) * amplitude
+            if (x === 0) {
+              ctx.moveTo(x, y)
+            } else {
+              ctx.lineTo(x, y)
+            }
+          }
+          ctx.stroke()
+        } else if (activeChannel === "clock") {
+          // Canal del reloj - mostrar hora digital
+          const now = new Date()
+          const timeString = now.toLocaleTimeString("es-AR", { hour12: false })
+          const dateString = now.toLocaleDateString("es-AR")
+
+          ctx.textAlign = "center"
+          ctx.textBaseline = "middle"
+
+          // Hora grande
+          ctx.font = "32px monospace"
+          ctx.fillText(timeString, width / 2, height / 2 - 20)
+
+          // Fecha pequeña
+          ctx.font = "14px monospace"
+          ctx.fillText(dateString, width / 2, height / 2 + 20)
+
+          // Título
+          ctx.font = "12px monospace"
+          ctx.textAlign = "left"
+          ctx.textBaseline = "top"
+          ctx.fillText("> clock", 20, 20)
+        } else {
+          // Otros canales existentes
+          ctx.textAlign = "left"
+          ctx.textBaseline = "top"
+
+          switch (activeChannel) {
+            case "whoami":
+              ctx.fillText("> whoami", 20, 20)
+              ctx.fillText("Desarrollador Full Stack", 20, 40)
+              ctx.fillText("Especialista en React & Node.js", 20, 60)
+              ctx.fillText("Apasionado por la tecnología", 20, 80)
+              ctx.fillText("y el código limpio", 20, 100)
+              break
+            case "projects":
+              ctx.fillText("> ls projects/", 20, 20)
+              ctx.fillText("• E-commerce Platform", 20, 40)
+              ctx.fillText("• Task Management App", 20, 60)
+              ctx.fillText("• Weather Dashboard", 20, 80)
+              ctx.fillText("• Portfolio Website", 20, 100)
+              break
+            case "blog":
+              ctx.fillText("> cat blog/README.md", 20, 20)
+              ctx.fillText("Escribo sobre:", 20, 40)
+              ctx.fillText("• Desarrollo web moderno", 20, 60)
+              ctx.fillText("• Mejores prácticas", 20, 80)
+              ctx.fillText("• Nuevas tecnologías", 20, 100)
+              break
+          }
         }
       }
 
-      // Efecto de líneas de escaneo
-      ctx.fillStyle = "rgba(255, 255, 255, 0.05)"
+      // Efecto de líneas de escaneo (siempre aplicar, encima de todo)
+      // El color de las líneas de escaneo se invierte con el tema
+      ctx.fillStyle = theme === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)"
       for (let y = 0; y < height; y += 4) {
         ctx.fillRect(0, y, width, 1)
       }
@@ -90,7 +129,7 @@ const CRTScreen = ({ theme, activeChannel }) => {
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [theme, activeChannel])
+  }, [theme, activeChannel, isDistorting])
 
   const isDark = theme === "dark"
 
