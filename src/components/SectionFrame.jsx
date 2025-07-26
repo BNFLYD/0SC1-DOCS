@@ -13,7 +13,7 @@ const SectionFrame = ({ title, children, theme }) => {
         {/* Etiqueta en la parte inferior */}
         <div
           className={`absolute -bottom-3 left-1/2 transform -translate-x-1/2 px-2 font-mono text-sm font-bold ${
-            isDark ? "bg-black text-white" : "bg-white text-black"
+            isDark ? "bg-black text-white" : "bg-gray-300 text-black"
           }`}
         >
           {title}

@@ -1,6 +1,10 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import WhoamiChannel from "../components/Channels/WhoamiChannel"
+import ProjectsChannel from "../components/Channels/ProjectsChannel"
+import BlogChannel from "../components/Channels/BlogChannel"
+import MesmerizerChannel from "../components/Channels/MesmerizerChannel"
 
 const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
   const canvasRef = useRef(null)
@@ -17,7 +21,7 @@ const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
 
     const animate = () => {
       // Limpiar canvas - fondo según el tema
-      ctx.fillStyle = theme === "dark" ? "#000000" : "#ffffff"
+      ctx.fillStyle = theme === "dark" ? "#111111" : "#ffffff"
       ctx.fillRect(0, 0, width, height)
 
       // Si está distorsionando, dibujar efecto de estática/glitch
@@ -34,82 +38,27 @@ const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
           ctx.fillStyle = `rgba(${theme === "dark" ? "255, 255, 255" : "0, 0, 0"}, ${Math.random() * 0.3 + 0.1})`
           ctx.fillRect(0, 0, width, height)
         }
-      } else {
-        // Lógica de dibujo normal (onda senoidal o contenido del canal)
+      } else if (!activeChannel) {
+        // Animación por defecto: onda senoidal (solo si no hay canal activo)
         ctx.strokeStyle = theme === "dark" ? "#ffffff" : "#000000"
-        ctx.fillStyle = theme === "dark" ? "#ffffff" : "#000000"
-        ctx.font = "12px monospace"
+        ctx.lineWidth = 2
+        ctx.beginPath()
 
-        if (!activeChannel) {
-          // Animación por defecto: onda senoidal
-          ctx.lineWidth = 2
-          ctx.beginPath()
+        const amplitude = height * 0.15
+        const frequency = 0.05
+        const centerY = height / 2
 
-          const amplitude = height * 0.15
-          const frequency = 0.05
-          const centerY = height / 2
-
-          for (let x = 0; x < width; x++) {
-            const y = centerY + Math.sin((x + time) * frequency) * amplitude
-            if (x === 0) {
-              ctx.moveTo(x, y)
-            } else {
-              ctx.lineTo(x, y)
-            }
-          }
-          ctx.stroke()
-        } else if (activeChannel === "clock") {
-          // Canal del reloj - mostrar hora digital
-          const now = new Date()
-          const timeString = now.toLocaleTimeString("es-AR", { hour12: false })
-          const dateString = now.toLocaleDateString("es-AR")
-
-          ctx.textAlign = "center"
-          ctx.textBaseline = "middle"
-
-          // Hora grande
-          ctx.font = "32px monospace"
-          ctx.fillText(timeString, width / 2, height / 2 - 20)
-
-          // Fecha pequeña
-          ctx.font = "14px monospace"
-          ctx.fillText(dateString, width / 2, height / 2 + 20)
-
-          // Título
-          ctx.font = "12px monospace"
-          ctx.textAlign = "left"
-          ctx.textBaseline = "top"
-          ctx.fillText("> clock", 20, 20)
-        } else {
-          // Otros canales existentes
-          ctx.textAlign = "left"
-          ctx.textBaseline = "top"
-
-          switch (activeChannel) {
-            case "whoami":
-              ctx.fillText("> whoami", 20, 20)
-              ctx.fillText("Desarrollador Full Stack", 20, 40)
-              ctx.fillText("Especialista en React & Node.js", 20, 60)
-              ctx.fillText("Apasionado por la tecnología", 20, 80)
-              ctx.fillText("y el código limpio", 20, 100)
-              break
-            case "projects":
-              ctx.fillText("> ls projects/", 20, 20)
-              ctx.fillText("• E-commerce Platform", 20, 40)
-              ctx.fillText("• Task Management App", 20, 60)
-              ctx.fillText("• Weather Dashboard", 20, 80)
-              ctx.fillText("• Portfolio Website", 20, 100)
-              break
-            case "blog":
-              ctx.fillText("> cat blog/README.md", 20, 20)
-              ctx.fillText("Escribo sobre:", 20, 40)
-              ctx.fillText("• Desarrollo web moderno", 20, 60)
-              ctx.fillText("• Mejores prácticas", 20, 80)
-              ctx.fillText("• Nuevas tecnologías", 20, 100)
-              break
+        for (let x = 0; x < width; x++) {
+          const y = centerY + Math.sin((x + time) * frequency) * amplitude
+          if (x === 0) {
+            ctx.moveTo(x, y)
+          } else {
+            ctx.lineTo(x, y)
           }
         }
+        ctx.stroke()
       }
+
 
       // Efecto de líneas de escaneo (siempre aplicar, encima de todo)
       // El color de las líneas de escaneo se invierte con el tema
@@ -150,6 +99,18 @@ const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
             className="w-full h-full"
             style={{ imageRendering: "" }}
           />
+
+          {/* Overlay interactivo para el contenido del canal */}
+          {!isDistorting && ( // Ocultar overlay durante la distorsión
+            <div
+              className={`absolute inset-0 font-mono text-sm ${isDark ? "text-white" : "text-black"} flex flex-col`}
+            >
+              {activeChannel === "whoami" && <WhoamiChannel theme={theme} />}
+              {activeChannel === "projects" && <ProjectsChannel theme={theme} />}
+              {activeChannel === "blog" && <BlogChannel theme={theme} />}
+              {activeChannel === "play" && <MesmerizerChannel theme={theme} />}
+            </div>
+          )}
 
           {/* Efecto de curvatura CRT */}
           <div

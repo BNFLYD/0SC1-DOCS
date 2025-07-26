@@ -19,7 +19,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
   }
 
   return (
-    <nav className={`fixed top-0 left-0 w-full px-6 py-4 border-b transition-colors duration-300 z-50 ${isDark ? "bg-black border-white/20 text-white" : "bg-white border-black/20 text-black"
+    <nav className={`fixed top-0 left-0 w-full px-6 py-4 border-b transition-colors duration-300 z-50 ${isDark ? "bg-black border-white/20 text-white" : "bg-gray-300 border-black/20 text-black"
       }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo y nombre */}

@@ -32,7 +32,7 @@ const Home = () => {
 
   const frontendCapabilities = [
     { name: "React", percentage: 90 },
-    { name: "Astro", percentage: 70 },
+    { name: "Svelte", percentage: 70 },
     { name: "Tailwind", percentage: 30 },
     { name: "Next", percentage: 60 },
   ]
@@ -40,13 +40,13 @@ const Home = () => {
   const backendCapabilities = [
     { name: "Node", percentage: 90 },
     { name: "Fast API", percentage: 70 },
-    { name: "Axum", percentage: 30 },
+    { name: "Tauri", percentage: 30 },
     { name: "PostgreSQL", percentage: 60 },
   ]
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${isDark ? "bg-black text-white" : "bg-white text-black"
+      className={`min-h-screen transition-colors duration-300 ${isDark ? "bg-black text-white" : "bg-gray-300 text-black"
         }`}
     >
 
@@ -92,7 +92,9 @@ const Home = () => {
                 </div>
 
                 {/* Espacio entre secciones reducido */}
-                <div style={{ height: "2.5%" }} />
+                <div style={{ height: "20%" }}>
+
+                </div>
 
                 {/* Backend (50% del alto) */}
                 <div style={{ height: "50%" }}>

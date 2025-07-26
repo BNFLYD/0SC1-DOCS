@@ -13,7 +13,7 @@ const AmplitudeIndicator = ({ skill, percentage, theme }) => {
 
         {/* Barra de amplitud */}
         <div
-          className={`w-full rounded-b-lg transition-all duration-700 ${isDark ? "bg-white" : "bg-black"}`}
+          className={`w-full rounded-b-lg transition-all duration-700 ${isDark ? "bg-gray-300" : "bg-black"}`}
           style={{ height: `${height}px` }}
         />
       </div>

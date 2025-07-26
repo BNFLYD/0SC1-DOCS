@@ -1,14 +1,17 @@
 "use client"
+import { useUser } from "../context/UserContext"
+import { translations } from "../constants/translations"
 
 const ChannelButtons = ({ activeChannel, onChannelChange, theme }) => {
   const isDark = theme === "dark"
+  const { language } = useUser()
 
   const channels = [
-    { id: "whoami", label: "About" },
-    { id: "blog", label: "Blog" },
-    { id: "projects", label: "Proyectos" },
+    { id: "whoami", label: translations[language].about },
+    { id: "blog", label: translations[language].blog },
+    { id: "projects", label: translations[language].projects || "Projects" },
     { id: "nami", label: "News" },
-    { id: "games", label: "Play" },
+    { id: "play", label: "Play" },
   ]
 
   const handleChannelClick = (channelId) => {
@@ -28,10 +31,10 @@ const ChannelButtons = ({ activeChannel, onChannelChange, theme }) => {
               <button
                 onClick={() => handleChannelClick(channel.id)}
                 className={`px-7 py-3 text-xs font-mono font-bold rounded border transition-all duration-300 ${activeChannel === channel.id
-                    ? "bg-[#2ca798] text-white border-[#2ca798]"
+                    ? "bg-[#2ca798]"
                     : isDark
                       ? "bg-black text-white border-white/60"
-                      : "bg-white text-black border-black/60"
+                      : "bg-gray-300 text-black border-black/60"
                   }`}
               >
 
