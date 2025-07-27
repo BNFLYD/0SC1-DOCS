@@ -6,7 +6,7 @@ const Layout = ({ children }) => {
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
-      isDark ? "bg-black text-white" : "bg-gray-300 text-black"
+      isDark ? "bg-void text-white" : "bg-cloud text-black"
     }`}>
       <Header />
       <main className="pt-20">

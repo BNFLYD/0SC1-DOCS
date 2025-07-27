@@ -6,14 +6,14 @@ const SectionFrame = ({ title, children, theme }) => {
   return (
     <div className="relative w-full h-full p-4">
       {/* Marco rectangular */}
-      <div className={`w-full h-full border-2 rounded-xl relative ${isDark ? "border-white/60" : "border-black/60"}`}>
+      <div className={`w-full h-full border-2 rounded-xl relative ${isDark ? "border-white/60" : "border-black/80"}`}>
         {/* Contenido */}
         <div className="w-full h-full p-4 flex items-center justify-center">{children}</div>
 
         {/* Etiqueta en la parte inferior */}
         <div
           className={`absolute -bottom-3 left-1/2 transform -translate-x-1/2 px-2 font-mono text-sm font-bold ${
-            isDark ? "bg-black text-white" : "bg-gray-300 text-black"
+            isDark ? "bg-black text-white" : "bg-cloud text-black"
           }`}
         >
           {title}

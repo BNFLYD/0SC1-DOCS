@@ -34,7 +34,7 @@ const ChannelButtons = ({ activeChannel, onChannelChange, theme }) => {
                     ? "bg-[#2ca798]"
                     : isDark
                       ? "bg-black text-white border-white/60"
-                      : "bg-gray-300 text-black border-black/60"
+                      : "bg-cloud text-black border-black/60"
                   }`}
               >
 

@@ -14,7 +14,7 @@ const WhoamiChannel = ({ theme }) => {
     <div className={`flex flex-col p-8 gap-2 ${textColor}`}>
       <p className="text-xl font-bold">{"> whoami"}</p>
       <div className="text-lg font-mono font-semibold">
-        <p>{t.title}</p>
+
         {t.items.map((item, index) => (
           <p key={index}>{item}</p>
         ))}
