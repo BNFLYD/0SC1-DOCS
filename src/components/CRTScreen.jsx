@@ -5,6 +5,7 @@ import WhoamiChannel from "../components/Channels/WhoamiChannel"
 import ProjectsChannel from "../components/Channels/ProjectsChannel"
 import BlogChannel from "../components/Channels/BlogChannel"
 import MesmerizerChannel from "../components/Channels/MesmerizerChannel"
+import VaporwaveChannel from "../components/Channels/VaporwaveChannel"
 
 const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
   const canvasRef = useRef(null)
@@ -108,6 +109,7 @@ const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
               {activeChannel === "whoami" && <WhoamiChannel theme={theme} />}
               {activeChannel === "projects" && <ProjectsChannel theme={theme} />}
               {activeChannel === "blog" && <BlogChannel theme={theme} />}
+              {activeChannel === "nami" && <VaporwaveChannel theme={theme} />}
               {activeChannel === "play" && <MesmerizerChannel theme={theme} />}
             </div>
           )}

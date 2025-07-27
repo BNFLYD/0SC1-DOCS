@@ -51,7 +51,7 @@ const Home = () => {
     >
 
       {/* Contenido principal */}
-      <main className="flex items-center justify-center" style={{ height: "calc(65vh)" }}>
+      <main className="flex items-center justify-center" style={{ height: "calc(75vh)" }}>
         <div className="flex items-start w-full" style={{ maxWidth: "1440px" }}>
           {/* Monitor CRT (40% del ancho) */}
           <div className="p-4" style={{ width: "40%" }}>

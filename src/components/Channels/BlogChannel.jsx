@@ -11,7 +11,7 @@ const BlogChannel = ({ theme }) => {
 
   return (
     <div className={`flex flex-col p-8 gap-2 ${textColor}`}>
-      <p className="text-xl font-bold">{"> cat blog/README.md"}</p>
+      <p className="text-xl font-bold">{"> bat blog/README.md"}</p>
       <div className="text-lg font-mono font-semibold">
         <p>{t.title}</p>
         <ul className="list-disc list-inside ml-2">
