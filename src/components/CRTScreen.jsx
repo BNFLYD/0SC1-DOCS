@@ -22,7 +22,7 @@ const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
 
     const animate = () => {
       // Limpiar canvas - fondo según el tema
-      ctx.fillStyle = theme === "dark" ? "#111111" : "#ffffff"
+      ctx.fillStyle = theme === "dark" ? "#1b1b1b" : "#ffffff"
       ctx.fillRect(0, 0, width, height)
 
       // Si está distorsionando, dibujar efecto de estática/glitch
