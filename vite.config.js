@@ -10,4 +10,10 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    allowedHosts: [
+      'localhost',
+      'cross-sd-now-catering.trycloudflare.com', // Tu subdominio de TryCloudflare
+    ],
+  },
 });

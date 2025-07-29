@@ -9,9 +9,9 @@ const AmplitudeIndicator = ({ skill, percentage, theme, vertical = true }) => {
     return (
       <div className="flex flex-col items-center space-y-1">
         {/* Indicador de amplitud simplificado */}
-        <div className="relative w-5 h-12 flex flex-col justify-end">
+        <div className={`relative w-5 h-12 flex flex-col justify-end rounded-lg ${isDark ? "bg-primary" : "bg-secondary"}`}>
           {/* Marco simple */}
-          <div className={`absolute inset-0 border rounded-lg ${isDark ? "border-white/40" : "border-black/40"}`} />
+          <div className={`absolute inset-0 border rounded-lg ${isDark ? "border-white/60" : "border-black/60"}`} />
 
           {/* Barra de amplitud */}
           <div

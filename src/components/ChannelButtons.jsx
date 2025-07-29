@@ -33,8 +33,8 @@ const ChannelButtons = ({ activeChannel, onChannelChange, theme }) => {
                 className={`px-7 py-3 text-xs font-mono font-bold rounded border transition-all duration-300 ${activeChannel === channel.id
                     ? "bg-[#2ca798]"
                     : isDark
-                      ? "bg-black text-white border-white/60"
-                      : "bg-cloud text-black border-black/60"
+                      ? "bg-primary text-white border-white/60"
+                      : "bg-secondary text-black border-black/60"
                   }`}
               >
 

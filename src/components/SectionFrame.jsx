@@ -6,7 +6,7 @@ const SectionFrame = ({ title, children, theme }) => {
   return (
     <div className="relative w-full h-full p-4">
       {/* Marco rectangular */}
-      <div className={`w-full h-full border-2 rounded-xl relative ${isDark ? "border-white/60" : "border-black/80"}`}>
+      <div className={`w-full h-full border-2 rounded-xl relative ${isDark ? "border-white/60 " : "border-black/80 bg-cloud"}`}>
         {/* Contenido */}
         <div className="w-full h-full p-4 flex items-center justify-center">{children}</div>
 

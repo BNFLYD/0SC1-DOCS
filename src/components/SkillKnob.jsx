@@ -10,8 +10,8 @@ const SkillKnob = ({ skill, percentage, theme }) => {
       <div className="relative w-10 h-10">
         {/* Base del knob */}
         <div
-          className={`w-full h-full rounded-full border relative bg-transparent ${
-            isDark ? "border-white/60" : "border-black/60"
+          className={`w-full h-full rounded-full border relative ${
+            isDark ? "border-white/60 bg-primary" : "border-black/60 bg-secondary"
           }`}
         >
           {/* Indicador del knob */}

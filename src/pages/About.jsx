@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect, useRef } from "react" // Importar useEffect y useRef
 import { useUser } from "../context/UserContext"
 import { Mail, Github, Linkedin } from "lucide-react"
 import AmplitudeIndicator from "../components/AmplitudeIndicator"
@@ -7,6 +8,35 @@ import profile from "../assets/yo.jpg";
 
 const About = () => {
   const { isDark } = useUser()
+  const [showSkillsSection, setShowSkillsSection] = useState(false) // Nuevo estado para controlar la visibilidad
+  const skillsSectionRef = useRef(null) // Referencia para la sección de habilidades
+
+  // Efecto para el IntersectionObserver
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setShowSkillsSection(true)
+            observer.unobserve(entry.target) // Dejar de observar una vez que se muestra
+          }
+        })
+      },
+      {
+        threshold: 0.4, // El 10% del elemento debe ser visible para activar
+      },
+    )
+
+    if (skillsSectionRef.current) {
+      observer.observe(skillsSectionRef.current)
+    }
+
+    return () => {
+      if (skillsSectionRef.current) {
+        observer.unobserve(skillsSectionRef.current)
+      }
+    }
+  }, []) // Se ejecuta una sola vez al montar el componente
 
 
   // Datos de habilidades organizados por categorías
@@ -46,20 +76,22 @@ const About = () => {
         }`}
     >
       {/* Contenido principal */}
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      <main className="max-w-7xl mx-auto space-y-52">
+        {" "}
+        {/* Añadido px-6 para padding lateral */}
         {/* Sección de perfil */}
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-16">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-16 pt-32">
           {/* Información personal */}
-          <div className="flex-1 text-center md:text-left">
+          <div className="flex-1 text-left">
             <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">{">"} whoami</h1>
 
             <div
-              className={`p-6 rounded-xl border-2 ${isDark ? "border-white/40 bg-gray-900/50" : "border-black/40 bg-gray-100/50"
+              className={`p-6 rounded-xl border-2 ${isDark ? "border-primary/10 bg-primary" : "border-secondary/10 bg-secondary"
                 }`}
             >
               <h2 className="text-xl font-mono font-bold mb-4 tracking-wide">Flavio Gabriel Morales</h2>
 
-              <div className="space-y-3 font-mono text-sm leading-relaxed">
+              <div className="space-y-3 font-mono text-lg leading-relaxed">
                 <p>Desarrollador Full Stack apasionado por crear soluciones tecnológicas innovadoras y eficientes.</p>
                 <p>
                   Me especializo en el desarrollo web moderno, con experiencia en arquitecturas escalables y tecnologías
@@ -78,11 +110,10 @@ const About = () => {
           </div>
 
           {/* Columna derecha: Foto de perfil + Contacto */}
-          <div className="flex flex-col items-center gap-8">
+          <div className="flex flex-col items-center gap-4">
             {/* Foto de perfil */}
             <div
-              className={`w-48 h-48 rounded-3xl border-2 overflow-hidden ${isDark ? "border-white/40" : "border-black/40"
-                }`}
+              className="w-48 h-48 rounded-3xl overflow-hidden"
             >
               <img src={profile} alt="report" className="w-auto h-auto rounded-lg" />
             </div>
@@ -140,13 +171,16 @@ const About = () => {
             </div>
           </div>
         </div>
-
         {/* Sección de habilidades */}
-        <div className="space-y-12">
-          <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">{">"} skills --list</h1>
+        <div
+          ref={skillsSectionRef} // Asignar la referencia
+          className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${showSkillsSection ? "opacity-100" : "opacity-0" // Controlar la opacidad
+            }`}
+        >
+          <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">{">"} htop skills</h1>
 
           {skillCategories.map((category) => (
-            <div key={category.title} className="space-y-6">
+            <div key={category.title} className="space-y-2">
               {/* Título de la categoría */}
               <h3
                 className={`text-xl font-mono font-bold tracking-wide pb-2 border-b ${isDark ? "border-white/20" : "border-black/20"
@@ -156,7 +190,7 @@ const About = () => {
               </h3>
 
               {/* Grid de habilidades */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {category.skills.map((skill) => (
                   <AmplitudeIndicator
                     key={skill.name}

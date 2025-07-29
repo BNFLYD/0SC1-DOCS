@@ -30,7 +30,7 @@ export default {
         elementary: "hsl(var(--elementary))",       // Blanco (modo claro) / Negro (modo oscuro)
         void: "#000000",       // Negro (modo claro) / Blanco (modo oscuro)
         primary: "#1b1b1b",
-        secondary: "#d1d4db",
+        secondary: "#e2e2e3", // e2e2e3 vs d1d4db
         cloud: "#d0d0d0",   // d0d0d0 vs d1d5db
         night: "#3b82f6",
         feather: "#2ca798",     // Miku
