@@ -1,8 +1,31 @@
 "use client"
+import { useState, useEffect } from "react"
 
-const SkillKnob = ({ skill, percentage, theme }) => {
+const SkillKnob = ({ skill, percentage, theme, shouldAnimate = true }) => {
   const isDark = theme === "dark"
-  const rotation = (percentage / 100) * 180 - 90
+  const [currentRotation, setCurrentRotation] = useState(-90) // Empezamos desde -90 grados
+  const rotation = (percentage / 100) * 180 - 90 // El valor final de rotación
+
+  useEffect(() => {
+    const startAnimation = async () => {
+      if (!shouldAnimate) return
+
+      // Resetear a la posición inicial
+      setCurrentRotation(-90)
+
+      // Pequeña pausa para asegurar el reset
+      await new Promise(resolve => setTimeout(resolve, 250))
+
+      // Animar hasta la posición final
+      setCurrentRotation(rotation)
+    }
+
+    startAnimation()
+
+    return () => {
+      setCurrentRotation(-90)
+    }
+  }, [percentage, shouldAnimate, rotation])
 
   return (
     <div className="flex flex-col items-center space-y-2">
@@ -16,11 +39,11 @@ const SkillKnob = ({ skill, percentage, theme }) => {
         >
           {/* Indicador del knob */}
           <div
-            className={`absolute w-0.5 h-3 top-1 left-1/2 origin-bottom transform -translate-x-1/2 transition-transform duration-500 ${
+            className={`absolute w-0.5 h-3 top-1 left-1/2 origin-bottom transform -translate-x-1/2 transition-all duration-[1500ms] ease-out ${
               isDark ? "bg-white" : "bg-black"
             }`}
             style={{
-              transform: `translateX(-50%) rotate(${rotation}deg)`,
+              transform: `translateX(-50%) rotate(${currentRotation}deg)`,
               transformOrigin: "50% 18px",
             }}
           />

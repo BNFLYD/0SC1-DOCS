@@ -1,18 +1,28 @@
 "use client"
+import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useUser } from "../../context/UserContext"
 import { translations } from "../../constants/translations"
+import TerminalText from "../TerminalText"
 
 const BlogChannel = ({ theme }) => {
   const isDark = theme === "dark"
   const textColor = isDark ? "text-white" : "text-black"
   const { language } = useUser()
   const t = translations[language].channelContent.blog
+  const [showContent, setShowContent] = useState(false)
 
   return (
     <div className={`flex flex-col p-8 gap-2 ${textColor}`}>
-      <p className="text-xl font-bold">{"> bat blog/README.md"}</p>
-      <div className="text-lg font-mono font-semibold">
+      <div className="text-xl font-bold">
+        <TerminalText
+          text="bat blog/README.md"
+          inView={true}
+          onComplete={() => setShowContent(true)}
+          prefix="> "
+        />
+      </div>
+      <div className={`text-lg font-mono font-semibold transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
         <p>{t.title}</p>
         <ul className="list-disc list-inside ml-2">
           {t.items.map((item, index) => (
@@ -22,7 +32,7 @@ const BlogChannel = ({ theme }) => {
       </div>
       <Link
         to="/blog"
-        className={`mt-4 px-3 py-1 border rounded-md text-xs font-bold self-start ${isDark ? "border-white/60 hover:bg-white/10" : "border-black/60 hover:bg-black/10"}`}
+        className={`mt-4 px-3 py-1 border rounded-md text-xs font-bold self-start transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'} ${isDark ? "border-white/60 hover:bg-white/10" : "border-black/60 hover:bg-black/10"}`}
       >
         {t.action} →
       </Link>

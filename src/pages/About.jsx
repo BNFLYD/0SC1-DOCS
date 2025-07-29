@@ -3,37 +3,42 @@
 import { useState, useEffect, useRef } from "react" // Importar useEffect y useRef
 import { useUser } from "../context/UserContext"
 import { Mail, Github, Linkedin } from "lucide-react"
+import TerminalText from "../components/TerminalText"
 import AmplitudeIndicator from "../components/AmplitudeIndicator"
 import profile from "../assets/yo.jpg";
 
 const About = () => {
   const { isDark } = useUser()
-  const [showSkillsSection, setShowSkillsSection] = useState(false) // Nuevo estado para controlar la visibilidad
-  const skillsSectionRef = useRef(null) // Referencia para la sección de habilidades
+  const [isSkillsSectionVisible, setIsSkillsSectionVisible] = useState(false)
+  const [showWhoamiContent, setShowWhoamiContent] = useState(false)
+  const [showSkillsContent, setShowSkillsContent] = useState(false)
+  const skillsSectionRef = useRef(null)
 
   // Efecto para el IntersectionObserver
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setShowSkillsSection(true)
-            observer.unobserve(entry.target) // Dejar de observar una vez que se muestra
+          setIsSkillsSectionVisible(entry.isIntersecting)
+          if (!entry.isIntersecting) {
+            // Resetear el estado del contenido cuando el elemento sale de la vista
+            setShowSkillsContent(false)
           }
         })
       },
       {
-        threshold: 0.4, // El 10% del elemento debe ser visible para activar
+        threshold: 0.5, // El 50% del elemento debe ser visible para activar
       },
     )
 
-    if (skillsSectionRef.current) {
-      observer.observe(skillsSectionRef.current)
+    const currentRef = skillsSectionRef.current
+    if (currentRef) {
+      observer.observe(currentRef)
     }
 
     return () => {
-      if (skillsSectionRef.current) {
-        observer.unobserve(skillsSectionRef.current)
+      if (currentRef) {
+        observer.unobserve(currentRef)
       }
     }
   }, []) // Se ejecuta una sola vez al montar el componente
@@ -60,6 +65,15 @@ const About = () => {
       ],
     },
     {
+      title: "Inteligencia Artificial",
+      skills: [
+        { name: "IA SDK", percentage: 90 },
+        { name: "Model Context Protocols", percentage: 70 },
+        { name: "Context Engenering", percentage: 30 },
+        { name: "Model Paragrph", percentage: 60 },
+      ],
+    },
+    {
       title: "Frontend",
       skills: [
         { name: "React", percentage: 90 },
@@ -83,11 +97,14 @@ const About = () => {
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-16 pt-32">
           {/* Información personal */}
           <div className="flex-1 text-left">
-            <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">{">"} whoami</h1>
+            <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
+              <TerminalText text="whoami" onComplete={() => setShowWhoamiContent(true)} />
+            </h1>
 
             <div
-              className={`p-6 rounded-xl border-2 ${isDark ? "border-primary/10 bg-primary" : "border-secondary/10 bg-secondary"
-                }`}
+              className={`p-6 rounded-xl border-2 transition-opacity duration-500 ${
+                isDark ? "border-primary/10 bg-primary" : "border-secondary/10 bg-secondary"
+              } ${showWhoamiContent ? "opacity-100" : "opacity-0"}`}
             >
               <h2 className="text-xl font-mono font-bold mb-4 tracking-wide">Flavio Gabriel Morales</h2>
 
@@ -110,7 +127,9 @@ const About = () => {
           </div>
 
           {/* Columna derecha: Foto de perfil + Contacto */}
-          <div className="flex flex-col items-center gap-4">
+          <div className={`flex flex-col items-center gap-4 transition-opacity duration-500 ${
+            showWhoamiContent ? "opacity-100" : "opacity-0"
+          }`}>
             {/* Foto de perfil */}
             <div
               className="w-48 h-48 rounded-3xl overflow-hidden"
@@ -174,12 +193,19 @@ const About = () => {
         {/* Sección de habilidades */}
         <div
           ref={skillsSectionRef} // Asignar la referencia
-          className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${showSkillsSection ? "opacity-100" : "opacity-0" // Controlar la opacidad
+          className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${isSkillsSectionVisible ? "opacity-100" : "opacity-0" // Controlar la opacidad
             }`}
         >
-          <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">{">"} htop skills</h1>
+          <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
+            <TerminalText
+              text="htop skills"
+              inView={isSkillsSectionVisible}
+              onComplete={() => setShowSkillsContent(true)}
+            />
+          </h1>
 
-          {skillCategories.map((category) => (
+          <div className={`transition-opacity duration-500 space-y-6 ${showSkillsContent ? "opacity-100" : "opacity-0"}`}>
+            {skillCategories.map((category) => (
             <div key={category.title} className="space-y-2">
               {/* Título de la categoría */}
               <h3
@@ -190,7 +216,7 @@ const About = () => {
               </h3>
 
               {/* Grid de habilidades */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {category.skills.map((skill) => (
                   <AmplitudeIndicator
                     key={skill.name}
@@ -198,12 +224,15 @@ const About = () => {
                     percentage={skill.percentage}
                     theme={isDark ? "dark" : "light"}
                     vertical={false}
+                    shouldAnimate={showSkillsContent}
                   />
                 ))}
               </div>
             </div>
           ))}
+          </div>
         </div>
+        <div></div>
       </main>
     </div>
   )

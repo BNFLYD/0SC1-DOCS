@@ -1,8 +1,29 @@
 "use client"
+import { useState, useEffect } from "react"
 
-const AmplitudeIndicator = ({ skill, percentage, theme, vertical = true }) => {
+const AmplitudeIndicator = ({ skill, percentage, theme, vertical = true, shouldAnimate = true }) => {
   const isDark = theme === "dark"
-  const height = (percentage / 100) * 40 // Altura máxima reducida
+  const [currentValue, setCurrentValue] = useState(0)
+  const height = (currentValue / 100) * 40 // Altura máxima reducida
+
+  useEffect(() => {
+    const startAnimation = async () => {
+      if (!shouldAnimate) return
+      // Resetear al inicio
+      setCurrentValue(0)
+      // Esperar a que el estado se actualice
+      await new Promise(resolve => setTimeout(resolve, 250))
+      // Iniciar la animación
+      setCurrentValue(percentage)
+    }
+
+    startAnimation()
+
+    // Limpiar la animación cuando el componente se desmonte
+    return () => {
+      setCurrentValue(0)
+    }
+  }, [percentage, shouldAnimate])
 
   if (vertical) {
     // Diseño vertical (original)
@@ -28,14 +49,12 @@ const AmplitudeIndicator = ({ skill, percentage, theme, vertical = true }) => {
     )
   } else {
     // Diseño horizontal (para la página About)
-    const width = (percentage / 100) * 200 // Ancho máximo de la barra horizontal
-
     return (
       <div className="space-y-2">
         {/* Nombre y porcentaje */}
         <div className="flex justify-between items-center">
           <span className="font-mono font-bold text-sm tracking-wide">{skill}</span>
-          <span className="font-mono text-xs">{percentage}%</span>
+          <span className="font-mono text-xs">{currentValue}%</span>
         </div>
 
         {/* Barra de progreso horizontal */}
@@ -44,8 +63,8 @@ const AmplitudeIndicator = ({ skill, percentage, theme, vertical = true }) => {
           <div className={`w-full h-2 rounded-full ${isDark ? "bg-white/20" : "bg-black/20"}`}>
             {/* Barra de progreso */}
             <div
-              className={`h-full rounded-full transition-all duration-1000 ease-out ${isDark ? "bg-white" : "bg-black"}`}
-              style={{ width: `${percentage}%` }}
+              className={`h-full rounded-full transition-all duration-[1500ms] ease-out ${isDark ? "bg-white" : "bg-black"}`}
+              style={{ width: `${currentValue}%` }}
             />
           </div>
         </div>
