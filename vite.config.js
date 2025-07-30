@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     allowedHosts: [
       'localhost',
-      'cross-sd-now-catering.trycloudflare.com', // Tu subdominio de TryCloudflare
+      '', // Tu subdominio de TryCloudflare
     ],
   },
 });

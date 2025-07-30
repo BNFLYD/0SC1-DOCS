@@ -7,15 +7,6 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
-      keyframes: {
-        blink: {
-          '0%, 100%': { opacity: 1 },
-          '50%': { opacity: 0 },
-        }
-      },
-      animation: {
-        blink: 'blink 1s step-start infinite',
-      },
       fontSize: {
         'xs': ['12px', { lineHeight: '16px' }],
         'sm': ['14px', { lineHeight: '20px' }],
@@ -59,9 +50,13 @@ export default {
         },
       },
       keyframes: {
+        blink: {
+          '0%, 100%': { opacity: 1 },
+          '50%': { opacity: 0 },
+        },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
+          "50%": { transform: "translateY(-20px)" }
         },
         clouds: {
           '0%': { transform: 'translateX(-100%)' },
@@ -79,12 +74,13 @@ export default {
 
       // Animaciones
       animation: {
-        float: "float 2s ease-in-out infinite",
+        float: "float 3s ease-in-out infinite",
         clouds: 'clouds 50s linear infinite',
         clouds2: 'clouds 15s linear infinite',
         sprite: 'spriteAnimation 10s steps(4) infinite',
+        blink: 'blink 1s step-start infinite',
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [],
 }

@@ -6,6 +6,7 @@ import { Link } from "react-router-dom"
 import { useUser } from "../../context/UserContext"
 import { translations } from "../../constants/translations"
 import { languages } from "../../constants/languages"
+import icon from "../../assets/iconb.svg"
 
 const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false)
@@ -28,11 +29,14 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
           className={`flex items-center space-x-3 cursor-pointer ${isDark ? "text-white" : "text-black"
             }`}>
           <div className="flex items-center space-x-3 cursor-pointer">
-            <div className={`w-8 h-8 border-2 rounded-sm flex items-center justify-center font-mono text-sm font-bold ${isDark ? "border-white" : "border-black"
-              }`}>
-              <span className="text-xs">01</span>
+            <div className="w-8 h-8 flex items-center justify-center">
+              <img
+                src={icon}
+                alt="icon"
+                className={`w-8 h-8 ${isDark ? "filter invert-[100%] hue-rotate-180" : "filter invert-[0%] hue-rotate-0"}`}
+              />
             </div>
-            <h1 className="text-xl font-mono font-bold tracking-wider">0SC1-DOCS</h1>
+            <h1 className="text-xl font-mono font-semibold tracking-wider">0SC1-DOCS</h1>
           </div>
         </Link>
 

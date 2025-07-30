@@ -9,7 +9,9 @@ const TerminalText = ({ text, className, inView = true, onComplete }) => {
 
   useEffect(() => {
     if (inView && !isTyping) {
+      // Iniciar la animación
       setIsTyping(true)
+      setDisplayText('> ') // Resetear el texto al inicio
       let currentIndex = 2 // Empezamos después del "> "
 
       intervalRef.current = setInterval(() => {
@@ -22,6 +24,11 @@ const TerminalText = ({ text, className, inView = true, onComplete }) => {
           onComplete?.() // Llamar al callback cuando termine
         }
       }, 50) // Velocidad de escritura
+    } else if (!inView && isTyping) {
+      // Si pierde visibilidad durante la animación, reiniciar
+      clearInterval(intervalRef.current)
+      setIsTyping(false)
+      setDisplayText('> ') // Resetear el texto
     }
 
     return () => {
