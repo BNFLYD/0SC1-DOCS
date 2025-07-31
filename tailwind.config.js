@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+
   darkMode: 'class',
   theme: {
     extend: {
@@ -67,8 +68,8 @@ export default {
           '100%': { transform: 'translateX(100%)' },
         },
         spriteAnimation: {
-          '0%': { backgroundPosition: '0 0' }, // Primer frame
-          '100%': { backgroundPosition: '0 100%' }, // Último frame
+          '0%': { backgroundPosition: '0 -100px' },
+          '100%': { backgroundPosition: '0 -6520px' }
         },
       },
 
@@ -77,8 +78,8 @@ export default {
         float: "float 3s ease-in-out infinite",
         clouds: 'clouds 50s linear infinite',
         clouds2: 'clouds 15s linear infinite',
-        sprite: 'spriteAnimation 10s steps(4) infinite',
         blink: 'blink 1s step-start infinite',
+        sprite: 'spriteAnimation 3.5s steps(34) infinite',
       },
     },
   },

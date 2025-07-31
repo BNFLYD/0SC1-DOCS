@@ -7,8 +7,8 @@ import TerminalText from "../components/TerminalText"
 import AmplitudeIndicator from "../components/AmplitudeIndicator"
 import StaticEffect from "../components/UI/StaticEffect"
 import profile from "../assets/yo.jpg"
-import report from "../assets/hornero.svg"
-import report2 from "../assets/report2.png";
+import hornero from "../assets/hornero.svg"
+import osci from "../assets/sprite-try.svg";
 
 const About = () => {
   const { isDark } = useUser()
@@ -19,7 +19,7 @@ const About = () => {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const skillsSectionRef = useRef(null)
 
-  const images = [profile, report, report2]
+  const images = [profile, osci, hornero]
 
   // Efecto para el IntersectionObserver
   useEffect(() => {
@@ -93,8 +93,7 @@ const About = () => {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${isDark ? "bg-void text-white" : "bg-cloud text-black"
-        }`}>
+      className="min-h-screen transition-colors duration-300 bg-none">
       {/* Contenido principal */}
       <main className="max-w-7xl mx-auto space-y-52">
         {" "}
@@ -137,7 +136,7 @@ const About = () => {
               {/* Foto de perfil */}
               <div
                 className={`w-48 h-48 rounded-3xl overflow-hidden relative cursor-pointer ${isDark ? "bg-primary" : "bg-secondary"
-              }`}
+                  }`}
                 onClick={() => {
                   setIsTransitioning(true);
                   setTimeout(() => {
@@ -148,14 +147,24 @@ const About = () => {
                   }, 500);
                 }}
               >
-                <div className="relative w-full h-full">
-                  <img
-                    src={images[currentImageIndex]}
-                    alt={`Profile ${currentImageIndex + 1}`}
-                    className={`w-full h-full transition-opacity duration-300
-                      ${isTransitioning ? 'opacity-0' : 'opacity-100'}
-                      ${currentImageIndex === 1 ? 'object-contain animate-float' : ''}`}
-                  />
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {currentImageIndex === 1 ? (
+                    <div
+                      className={`animate-sprite bg-no-repeat w-full h-full ${isDark ? "filter invert-[0%] hue-rotate-0" : "filter invert-[100%] hue-rotate-180"}`}
+                      style={{
+                        backgroundImage: `url(${images[1]})`,
+                        backgroundSize: '100% 6400%'
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={images[currentImageIndex]}
+                      alt={`Profile ${currentImageIndex + 1}`}
+                      className={`w-full h-full transition-opacity duration-300
+                        ${isTransitioning ? 'opacity-0' : 'opacity-100'}
+                        ${currentImageIndex === 2 ? 'object-contain animate-float' : ''}`}
+                    />
+                  )}
                 </div>
                 {isTransitioning && (
                   <StaticEffect
@@ -220,6 +229,7 @@ const About = () => {
             </div>
           </div>
         </section>
+
         {/* Sección de habilidades */}
         <section>
           <div

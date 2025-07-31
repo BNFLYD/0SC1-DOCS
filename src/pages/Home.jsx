@@ -53,8 +53,7 @@ const Home = () => {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-300 ${isDark ? "bg-void text-white" : "bg-cloud text-black"
-        }`}
+      className="min-h-screen transition-colors duration-300 bg-none"
     >
 
       {/* Contenido principal */}
