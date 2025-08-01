@@ -1,5 +1,6 @@
 import Header from "./global/Header"
 import { useUser } from "../context/UserContext"
+import ScrollToTop from "../components/UI/ScrollToTop"
 
 const Layout = ({ children }) => {
   const { isDark } = useUser()
@@ -9,6 +10,7 @@ const Layout = ({ children }) => {
       isDark ? "bg-void text-white" : "bg-cloud text-black"
     }`}>
       <Header />
+      <ScrollToTop />
       <main className="pt-20">
         {children}
       </main>

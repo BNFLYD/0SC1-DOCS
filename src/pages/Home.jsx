@@ -33,8 +33,8 @@ const Home = () => {
   const aiCapabilities = [
     { name: "IA SDK", percentage: 90 },
     { name: "MCPs", percentage: 70 },
-    { name: "Vibe Coding", percentage: 30 },
-    { name: "Context Eng", percentage: 60 },
+    { name: "n8n", percentage: 30 },
+    { name: "Vibe Cod", percentage: 60 },
   ]
 
   const frontendCapabilities = [

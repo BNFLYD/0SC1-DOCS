@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { useUser } from "../context/UserContext"
 import { Mail, Github, Linkedin } from "lucide-react"
 import TerminalText from "../components/TerminalText"
@@ -12,43 +12,125 @@ import osci from "../assets/sprite-try.svg";
 
 const About = () => {
   const { isDark } = useUser()
-  const [isSkillsSectionVisible, setIsSkillsSectionVisible] = useState(false)
   const [showWhoamiContent, setShowWhoamiContent] = useState(false)
-  const [showSkillsContent, setShowSkillsContent] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const skillsSectionRef = useRef(null)
+  const [isScrolling, setIsScrolling] = useState(false)
+
+  // Estado unificado para las secciones
+  const [sections, setSections] = useState({
+    skills: { isVisible: false, canScroll: true, showContent: false },
+    experience: { isVisible: false, canScroll: true, showContent: false }
+  })
+
+  // Referencias unificadas
+  const skillsRef = useRef(null)
+  const experienceRef = useRef(null)
+  const sectionRefs = useMemo(() => ({
+    skills: skillsRef,
+    experience: experienceRef
+  }), [])
+
+  // Función para scroll suave personalizado
+  const smoothScrollTo = useCallback((element) => {
+    if (isScrolling) return; // Evitar múltiples scrolls simultáneos
+
+    setIsScrolling(true);
+    const navbarHeight = 80; // Altura aproximada del navbar
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
+    const startPosition = window.pageYOffset;
+    const distance = offsetPosition - startPosition;
+    const duration = 1000; // Duración en ms
+    let start = null;
+
+    const animation = (currentTime) => {
+      if (start === null) start = currentTime;
+      const timeElapsed = currentTime - start;
+      const progress = Math.min(timeElapsed / duration, 1);
+
+      // Función de easing para un movimiento más suave
+      const easeInOutCubic = progress => {
+        return progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      };
+
+      window.scrollTo(0, startPosition + distance * easeInOutCubic(progress));
+
+      if (progress < 1) {
+        requestAnimationFrame(animation);
+      } else {
+        setIsScrolling(false);
+      }
+    };
+
+    requestAnimationFrame(animation);
+  }, [isScrolling, setIsScrolling]);
 
   const images = [profile, osci, hornero]
 
   // Efecto para el IntersectionObserver
+  // Función auxiliar para actualizar el estado de una sección
+  const updateSection = useCallback((sectionId, updates) => {
+    setSections(prev => ({
+      ...prev,
+      [sectionId]: { ...prev[sectionId], ...updates }
+    }));
+  }, []);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          setIsSkillsSectionVisible(entry.isIntersecting)
-          if (!entry.isIntersecting) {
-            // Resetear el estado del contenido cuando el elemento sale de la vista
-            setShowSkillsContent(false)
+          // Identificar qué sección está siendo observada por su ref
+          const sectionId = Object.keys(sectionRefs).find(
+            key => sectionRefs[key].current === entry.target
+          );
+
+          if (sectionId) {
+            const currentSection = sections[sectionId];
+
+            if (entry.isIntersecting) {
+              // Cuando la sección entra en vista
+              updateSection(sectionId, { isVisible: true });
+
+              if (currentSection.canScroll && !isScrolling) {
+                smoothScrollTo(entry.target);
+                updateSection(sectionId, { canScroll: false });
+              }
+            } else {
+              // Cuando la sección sale de vista
+              updateSection(sectionId, {
+                isVisible: false,
+                showContent: false,
+                canScroll: true
+              });
+            }
           }
-        })
+        });
       },
       {
-        threshold: 0.5, // El 50% del elemento debe ser visible para activar
-      },
-    )
+        threshold: 0.4,
+        rootMargin: '0px 0px'
+      }
+    );
 
-    const currentRef = skillsSectionRef.current
-    if (currentRef) {
-      observer.observe(currentRef)
-    }
+    // Observar todas las secciones
+    Object.values(sectionRefs).forEach(ref => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+    });
 
     return () => {
-      if (currentRef) {
-        observer.unobserve(currentRef)
-      }
-    }
-  }, []) // Se ejecuta una sola vez al montar el componente
+      Object.values(sectionRefs).forEach(ref => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      });
+    };
+  }, [isScrolling, sections, updateSection, smoothScrollTo, sectionRefs]);
 
 
   // Datos de habilidades organizados por categorías
@@ -104,7 +186,7 @@ const About = () => {
             {/* Información personal */}
             <div className="flex-1 text-left">
               <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
-                <TerminalText text="whoami" onComplete={() => setShowWhoamiContent(true)} />
+                <TerminalText text= "whoami"onComplete={() => setShowWhoamiContent(true)} />
               </h1>
 
               <div
@@ -183,7 +265,7 @@ const About = () => {
                 <div className="flex justify-center gap-2 font-mono text-sm">
                   {/* Reducido gap-4 a gap-2 */}
                   <a
-                    href="mailto:tu@email.com"
+                    href="mailto:flaviogv010@gmail.com"
                     className={`relative p-3 rounded-lg transition-all duration-200 flex flex-col items-center justify-center group ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"
                       }`}
                     aria-label="Enviar correo electrónico"
@@ -233,19 +315,20 @@ const About = () => {
         {/* Sección de habilidades */}
         <section>
           <div
-            ref={skillsSectionRef} // Asignar la referencia
-            className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${isSkillsSectionVisible ? "opacity-100" : "opacity-0" // Controlar la opacidad
-              }`}
+            ref={sectionRefs.skills}
+            className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${
+              sections.skills.isVisible ? "opacity-100" : "opacity-0"
+            }`}
           >
             <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
               <TerminalText
                 text="htop skills"
-                inView={isSkillsSectionVisible}
-                onComplete={() => setShowSkillsContent(true)}
+                inView={sections.skills.isVisible}
+                onComplete={() => updateSection('skills', { showContent: true })}
               />
             </h1>
 
-            <div className={`transition-opacity duration-500 space-y-6 ${showSkillsContent ? "opacity-100" : "opacity-0"}`}>
+            <div className={`transition-opacity duration-500 space-y-6 ${sections.skills.showContent ? "opacity-100" : "opacity-0"}`}>
               {skillCategories.map((category) => (
                 <div key={category.title} className="space-y-2">
                   {/* Título de la categoría */}
@@ -265,7 +348,7 @@ const About = () => {
                         percentage={skill.percentage}
                         theme={isDark ? "dark" : "light"}
                         vertical={false}
-                        shouldAnimate={showSkillsContent}
+                        shouldAnimate={sections.skills.showContent}
                       />
                     ))}
                   </div>
@@ -274,7 +357,42 @@ const About = () => {
             </div>
           </div>
         </section>
-        <div></div>
+
+        {/* Sección de experiencia øøø*/}
+        <section>
+          <div
+            ref={sectionRefs.experience}
+            className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${
+              sections.experience.isVisible ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
+              <TerminalText
+                text="bat experience.md"
+                inView={sections.experience.isVisible}
+                onComplete={() => updateSection('experience', { showContent: true })}
+              />
+            </h1>
+
+            <div className={`transition-opacity duration-500 ${sections.experience.showContent ? "opacity-100" : "opacity-0"}`}>
+              <div className={`p-6 rounded-xl border-2 ${
+                isDark ? "border-primary/10 bg-primary" : "border-secondary/10 bg-secondary"
+              }`}>
+                <div className="space-y-4 font-mono text-lg">
+                  <p>
+                    Con más de 5 años de experiencia en desarrollo web, he participado
+                    en diversos proyectos que han enriquecido mi perfil profesional.
+                  </p>
+                  <p>
+                    Mi trayectoria incluye el desarrollo de aplicaciones web escalables,
+                    implementación de arquitecturas robustas y optimización de rendimiento
+                    en proyectos de alto impacto.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   )
