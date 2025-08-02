@@ -2,10 +2,9 @@
 import { useUser } from "../context/UserContext"
 import { translations } from "../constants/translations"
 
-const ChannelButtons = ({ activeChannel, onChannelChange, theme }) => {
-  const isDark = theme === "dark"
-  const { language } = useUser()
+const ChannelButtons = ({ activeChannel, onChannelChange }) => {
 
+  const { language, isDark } = useUser()
   const channels = [
     { id: "whoami", label: translations[language].about },
     { id: "blog", label: translations[language].blog },

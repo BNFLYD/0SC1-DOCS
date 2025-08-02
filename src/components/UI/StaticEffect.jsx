@@ -1,8 +1,10 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useUser } from '../../context/UserContext'
 
-const StaticEffect = ({ theme = "dark", intensity = 100, flashProbability = 0.1 }) => {
+const StaticEffect = ({ intensity = 100, flashProbability = 0.1 }) => {
+  const { isDark } = useUser()
   const canvasRef = useRef(null)
   const animationRef = useRef(null)
 
@@ -19,10 +21,10 @@ const StaticEffect = ({ theme = "dark", intensity = 100, flashProbability = 0.1 
       ctx.clearRect(0, 0, width, height)
 
       // En modo claro, usamos un blend mode diferente para que la estática negra sea visible
-      canvas.style.mixBlendMode = theme === "dark" ? "screen" : "multiply"
+      canvas.style.mixBlendMode = isDark ? "screen" : "multiply"
 
       // Color de la estática basado en el tema
-      ctx.fillStyle = theme === "dark" ? "#ffffff" : "#000000"
+      ctx.fillStyle = isDark ? "#ffffff" : "#000000"
 
       // Dibujar líneas aleatorias
       for (let i = 0; i < intensity; i++) {
@@ -37,7 +39,7 @@ const StaticEffect = ({ theme = "dark", intensity = 100, flashProbability = 0.1 
       // Efecto de flash
       if (Math.random() < flashProbability) {
         ctx.fillStyle = `rgba(${
-          theme === "dark" ? "255, 255, 255" : "0, 0, 0"
+          isDark ? "255, 255, 255" : "0, 0, 0"
         }, ${Math.random() * 0.3 + 0.1})`
         ctx.fillRect(0, 0, width, height)
       }
@@ -52,7 +54,7 @@ const StaticEffect = ({ theme = "dark", intensity = 100, flashProbability = 0.1 
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [theme, intensity, flashProbability])
+  }, [ intensity, flashProbability])
 
   return (
     <canvas

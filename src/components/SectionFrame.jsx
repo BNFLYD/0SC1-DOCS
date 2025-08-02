@@ -1,7 +1,10 @@
 "use client"
 
+
+import { useUser } from "../context/UserContext"
+
 const SectionFrame = ({ title, children, theme }) => {
-  const isDark = theme === "dark"
+  const { isDark } = useUser()
 
   return (
     <div className="relative w-full h-full p-4">

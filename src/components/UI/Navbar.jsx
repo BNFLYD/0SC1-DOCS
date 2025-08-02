@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Icon } from '@iconify/react'
 import { Sun, Moon, Menu } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useUser } from "../../context/UserContext"
@@ -75,9 +76,11 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
                 }`}
               aria-label={translations[currentLanguage].languageSelector}
             >
-              <span className="text-lg">
-                {languages.find(lang => lang.code === currentLanguage)?.flag}
-              </span>
+              <Icon
+                icon={languages.find(lang => lang.code === currentLanguage)?.icon}
+                width="20"
+                height="20"
+              />
             </button>
 
             {isLanguageMenuOpen && (
@@ -92,7 +95,11 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
                     className="w-full px-3 py-2 text-left text-sm font-mono relative group"
                   >
                     <div className="flex items-center space-x-2">
-                      <span>{language.flag}</span>
+                      <Icon
+                        icon={language.icon}
+                        width="24"
+                        height="24"
+                      />
                       <span className={`relative ${currentLanguage === language.code ? "font-bold" : ""}`}>
                         {translations[currentLanguage][
                           language.code === "es" ? "spanish" :

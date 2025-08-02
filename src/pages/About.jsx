@@ -6,9 +6,10 @@ import { Mail, Github, Linkedin } from "lucide-react"
 import TerminalText from "../components/TerminalText"
 import AmplitudeIndicator from "../components/AmplitudeIndicator"
 import StaticEffect from "../components/UI/StaticEffect"
+import Toast from "../components/UI/Toast"
 import profile from "../assets/yo.jpg"
 import hornero from "../assets/hornero.svg"
-import osci from "../assets/sprite-try.svg";
+import osci from "../assets/sprite.svg";
 
 const About = () => {
   const { isDark } = useUser()
@@ -16,6 +17,7 @@ const About = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [isScrolling, setIsScrolling] = useState(false)
+  const [hoveredSkill, setHoveredSkill] = useState(null)
 
   // Estado unificado para las secciones
   const [sections, setSections] = useState({
@@ -138,37 +140,37 @@ const About = () => {
     {
       title: "Habilidades",
       skills: [
-        { name: "Javascript", percentage: 90 },
-        { name: "Python", percentage: 70 },
-        { name: "Rust", percentage: 30 },
-        { name: "Docker", percentage: 60 },
+        { name: "Javascript", percentage: 90, toast: "El lenguaje de la web, ideal para el desarrollo de apps y sitios facilmente desplegables y de alto rendimiento, sobre todo con ES6+, mi lenguaje favorito", icon: "simple-icons:javascript" },
+        { name: "Python", percentage: 70, toast: "Un lenguaje dinamico, flexible y con un repertorio de bibliotecas enorme sobre todo para Data Science y AI/ML, actualmente es el lenguaje de la IA", icon: "simple-icons:python" },
+        { name: "Rust", percentage: 30, toast: "Un lenguaje diseñado para ser robusto, tener un exelente performance y ser seguro. Es la opcion ideal para gestionar sistemas de alta velocidad y concurrencia", icon: "simple-icons:rust" },
+        { name: "Docker", percentage: 60, toast: "Una plataforma para desarrollar, enviar y ejecutar aplicaciones en contenedores. Es la opcion ideal para desplegar servicios en la nube de manera eficiente", icon: "simple-icons:docker" },
       ],
     },
     {
       title: "Backend",
       skills: [
-        { name: "Node", percentage: 90 },
-        { name: "Fast API", percentage: 70 },
-        { name: "Tauri", percentage: 30 },
-        { name: "PostgreSQL", percentage: 60 },
+        { name: "Node", percentage: 90, toast: "Es, junto con Deno y Bun, el entorno de ejecución de JavaScript en el servidor, ideal para aplicaciones escalables y en tiempo real, confiable y seguro", icon: "simple-icons:nodedotjs" },
+        { name: "Fast API", percentage: 70, toast: "Un framework moderno y rápido para construir APIs con Python similar a Django pero más ligero y orientado eventos. Es ideal para microservicios", icon: "simple-icons:fastapi" },
+        { name: "Tauri", percentage: 30, toast: "Es rapido, ligero, trabaja a nivel de sistema y permite crear apps de Rust con tecnologías web. Es mejor que Electron para aplicaciones multiplataforma", icon: "simple-icons:tauri" },
+        { name: "PostgreSQL", percentage: 60, toast: "Es una sql moderna, rapida, eficiente, ampliamente utilizada y de codigo abierto. Es ideal para proyectos con relaciones complejas", icon: "simple-icons:postgresql" },
       ],
     },
     {
       title: "Frontend",
       skills: [
-        { name: "React", percentage: 90 },
-        { name: "Svelte", percentage: 70 },
-        { name: "Tailwind", percentage: 30 },
-        { name: "Next", percentage: 60 },
+        { name: "React", percentage: 90, toast: "El framework de JavaScript más popular para construir interfaces de usuario. Ideal para aplicaciones web interactivas y dinámicas", icon: "simple-icons:react" },
+        { name: "Svelte", percentage: 70, toast: "Un framework centrado en la optimización del rendimiento. Ideal para proyectos donde se necesita un desarrollo ágil y una interfaz simple pero moderna", icon: "simple-icons:svelte" },
+        { name: "Tailwind", percentage: 30, toast: "Un framework CSS para diseño responsivo y personalizado. Ideal para desarrolladr una solución rápida y flexible con mucho estilo", icon: "simple-icons:tailwindcss" },
+        { name: "Next.js", percentage: 60, toast: "Un framework para React que permite la renderización del lado del servidor y la optimización del rendimiento. Ideal para proyectos mas grandes y escalables", icon: "simple-icons:nextdotjs" },
       ],
     },
     {
       title: "Inteligencia Artificial",
       skills: [
-        { name: "IA SDK", percentage: 10 },
-        { name: "Model Context Protocols", percentage: 20 },
-        { name: "Vibe Coding", percentage: 20 },
-        { name: "Context Enginiering", percentage: 40 },
+        { name: "IA SDK", percentage: 10, toast: "Desarrollado por Vercel, es un conjunto de herramientas y bibliotecas que facilitan la integración de modelos de inteligencia artificial en aplicaciones", icon: "simple-icons:vercel" },
+        { name: "Model Context Protocols", percentage: 20, toast: "Un protocolo de gestión de contextos en IA desarrollado por Anthropic. Actualmente es un estándar para la interacción entre modelos y su entorno", icon: "simple-icons:claude" },
+        { name: "Vibe Coding", percentage: 20, toast: "Una técnica donde la IA hace el codigo y mediante prompts, mejora el flujo de trabajo para el diseño de interfaces y el prototipado basico", icon: "material-symbols:airwave" },
+        { name: "n8n", percentage: 40, toast: "Una herramienta de automatización de flujos de trabajo que permite integrar diferentes servicios, aplicaciones y modelos de manera sencilla", icon: "simple-icons:n8n" },
       ],
     },
   ]
@@ -186,7 +188,7 @@ const About = () => {
             {/* Información personal */}
             <div className="flex-1 text-left">
               <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
-                <TerminalText text= "whoami"onComplete={() => setShowWhoamiContent(true)} />
+                <TerminalText text="whoami" onComplete={() => setShowWhoamiContent(true)} />
               </h1>
 
               <div
@@ -316,9 +318,8 @@ const About = () => {
         <section>
           <div
             ref={sectionRefs.skills}
-            className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${
-              sections.skills.isVisible ? "opacity-100" : "opacity-0"
-            }`}
+            className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${sections.skills.isVisible ? "opacity-100" : "opacity-0"
+              }`}
           >
             <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
               <TerminalText
@@ -342,14 +343,20 @@ const About = () => {
                   {/* Grid de habilidades */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {category.skills.map((skill) => (
-                      <AmplitudeIndicator
+                      <div
                         key={skill.name}
-                        skill={skill.name}
-                        percentage={skill.percentage}
-                        theme={isDark ? "dark" : "light"}
-                        vertical={false}
-                        shouldAnimate={sections.skills.showContent}
-                      />
+                        className="relative"
+                        onMouseEnter={() => setHoveredSkill(skill.name)}
+                        onMouseLeave={() => setHoveredSkill(null)}
+                      >
+                        <AmplitudeIndicator
+                          skill={skill.name}
+                          percentage={skill.percentage}
+                          vertical={false}
+                          shouldAnimate={sections.skills.showContent}
+                        />
+                        <Toast text={skill.toast} icon={skill.icon} visible={hoveredSkill === skill.name} />
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -362,9 +369,8 @@ const About = () => {
         <section>
           <div
             ref={sectionRefs.experience}
-            className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${
-              sections.experience.isVisible ? "opacity-100" : "opacity-0"
-            }`}
+            className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${sections.experience.isVisible ? "opacity-100" : "opacity-0"
+              }`}
           >
             <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
               <TerminalText
@@ -375,9 +381,8 @@ const About = () => {
             </h1>
 
             <div className={`transition-opacity duration-500 ${sections.experience.showContent ? "opacity-100" : "opacity-0"}`}>
-              <div className={`p-6 rounded-xl border-2 ${
-                isDark ? "border-primary/10 bg-primary" : "border-secondary/10 bg-secondary"
-              }`}>
+              <div className={`p-6 rounded-xl border-2 ${isDark ? "border-primary/10 bg-primary" : "border-secondary/10 bg-secondary"
+                }`}>
                 <div className="space-y-4 font-mono text-lg">
                   <p>
                     Con más de 5 años de experiencia en desarrollo web, he participado

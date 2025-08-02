@@ -1,13 +1,15 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useUser } from "../context/UserContext"
 import WhoamiChannel from "../components/Channels/WhoamiChannel"
 import ProjectsChannel from "../components/Channels/ProjectsChannel"
 import BlogChannel from "../components/Channels/BlogChannel"
 import MesmerizerChannel from "../components/Channels/MesmerizerChannel"
 import VaporwaveChannel from "../components/Channels/VaporwaveChannel"
 
-const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
+const CRTScreen = ({ activeChannel, isDistorting }) => {
+  const { isDark } = useUser()
   const canvasRef = useRef(null)
   const animationRef = useRef(null)
 
@@ -22,13 +24,13 @@ const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
 
     const animate = () => {
       // Limpiar canvas - fondo según el tema
-      ctx.fillStyle = theme === "dark" ? "#1b1b1b" : "#ffffff"
+      ctx.fillStyle = isDark ? "#1b1b1b" : "#ffffff"
       ctx.fillRect(0, 0, width, height)
 
       // Si está distorsionando, dibujar efecto de estática/glitch
       if (isDistorting) {
         // Color de la estática: blanco si el fondo es oscuro, negro si el fondo es claro
-        ctx.fillStyle = theme === "dark" ? "#ffffff" : "#000000"
+        ctx.fillStyle = isDark ? "#ffffff" : "#000000"
         for (let i = 0; i < 100; i++) {
           // Dibujar muchas líneas aleatorias
           ctx.fillRect(Math.random() * width, Math.random() * height, Math.random() * 20 + 5, 1)
@@ -36,12 +38,12 @@ const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
         // Añadir un flash rápido
         if (Math.random() < 0.1) {
           // 10% de probabilidad de un flash
-          ctx.fillStyle = `rgba(${theme === "dark" ? "255, 255, 255" : "0, 0, 0"}, ${Math.random() * 0.3 + 0.1})`
+          ctx.fillStyle = `rgba(${isDark? "255, 255, 255" : "0, 0, 0"}, ${Math.random() * 0.3 + 0.1})`
           ctx.fillRect(0, 0, width, height)
         }
       } else if (!activeChannel) {
         // Animación por defecto: onda senoidal (solo si no hay canal activo)
-        ctx.strokeStyle = theme === "dark" ? "#ffffff" : "#000000"
+        ctx.strokeStyle = isDark ? "#ffffff" : "#000000"
         ctx.lineWidth = 2
         ctx.beginPath()
 
@@ -63,7 +65,7 @@ const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
 
       // Efecto de líneas de escaneo (siempre aplicar, encima de todo)
       // El color de las líneas de escaneo se invierte con el tema
-      ctx.fillStyle = theme === "dark" ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)"
+      ctx.fillStyle = isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)"
       for (let y = 0; y < height; y += 4) {
         ctx.fillRect(0, y, width, 1)
       }
@@ -79,9 +81,7 @@ const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [theme, activeChannel, isDistorting])
-
-  const isDark = theme === "dark"
+  }, [ isDark, activeChannel, isDistorting])
 
   return (
     <div className="relative w-full h-full">
@@ -106,11 +106,11 @@ const CRTScreen = ({ theme, activeChannel, isDistorting }) => {
             <div
               className={`absolute inset-0 font-mono text-sm ${isDark ? "text-white" : "text-black"} flex flex-col`}
             >
-              {activeChannel === "whoami" && <WhoamiChannel theme={theme} />}
-              {activeChannel === "projects" && <ProjectsChannel theme={theme} />}
-              {activeChannel === "blog" && <BlogChannel theme={theme} />}
-              {activeChannel === "nami" && <VaporwaveChannel theme={theme} />}
-              {activeChannel === "play" && <MesmerizerChannel theme={theme} />}
+              {activeChannel === "whoami" && <WhoamiChannel theme={isDark ? "dark" : "light"} />}
+              {activeChannel === "projects" && <ProjectsChannel theme={isDark ? "dark" : "light"} />}
+              {activeChannel === "blog" && <BlogChannel theme={isDark ? "dark" : "light"} />}
+              {activeChannel === "nami" && <VaporwaveChannel theme={isDark ? "dark" : "light"} />}
+              {activeChannel === "play" && <MesmerizerChannel theme={isDark ? "dark" : "light"} />}
             </div>
           )}
 

@@ -1,10 +1,19 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useUser } from '../context/UserContext'
+import PropTypes from 'prop-types'
 
-const AmplitudeIndicator = ({ skill, percentage, theme, vertical = true, shouldAnimate = true }) => {
-  const isDark = theme === "dark"
+const AmplitudeIndicator = ({ skill, percentage, vertical = true, shouldAnimate = true }) => {
+  const { isDark } = useUser()
   const [currentValue, setCurrentValue] = useState(0)
   const height = (currentValue / 100) * 40 // Altura máxima reducida
+
+AmplitudeIndicator.propTypes = {
+  skill: PropTypes.string.isRequired,
+  percentage: PropTypes.number.isRequired,
+  vertical: PropTypes.bool,
+  shouldAnimate: PropTypes.bool
+}
 
   useEffect(() => {
     const startAnimation = async () => {
@@ -26,7 +35,7 @@ const AmplitudeIndicator = ({ skill, percentage, theme, vertical = true, shouldA
   }, [percentage, shouldAnimate])
 
   if (vertical) {
-    // Diseño vertical (original)
+    // Diseño vertical
     return (
       <div className="flex flex-col items-center space-y-1">
         {/* Indicador de amplitud simplificado */}
@@ -48,7 +57,7 @@ const AmplitudeIndicator = ({ skill, percentage, theme, vertical = true, shouldA
       </div>
     )
   } else {
-    // Diseño horizontal (para la página About)
+    // Diseño horizontal
     return (
       <div className="space-y-2">
         {/* Nombre y porcentaje */}
