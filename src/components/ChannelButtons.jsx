@@ -9,7 +9,7 @@ const ChannelButtons = ({ activeChannel, onChannelChange }) => {
     { id: "whoami", label: translations[language].about },
     { id: "blog", label: translations[language].blog },
     { id: "projects", label: translations[language].projects || "Projects" },
-    { id: "nami", label: "News" },
+    { id: "hire", label: "Contacto" },
     { id: "play", label: "Play" },
   ]
 

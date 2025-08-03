@@ -97,8 +97,8 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
                     <div className="flex items-center space-x-2">
                       <Icon
                         icon={language.icon}
-                        width="24"
-                        height="24"
+                        width="20"
+                        height="20"
                       />
                       <span className={`relative ${currentLanguage === language.code ? "font-bold" : ""}`}>
                         {translations[currentLanguage][

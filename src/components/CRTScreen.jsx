@@ -6,7 +6,7 @@ import WhoamiChannel from "../components/Channels/WhoamiChannel"
 import ProjectsChannel from "../components/Channels/ProjectsChannel"
 import BlogChannel from "../components/Channels/BlogChannel"
 import MesmerizerChannel from "../components/Channels/MesmerizerChannel"
-import VaporwaveChannel from "../components/Channels/VaporwaveChannel"
+import HireChannel from "./Channels/HireChannel"
 
 const CRTScreen = ({ activeChannel, isDistorting }) => {
   const { isDark } = useUser()
@@ -63,13 +63,6 @@ const CRTScreen = ({ activeChannel, isDistorting }) => {
       }
 
 
-      // Efecto de líneas de escaneo (siempre aplicar, encima de todo)
-      // El color de las líneas de escaneo se invierte con el tema
-      ctx.fillStyle = isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)"
-      for (let y = 0; y < height; y += 4) {
-        ctx.fillRect(0, y, width, 1)
-      }
-
       time += 2
       animationRef.current = requestAnimationFrame(animate)
     }
@@ -109,16 +102,30 @@ const CRTScreen = ({ activeChannel, isDistorting }) => {
               {activeChannel === "whoami" && <WhoamiChannel theme={isDark ? "dark" : "light"} />}
               {activeChannel === "projects" && <ProjectsChannel theme={isDark ? "dark" : "light"} />}
               {activeChannel === "blog" && <BlogChannel theme={isDark ? "dark" : "light"} />}
-              {activeChannel === "nami" && <VaporwaveChannel theme={isDark ? "dark" : "light"} />}
+              {activeChannel === "hire" && <HireChannel theme={isDark ? "dark" : "light"} />}
               {activeChannel === "play" && <MesmerizerChannel theme={isDark ? "dark" : "light"} />}
             </div>
           )}
+
+          {/* Líneas de escaneo CRT */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `repeating-linear-gradient(
+                0deg,
+                ${isDark ? 'rgba(255, 255, 255, 0.09)' : 'rgba(0, 0, 0, 0.1)'} 0px,
+                ${isDark ? 'rgba(255, 255, 255, 0.09)' : 'rgba(0, 0, 0, 0.1)'} 0px,
+                transparent 1px,
+                transparent 6px
+              )`
+            }}
+          />
 
           {/* Efecto de curvatura CRT */}
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: `radial-gradient(ellipse at center, transparent 70%, rgba(0,0,0,0.2) 100%)`,
+              background: `radial-gradient(ellipse at center, transparent 70%, ${isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.3)'} 100%)`,
             }}
           />
         </div>

@@ -7,10 +7,9 @@ import { translations } from "../../constants/translations"
 import TerminalText from "../TerminalText"
 import report from "../../assets/report.png";
 
-const WhoamiChannel = ({ theme }) => {
-  const { language } = useUser()
+const WhoamiChannel = () => {
+  const { language, isDark } = useUser()
   const t = translations[language].channelContent.whoami
-  const isDark = theme === "dark"
   const textColor = isDark ? "text-white" : "text-black"
   const [showContent, setShowContent] = useState(false)
 
@@ -31,7 +30,7 @@ const WhoamiChannel = ({ theme }) => {
           ))}
         </div>
         <div className=" flex flex-col h-full pl-4" style={{ width: "40%" }}>
-          <img src={report} alt="report" className="w-auto h-auto rounded-lg"/>
+          <img loading="lazy" src={report} alt="report" className="w-auto h-auto rounded-lg"/>
         </div>
       </div>
       <Link

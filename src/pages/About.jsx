@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { useUser } from "../context/UserContext"
 import { Mail, Github, Linkedin } from "lucide-react"
+import { useInView } from 'react-intersection-observer'
 import TerminalText from "../components/TerminalText"
 import AmplitudeIndicator from "../components/AmplitudeIndicator"
 import StaticEffect from "../components/UI/StaticEffect"
@@ -10,6 +11,28 @@ import Toast from "../components/UI/Toast"
 import profile from "../assets/yo.jpg"
 import hornero from "../assets/hornero.svg"
 import osci from "../assets/sprite.svg";
+
+// Componente para la imagen con intersection observer
+const InViewImage = ({ src, alt, isTransitioning, currentImageIndex }) => {
+  const { ref, inView } = useInView({
+    threshold: 0.2,
+    triggerOnce: false,
+  });
+
+  return (
+    <img
+      loading="lazy"
+      ref={ref}
+      src={src}
+      alt={alt}
+      className={`w-full h-full transition-opacity duration-300
+        ${isTransitioning ? 'opacity-0' : 'opacity-100'}
+        ${currentImageIndex === 2 ? 'object-contain animate-float' : ''}
+        ${inView ? 'scale-100' : 'scale-95'}
+        transition-all duration-700 ease-out`}
+    />
+  );
+};
 
 const About = () => {
   const { isDark } = useUser()
@@ -169,8 +192,8 @@ const About = () => {
       skills: [
         { name: "IA SDK", percentage: 10, toast: "Desarrollado por Vercel, es un conjunto de herramientas y bibliotecas que facilitan la integración de modelos de inteligencia artificial en aplicaciones", icon: "simple-icons:vercel" },
         { name: "Model Context Protocols", percentage: 20, toast: "Un protocolo de gestión de contextos en IA desarrollado por Anthropic. Actualmente es un estándar para la interacción entre modelos y su entorno", icon: "simple-icons:claude" },
-        { name: "Vibe Coding", percentage: 20, toast: "Una técnica donde la IA hace el codigo y mediante prompts, mejora el flujo de trabajo para el diseño de interfaces y el prototipado basico", icon: "material-symbols:airwave" },
         { name: "n8n", percentage: 40, toast: "Una herramienta de automatización de flujos de trabajo que permite integrar diferentes servicios, aplicaciones y modelos de manera sencilla", icon: "simple-icons:n8n" },
+        { name: "Vibe Coding", percentage: 20, toast: "Una técnica donde la IA hace el codigo mediante prompts, bien usada mejora el flujo de trabajo para el diseño de interfaces y el prototipado basico", icon: "material-symbols:airwave" },
       ],
     },
   ]
@@ -241,12 +264,11 @@ const About = () => {
                       }}
                     />
                   ) : (
-                    <img
+                    <InViewImage
                       src={images[currentImageIndex]}
                       alt={`Profile ${currentImageIndex + 1}`}
-                      className={`w-full h-full transition-opacity duration-300
-                        ${isTransitioning ? 'opacity-0' : 'opacity-100'}
-                        ${currentImageIndex === 2 ? 'object-contain animate-float' : ''}`}
+                      isTransitioning={isTransitioning}
+                      currentImageIndex={currentImageIndex}
                     />
                   )}
                 </div>

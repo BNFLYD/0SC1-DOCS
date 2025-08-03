@@ -3,7 +3,7 @@
 
 import { useUser } from "../context/UserContext"
 
-const SectionFrame = ({ title, children, theme }) => {
+const SectionFrame = ({ title, children}) => {
   const { isDark } = useUser()
 
   return (

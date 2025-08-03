@@ -32,7 +32,7 @@ const Toast = ({ text, icon, visible }) => {
     >
       <div className={`max-w-7xl mx-auto px-4`}>
         <div className={`p-3 rounded-xl
-          ${isDark ? 'bg-primary/80 backdrop-blur-3xl' : 'bg-secondary/80 backdrop-blur-md'}
+          ${isDark ? 'bg-primary/80 backdrop-blur-lg' : 'bg-secondary/80 backdrop-blur-md'}
           text-center`}
         >
           {icon && (

@@ -3,12 +3,12 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useUser } from "../../context/UserContext"
 import { translations } from "../../constants/translations"
+import sprite from "../../assets/sprite.svg"
 import TerminalText from "../TerminalText"
 
-const BlogChannel = ({ theme }) => {
-  const isDark = theme === "dark"
+const BlogChannel = () => {
+  const { language, isDark } = useUser()
   const textColor = isDark ? "text-white" : "text-black"
-  const { language } = useUser()
   const t = translations[language].channelContent.blog
   const [showContent, setShowContent] = useState(false)
 
@@ -22,13 +22,26 @@ const BlogChannel = ({ theme }) => {
           prefix="> "
         />
       </div>
-      <div className={`text-lg font-mono font-semibold transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
-        <p>{t.title}</p>
-        <ul className="list-disc list-inside ml-2">
-          {t.items.map((item, index) => (
-            <li key={index}>{item}</li>
-          ))}
-        </ul>
+      <div className={`flex w-full transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
+        {/* Contenido de texto (60% del ancho) */}
+        <div className="text-lg font-mono font-semibold w-[60%] pr-4 space-y-2">
+          <p>{t.title}</p>
+          <ul className="list-disc list-inside ml-2 space-y-4">
+            {t.items.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        </div>
+        {/* Animación sprite (40% del ancho) */}
+        <div className="w-[40%]">
+          <div
+            className={`animate-sprite h-48 w-48 rounded-xl mx-auto ${isDark ? "filter invert-[0%] hue-rotate-0 bg-void/25" : "filter invert-[100%] hue-rotate-180 bg-primary/45"}`}
+            style={{
+              backgroundImage: `url(${sprite})`,
+              backgroundSize: '100% 6400%', // Mantenemos la proporción exacta para la animación
+            }}
+          />
+        </div>
       </div>
       <Link
         to="/blog"
