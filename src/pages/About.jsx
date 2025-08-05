@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { useUser } from "../context/UserContext"
 import { Mail, Github, Linkedin } from "lucide-react"
 import { useInView } from 'react-intersection-observer'
+import emailjs from '@emailjs/browser'
 import TerminalText from "../components/TerminalText"
 import AmplitudeIndicator from "../components/AmplitudeIndicator"
 import StaticEffect from "../components/UI/StaticEffect"
@@ -37,10 +38,29 @@ const InViewImage = ({ src, alt, isTransitioning, currentImageIndex }) => {
 const About = () => {
   const { isDark } = useUser()
   const [showWhoamiContent, setShowWhoamiContent] = useState(false)
+  const [headerText, setHeaderText] = useState("whoami")
+  const [showEmailForm, setShowEmailForm] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [isScrolling, setIsScrolling] = useState(false)
   const [hoveredSkill, setHoveredSkill] = useState(null)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  })
+  const [sending, setSending] = useState(false)
+  const [sendStatus, setSendStatus] = useState(null)
+
+  // Función para manejar el cambio de texto y mostrar/ocultar el formulario
+  const handleMailClick = () => {
+    // Simplemente alternamos entre los dos estados
+    setHeaderText(headerText === "whoami" ? "mutt" : "whoami")
+    // Si volvemos a whoami, ocultamos el formulario inmediatamente
+    if (headerText === "mutt") {
+      setShowEmailForm(false)
+    }
+  }
 
   // Estado unificado para las secciones
   const [sections, setSections] = useState({
@@ -184,7 +204,7 @@ const About = () => {
         { name: "React", percentage: 90, toast: "El framework de JavaScript más popular para construir interfaces de usuario. Ideal para aplicaciones web interactivas y dinámicas", icon: "simple-icons:react" },
         { name: "Svelte", percentage: 70, toast: "Un framework centrado en la optimización del rendimiento. Ideal para proyectos donde se necesita un desarrollo ágil y una interfaz simple pero moderna", icon: "simple-icons:svelte" },
         { name: "Tailwind", percentage: 30, toast: "Un framework CSS para diseño responsivo y personalizado. Ideal para desarrolladr una solución rápida y flexible con mucho estilo", icon: "simple-icons:tailwindcss" },
-        { name: "Next.js", percentage: 60, toast: "Un framework para React que permite la renderización del lado del servidor y la optimización del rendimiento. Ideal para proyectos mas grandes y escalables", icon: "simple-icons:nextdotjs" },
+        { name: "Next", percentage: 60, toast: "Un framework para React que permite la renderización del lado del servidor y la optimización del rendimiento. Ideal para proyectos mas grandes y escalables", icon: "simple-icons:nextdotjs" },
       ],
     },
     {
@@ -211,30 +231,113 @@ const About = () => {
             {/* Información personal */}
             <div className="flex-1 text-left">
               <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
-                <TerminalText text="whoami" onComplete={() => setShowWhoamiContent(true)} />
+                <TerminalText
+                  key={headerText}
+                  text={headerText}
+                  onComplete={() => {
+                    setShowWhoamiContent(true)
+                    if (headerText === "mutt") {
+                      setShowEmailForm(true)
+                    }
+                  }}
+                />
               </h1>
 
               <div
                 className={`p-6 rounded-xl border-2 transition-opacity duration-500 ${isDark ? "border-primary/10 bg-primary" : "border-secondary/10 bg-secondary"
                   } ${showWhoamiContent ? "opacity-100" : "opacity-0"}`}
               >
-                <h2 className="text-xl font-mono font-bold mb-4 tracking-wide">Flavio Gabriel Morales</h2>
-
-                <div className="space-y-3 font-mono text-lg leading-relaxed">
-                  <p>Desarrollador Full Stack apasionado por crear soluciones tecnológicas innovadoras y eficientes.</p>
-                  <p>
-                    Me especializo en el desarrollo web moderno, con experiencia en arquitecturas escalables y tecnologías
-                    de vanguardia.
-                  </p>
-                  <p>
-                    Disfruto trabajando tanto en el frontend como en el backend, siempre buscando escribir código limpio y
-                    mantenible.
-                  </p>
-                  <p>
-                    Cuando no estoy programando, me gusta explorar nuevas tecnologías, contribuir a proyectos open source
-                    y compartir conocimiento con la comunidad.
-                  </p>
-                </div>
+                {showEmailForm ? (
+                  <form className="space-y-4 font-mono" onSubmit={async (e) => {
+                    e.preventDefault();
+                    setSending(true);
+                    try {
+                      const result = await emailjs.send(
+                        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+                        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+                        formData,
+                        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+                      );
+                      setSendStatus('success');
+                      setFormData({ name: '', email: '', message: '' });
+                    } catch (error) {
+                      setSendStatus('error');
+                    } finally {
+                      setSending(false);
+                    }
+                  }}>
+                    <div>
+                      <label htmlFor="name" className="block text-sm font-bold mb-2">Nombre</label>
+                      <input
+                        type="text"
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                        className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
+                        placeholder="Tu nombre"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-bold mb-2">Email</label>
+                      <input
+                        type="email"
+                        id="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                        className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
+                        placeholder="tu@email.com"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="message" className="block text-sm font-bold mb-2">Mensaje</label>
+                      <textarea
+                        id="message"
+                        rows="4"
+                        value={formData.message}
+                        onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                        className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
+                        placeholder="Escribe tu mensaje aquí..."
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={sending}
+                      className={`p-2 rounded-lg font-bold text-left transition-colors ${
+                        isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'
+                      } ${sending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      {sending ? 'Enviando...' : 'Enviar Mensaje'}
+                    </button>
+                    {sendStatus === 'success' && (
+                      <p className="text-green-500 mt-2">¡Mensaje enviado con éxito!</p>
+                    )}
+                    {sendStatus === 'error' && (
+                      <p className="text-red-500 mt-2">Error al enviar el mensaje. Por favor, intenta de nuevo.</p>
+                    )}
+                  </form>
+                ) : (
+                  <>
+                    <h2 className="text-xl font-mono font-bold mb-4 tracking-wide">Flavio Gabriel Morales</h2>
+                    <div className="space-y-3 font-mono text-lg leading-relaxed">
+                      <p>Desarrollador Full Stack apasionado por crear soluciones tecnológicas innovadoras y eficientes.</p>
+                      <p>
+                        Me especializo en el desarrollo web moderno, con experiencia en arquitecturas escalables y tecnologías
+                        de vanguardia.
+                      </p>
+                      <p>
+                        Disfruto trabajando tanto en el frontend como en el backend, siempre buscando escribir código limpio y
+                        mantenible.
+                      </p>
+                      <p>
+                        Cuando no estoy programando, me gusta explorar nuevas tecnologías, contribuir a proyectos open source
+                        y compartir conocimiento con la comunidad.
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -289,7 +392,10 @@ const About = () => {
                 <div className="flex justify-center gap-2 font-mono text-sm">
                   {/* Reducido gap-4 a gap-2 */}
                   <a
-                    href="mailto:flaviogv010@gmail.com"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleMailClick();
+                    }}
                     className={`relative p-3 rounded-lg transition-all duration-200 flex flex-col items-center justify-center group ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"
                       }`}
                     aria-label="Enviar correo electrónico"

@@ -30,7 +30,7 @@ const WhoamiChannel = () => {
           ))}
         </div>
         <div className=" flex flex-col h-full pl-4" style={{ width: "40%" }}>
-          <img loading="lazy" src={report} alt="report" className="w-auto h-auto rounded-lg"/>
+          <img loading="lazy" src={report} alt="report" className="w-auto h-auto rounded-2xl"/>
         </div>
       </div>
       <Link

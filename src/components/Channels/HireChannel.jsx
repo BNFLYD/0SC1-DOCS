@@ -14,7 +14,7 @@ const { isDark } = useUser()
     <div className={`flex flex-col p-8 gap-2 ${textColor}`}>
       <div className="text-xl font-bold">
         <TerminalText
-          text="send email"
+          text="sendmail"
           inView={true}
           onComplete={() => setShowContent(true)}
           prefix="> "

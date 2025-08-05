@@ -35,7 +35,7 @@ const BlogChannel = () => {
         {/* Animación sprite (40% del ancho) */}
         <div className="w-[40%]">
           <div
-            className={`animate-sprite h-48 w-48 rounded-xl mx-auto ${isDark ? "filter invert-[0%] hue-rotate-0 bg-void/25" : "filter invert-[100%] hue-rotate-180 bg-primary/45"}`}
+            className={`animate-sprite h-48 w-48 rounded-2xl mx-auto ${isDark ? "filter invert-[0%] hue-rotate-0 bg-void/25" : "filter invert-[100%] hue-rotate-180 bg-primary/65"}`}
             style={{
               backgroundImage: `url(${sprite})`,
               backgroundSize: '100% 6400%', // Mantenemos la proporción exacta para la animación
