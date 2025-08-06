@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     allowedHosts: [
       'localhost',
-      '', // Tu subdominio de TryCloudflare
+      'gamecube-dc-maintaining-gathering.trycloudflare.com', // Tu subdominio de TryCloudflare
     ],
   },
 });

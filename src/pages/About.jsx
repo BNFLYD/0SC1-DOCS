@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { useUser } from "../context/UserContext"
+import { useAuth } from "../hooks/useAuth"
 import { Mail, Github, Linkedin } from "lucide-react"
 import { useInView } from 'react-intersection-observer'
 import emailjs from '@emailjs/browser'
@@ -37,8 +38,22 @@ const InViewImage = ({ src, alt, isTransitioning, currentImageIndex }) => {
 
 const About = () => {
   const { isDark } = useUser()
+  const { isAuthenticated, user, loginWithRedirect, logout, isLoading } = useAuth()
   const [showWhoamiContent, setShowWhoamiContent] = useState(false)
   const [headerText, setHeaderText] = useState("whoami")
+  const [formError, setFormError] = useState(null)
+
+  // Efecto para recuperar el formulario guardado después de la autenticación
+  useEffect(() => {
+    if (isAuthenticated && user?.email) {
+      const savedForm = localStorage.getItem('pendingFormData');
+      if (savedForm) {
+        const parsedForm = JSON.parse(savedForm);
+        setFormData(parsedForm);
+        localStorage.removeItem('pendingFormData');
+      }
+    }
+  }, [isAuthenticated, user])
   const [showEmailForm, setShowEmailForm] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -221,7 +236,12 @@ const About = () => {
   return (
     <div
       className="min-h-screen transition-colors duration-300 bg-none">
-      {/* Contenido principal */}
+      {isLoading ? (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+        </div>
+      ) : (
+        /* Contenido principal */
       <main className="max-w-7xl mx-auto space-y-52">
         {" "}
         {/* Añadido px-6 para padding lateral */}
@@ -248,76 +268,133 @@ const About = () => {
                   } ${showWhoamiContent ? "opacity-100" : "opacity-0"}`}
               >
                 {showEmailForm ? (
-                  <form className="space-y-4 font-mono" onSubmit={async (e) => {
-                    e.preventDefault();
-                    setSending(true);
-                    try {
-                      const result = await emailjs.send(
-                        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-                        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-                        formData,
-                        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-                      );
-                      setSendStatus('success');
-                      setFormData({ name: '', email: '', message: '' });
-                    } catch (error) {
-                      setSendStatus('error');
-                    } finally {
-                      setSending(false);
+                  <div className="space-y-4 font-mono">
+                    {/* Formulario siempre visible */
+                      <form className="space-y-4" onSubmit={async (e) => {
+                        e.preventDefault();
+
+                        // Siempre guardamos el formulario antes de la verificación
+                        localStorage.setItem('pendingFormData', JSON.stringify(formData));
+
+                        // Si no está autenticado o el email no coincide, redirigimos a auth
+                        if (!isAuthenticated || (user?.email !== formData.email)) {
+                          setSendStatus('info');
+                          setFormError(
+                            <div className="space-y-2">
+                              <p>Por favor, verifica tu correo electrónico para continuar.</p>
+                              {isAuthenticated && (
+                                <p className="text-sm">Email actual: {user?.email}</p>
+                              )}
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  if (isAuthenticated) {
+                                    // Si está autenticado, primero cerramos la sesión
+                                    await logout({
+                                      // Asegurarnos de que la URL de retorno está en las URLs permitidas en Auth0
+                                      returnTo: window.location.origin,
+                                      // Forzar el cierre de sesión completo
+                                      federated: true
+                                    });
+                                  } else {
+                                    // Si no está autenticado, mostramos el formulario de login
+                                    await loginWithRedirect({
+                                      // Forzar la selección de cuenta
+                                      prompt: 'select_account',
+                                      // Sugerir el email ingresado
+                                      login_hint: formData.email,
+                                      // Volver a la página actual después del login
+                                      appState: { targetUrl: window.location.pathname }
+                                    });
+                                  }
+                                }}
+                                className={`w-full p-2 rounded-lg font-bold text-center transition-colors ${
+                                  isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'
+                                }`}
+                              >
+                                {isAuthenticated ? 'Cambiar cuenta' : 'Verificar email'}
+                              </button>
+                            </div>
+                          );
+                          return;
+                        }
+
+                        setSending(true);
+                        try {
+                          await emailjs.send(
+                            import.meta.env.VITE_EMAILJS_SERVICE_ID,
+                            import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+                            formData,
+                            import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+                          );
+                          setSendStatus('success');
+                          setFormData({ name: '', email: '', message: '' });
+                          setFormError(null);
+                        } catch (error) {
+                          console.error('Error sending email:', error);
+                          setSendStatus('error');
+                          setFormError('Error al enviar el mensaje. Por favor, intenta de nuevo.');
+                        } finally {
+                          setSending(false);
+                        }
+                      }}>
+                        <div>
+                          <label htmlFor="name" className="block text-sm font-bold mb-2">Nombre</label>
+                          <input
+                            type="text"
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                            className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
+                            placeholder="Tu nombre"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="email" className="block text-sm font-bold mb-2">Email</label>
+                          <input
+                            type="email"
+                            id="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                            className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
+                            placeholder="tu@email.com"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="message" className="block text-sm font-bold mb-2">Mensaje</label>
+                          <textarea
+                            id="message"
+                            rows="4"
+                            value={formData.message}
+                            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                            className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
+                            placeholder="Escribe tu mensaje aquí..."
+                            required
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={sending}
+                          className={`p-2 rounded-lg font-bold text-left transition-colors ${
+                            isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'
+                          } ${sending ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          {sending ? 'Enviando...' : 'Enviar Mensaje'}
+                        </button>
+                        {sendStatus === 'success' && (
+                          <p className="text-green-500 mt-2">¡Mensaje enviado con éxito!</p>
+                        )}
+                        {sendStatus === 'error' && (
+                          <p className="text-red-500 mt-2">Error al enviar el mensaje. Por favor, intenta de nuevo.</p>
+                        )}
+                        {formError && sendStatus === 'info' && (
+                          <div className="mt-2">{formError}</div>
+                        )}
+                      </form>
                     }
-                  }}>
-                    <div>
-                      <label htmlFor="name" className="block text-sm font-bold mb-2">Nombre</label>
-                      <input
-                        type="text"
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
-                        placeholder="Tu nombre"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-bold mb-2">Email</label>
-                      <input
-                        type="email"
-                        id="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                        className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
-                        placeholder="tu@email.com"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="message" className="block text-sm font-bold mb-2">Mensaje</label>
-                      <textarea
-                        id="message"
-                        rows="4"
-                        value={formData.message}
-                        onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                        className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
-                        placeholder="Escribe tu mensaje aquí..."
-                        required
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={sending}
-                      className={`p-2 rounded-lg font-bold text-left transition-colors ${
-                        isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'
-                      } ${sending ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                      {sending ? 'Enviando...' : 'Enviar Mensaje'}
-                    </button>
-                    {sendStatus === 'success' && (
-                      <p className="text-green-500 mt-2">¡Mensaje enviado con éxito!</p>
-                    )}
-                    {sendStatus === 'error' && (
-                      <p className="text-red-500 mt-2">Error al enviar el mensaje. Por favor, intenta de nuevo.</p>
-                    )}
-                  </form>
+                  </div>
                 ) : (
                   <>
                     <h2 className="text-xl font-mono font-bold mb-4 tracking-wide">Flavio Gabriel Morales</h2>
@@ -527,6 +604,7 @@ const About = () => {
           </div>
         </section>
       </main>
+      )}
     </div>
   )
 }
