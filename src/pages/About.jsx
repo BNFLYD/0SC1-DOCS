@@ -43,17 +43,54 @@ const About = () => {
   const [headerText, setHeaderText] = useState("whoami")
   const [formError, setFormError] = useState(null)
 
-  // Efecto para recuperar el formulario guardado después de la autenticación
+  // Estado para controlar si debemos enviar el email
+  const [shouldSendEmail, setShouldSendEmail] = useState(false);
+
+  // Efecto para manejar el envío del email después de la autenticación
   useEffect(() => {
-    if (isAuthenticated && user?.email) {
-      const savedForm = localStorage.getItem('pendingFormData');
-      if (savedForm) {
-        const parsedForm = JSON.parse(savedForm);
-        setFormData(parsedForm);
-        localStorage.removeItem('pendingFormData');
+    const handleFormSubmission = async () => {
+      // Solo procedemos si el usuario está autenticado y hay datos pendientes
+      if (isAuthenticated && user?.email) {
+        const savedForm = localStorage.getItem('pendingFormData');
+        // Si hay datos pendientes después de la autenticación, activamos shouldSendEmail
+        if (savedForm && !shouldSendEmail) {
+          setShouldSendEmail(true);
+          return;
+        }
+        if (savedForm && shouldSendEmail) {
+          setSending(true);
+          try {
+            const parsedForm = JSON.parse(savedForm);
+            const emailData = {
+              ...parsedForm,
+              email: user.email
+            };
+
+            await emailjs.send(
+              import.meta.env.VITE_EMAILJS_SERVICE_ID,
+              import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+              emailData,
+              import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+            );
+            setSendStatus('success');
+            setFormData({ name: '', message: '' });
+            setFormError(null);
+            // Limpiamos todo después del éxito
+            localStorage.removeItem('pendingFormData');
+            setShouldSendEmail(false);
+          } catch (error) {
+            console.error('Error sending email:', error);
+            setSendStatus('error');
+            setFormError('Error al enviar el mensaje. Por favor, intenta de nuevo.');
+          } finally {
+            setSending(false);
+          }
+        }
       }
-    }
-  }, [isAuthenticated, user])
+    };
+
+    handleFormSubmission();
+  }, [isAuthenticated, user, shouldSendEmail])
   const [showEmailForm, setShowEmailForm] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -61,11 +98,11 @@ const About = () => {
   const [hoveredSkill, setHoveredSkill] = useState(null)
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     message: ''
   })
   const [sending, setSending] = useState(false)
   const [sendStatus, setSendStatus] = useState(null)
+  const [lastSentEmail, setLastSentEmail] = useState('')
 
   // Función para manejar el cambio de texto y mostrar/ocultar el formulario
   const handleMailClick = () => {
@@ -207,8 +244,8 @@ const About = () => {
     {
       title: "Backend",
       skills: [
-        { name: "Node", percentage: 90, toast: "Es, junto con Deno y Bun, el entorno de ejecución de JavaScript en el servidor, ideal para aplicaciones escalables y en tiempo real, confiable y seguro", icon: "simple-icons:nodedotjs" },
-        { name: "Fast API", percentage: 70, toast: "Un framework moderno y rápido para construir APIs con Python similar a Django pero más ligero y orientado eventos. Es ideal para microservicios", icon: "simple-icons:fastapi" },
+        { name: "Node", percentage: 90, toast: "Es, junto con Deno y Bun, el entorno de ejecución de JavaScript del servidor, ideal para apps backend escalables y en tiempo real, confiable y seguro", icon: "simple-icons:nodedotjs" },
+        { name: "Fast API", percentage: 70, toast: "Un framework moderno y rápido para construir APIs con Python similar a Django pero más minimalista, ligero y asincrono. Es ideal para microservicios", icon: "simple-icons:fastapi" },
         { name: "Tauri", percentage: 30, toast: "Es rapido, ligero, trabaja a nivel de sistema y permite crear apps de Rust con tecnologías web. Es mejor que Electron para aplicaciones multiplataforma", icon: "simple-icons:tauri" },
         { name: "PostgreSQL", percentage: 60, toast: "Es una sql moderna, rapida, eficiente, ampliamente utilizada y de codigo abierto. Es ideal para proyectos con relaciones complejas", icon: "simple-icons:postgresql" },
       ],
@@ -218,7 +255,7 @@ const About = () => {
       skills: [
         { name: "React", percentage: 90, toast: "El framework de JavaScript más popular para construir interfaces de usuario. Ideal para aplicaciones web interactivas y dinámicas", icon: "simple-icons:react" },
         { name: "Svelte", percentage: 70, toast: "Un framework centrado en la optimización del rendimiento. Ideal para proyectos donde se necesita un desarrollo ágil y una interfaz simple pero moderna", icon: "simple-icons:svelte" },
-        { name: "Tailwind", percentage: 30, toast: "Un framework CSS para diseño responsivo y personalizado. Ideal para desarrolladr una solución rápida y flexible con mucho estilo", icon: "simple-icons:tailwindcss" },
+        { name: "Tailwind", percentage: 30, toast: "Un framework CSS para diseño responsivo y personalizado. Ideal para desarrollar una solución rápida y flexible con mucho estilo", icon: "simple-icons:tailwindcss" },
         { name: "Next", percentage: 60, toast: "Un framework para React que permite la renderización del lado del servidor y la optimización del rendimiento. Ideal para proyectos mas grandes y escalables", icon: "simple-icons:nextdotjs" },
       ],
     },
@@ -270,72 +307,26 @@ const About = () => {
                 {showEmailForm ? (
                   <div className="space-y-4 font-mono">
                     {/* Formulario siempre visible */
-                      <form className="space-y-4" onSubmit={async (e) => {
+                      <form className="space-y-4" onSubmit={(e) => {
                         e.preventDefault();
 
-                        // Siempre guardamos el formulario antes de la verificación
-                        localStorage.setItem('pendingFormData', JSON.stringify(formData));
-
-                        // Si no está autenticado o el email no coincide, redirigimos a auth
-                        if (!isAuthenticated || (user?.email !== formData.email)) {
-                          setSendStatus('info');
-                          setFormError(
-                            <div className="space-y-2">
-                              <p>Por favor, verifica tu correo electrónico para continuar.</p>
-                              {isAuthenticated && (
-                                <p className="text-sm">Email actual: {user?.email}</p>
-                              )}
-                              <button
-                                type="button"
-                                onClick={async () => {
-                                  if (isAuthenticated) {
-                                    // Si está autenticado, primero cerramos la sesión
-                                    await logout({
-                                      // Asegurarnos de que la URL de retorno está en las URLs permitidas en Auth0
-                                      returnTo: window.location.origin,
-                                      // Forzar el cierre de sesión completo
-                                      federated: true
-                                    });
-                                  } else {
-                                    // Si no está autenticado, mostramos el formulario de login
-                                    await loginWithRedirect({
-                                      // Forzar la selección de cuenta
-                                      prompt: 'select_account',
-                                      // Sugerir el email ingresado
-                                      login_hint: formData.email,
-                                      // Volver a la página actual después del login
-                                      appState: { targetUrl: window.location.pathname }
-                                    });
-                                  }
-                                }}
-                                className={`w-full p-2 rounded-lg font-bold text-center transition-colors ${
-                                  isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'
-                                }`}
-                              >
-                                {isAuthenticated ? 'Cambiar cuenta' : 'Verificar email'}
-                              </button>
-                            </div>
-                          );
-                          return;
-                        }
-
-                        setSending(true);
                         try {
-                          await emailjs.send(
-                            import.meta.env.VITE_EMAILJS_SERVICE_ID,
-                            import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-                            formData,
-                            import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-                          );
-                          setSendStatus('success');
-                          setFormData({ name: '', email: '', message: '' });
-                          setFormError(null);
+                          // Guardamos el formulario
+                          localStorage.setItem('pendingFormData', JSON.stringify(formData));
+
+                          // Redirigimos directamente a Auth0
+                          loginWithRedirect({
+                            authorizationParams: {
+                              prompt: 'login',
+                            },
+                            appState: {
+                              returnTo: window.location.pathname,
+                              formPending: true
+                            }
+                          });
                         } catch (error) {
-                          console.error('Error sending email:', error);
-                          setSendStatus('error');
-                          setFormError('Error al enviar el mensaje. Por favor, intenta de nuevo.');
-                        } finally {
-                          setSending(false);
+                          console.error('Error en el proceso de autenticación:', error);
+                          setFormError('Error en el proceso de autenticación. Por favor, intenta de nuevo.');
                         }
                       }}>
                         <div>
@@ -347,18 +338,6 @@ const About = () => {
                             onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                             className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
                             placeholder="Tu nombre"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="email" className="block text-sm font-bold mb-2">Email</label>
-                          <input
-                            type="email"
-                            id="email"
-                            value={formData.email}
-                            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                            className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
-                            placeholder="tu@email.com"
                             required
                           />
                         </div>
@@ -384,13 +363,12 @@ const About = () => {
                           {sending ? 'Enviando...' : 'Enviar Mensaje'}
                         </button>
                         {sendStatus === 'success' && (
-                          <p className="text-green-500 mt-2">¡Mensaje enviado con éxito!</p>
+                          <p className="text-green-500 mt-2">
+                            ¡Mensaje enviado con éxito desde {user?.email}!
+                          </p>
                         )}
                         {sendStatus === 'error' && (
                           <p className="text-red-500 mt-2">Error al enviar el mensaje. Por favor, intenta de nuevo.</p>
-                        )}
-                        {formError && sendStatus === 'info' && (
-                          <div className="mt-2">{formError}</div>
                         )}
                       </form>
                     }
