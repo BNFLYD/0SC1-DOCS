@@ -9,6 +9,14 @@ export const Auth0Provider = ({ children }) => {
       authorizationParams={{
         redirect_uri: window.location.origin,
       }}
+      onRedirectCallback={(appState) => {
+        // Usa navigate de react-router para no recargar
+        window.history.replaceState(
+          {},
+          document.title,
+          appState?.returnTo || '/'
+        );
+      }}
     >
       {children}
     </Auth0ProviderBase>

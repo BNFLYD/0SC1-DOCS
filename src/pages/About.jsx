@@ -37,10 +37,10 @@ const InViewImage = ({ src, alt, isTransitioning, currentImageIndex }) => {
 };
 
 const About = () => {
-  const { isDark } = useUser()
+  const { isDark, isMuttActive, setIsMuttActive } = useUser()
   const { isAuthenticated, user, loginWithRedirect, logout, isLoading } = useAuth()
   const [showWhoamiContent, setShowWhoamiContent] = useState(false)
-  const [headerText, setHeaderText] = useState("whoami")
+  const [headerText, setHeaderText] = useState(isMuttActive ? "mutt" : "whoami")
   const [formError, setFormError] = useState(null)
 
   // Estado para controlar si debemos enviar el email
@@ -106,8 +106,10 @@ const About = () => {
 
   // Función para manejar el cambio de texto y mostrar/ocultar el formulario
   const handleMailClick = () => {
-    // Simplemente alternamos entre los dos estados
-    setHeaderText(headerText === "whoami" ? "mutt" : "whoami")
+    const newState = headerText === "whoami"
+    // Actualizamos ambos estados
+    setHeaderText(newState ? "mutt" : "whoami")
+    setIsMuttActive(newState)
     // Si volvemos a whoami, ocultamos el formulario inmediatamente
     if (headerText === "mutt") {
       setShowEmailForm(false)
@@ -320,7 +322,6 @@ const About = () => {
                               prompt: 'login',
                             },
                             appState: {
-                              returnTo: window.location.pathname,
                               formPending: true
                             }
                           });

@@ -13,9 +13,18 @@ export const UserProvider = ({ children }) => {
     return savedTheme !== null ? savedTheme === "dark" : true
   })
 
+  const [isMuttActive, setIsMuttActive] = useState(() => {
+    const savedMuttState = localStorage.getItem("muttState")
+    return savedMuttState !== null ? savedMuttState === "true" : false
+  })
+
   useEffect(() => {
     localStorage.setItem("userLanguage", language)
   }, [language])
+
+  useEffect(() => {
+    localStorage.setItem("muttState", isMuttActive)
+  }, [isMuttActive])
 
   useEffect(() => {
     localStorage.setItem("userTheme", isDark ? "dark" : "light")
@@ -27,7 +36,9 @@ export const UserProvider = ({ children }) => {
         language,
         setLanguage,
         isDark,
-        setIsDark
+        setIsDark,
+        isMuttActive,
+        setIsMuttActive
       }}
     >
       {children}
