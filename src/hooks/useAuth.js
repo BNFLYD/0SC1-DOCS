@@ -5,6 +5,7 @@ export const useAuth = () => {
     isAuthenticated,
     user,
     loginWithRedirect: auth0Login,
+    loginWithPopup,
     logout,
     isLoading,
     error
@@ -14,15 +15,19 @@ export const useAuth = () => {
   const switchAccount = async (options = {}) => {
     // Primero cerramos la sesión actual
     await logout({
-      returnTo: window.location.origin + window.location.pathname,
-      federated: true // Esto fuerza a cerrar la sesión también en el IdP
+      logoutParams: {
+        returnTo: window.location.origin + window.location.pathname,
+        federated: true // Esto fuerza a cerrar la sesión también en el IdP
+      }
     });
 
-    // Luego iniciamos una nueva autenticación
-    return auth0Login({
+    // Luego iniciamos una nueva autenticación vía popup
+    return loginWithPopup({
       ...options,
-      prompt: 'login', // Fuerza a mostrar la pantalla de login
-      display: 'popup', // Usa un popup en lugar de redirección
+      authorizationParams: {
+        prompt: 'login',
+        ...(options.authorizationParams || {})
+      }
     });
   };
 
@@ -30,6 +35,7 @@ export const useAuth = () => {
     isAuthenticated,
     user,
     loginWithRedirect: auth0Login,
+    loginWithPopup,
     switchAccount, // Exportamos la nueva función
     logout,
     isLoading,

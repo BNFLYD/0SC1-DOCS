@@ -1,11 +1,2 @@
-- Este proyecto tiene como objetivo servir como mi portfolio personal y a su vez como un pequeño blog donde publicar mis experiencias y pensamientos.
-	- Lo primero es definir la estética y categorías del sitio
-		- Obviamente tiene que ser minimalista con detalles retro futuristas ya que 0sc1 es un osciloscopio CTR, la paleta de colores va a ser negro sobre blanco
-		- La pagina va a tener una Nabar y la disposición va a ser MPA
-			- Las secciones del Navbar van a ser:
-			  collapsed:: true
-				- El logo y nombre de la pagina que van a servir como atajo a home
-				- La categoría de Blog que da acceso a la pagina del blog
-				- La categoria de About que da acceso a la pagina sobre mi
-				- Un icono con la bandera argentina que despliega un menu de hamburguesa para seleccionar el idioma de la pagina
-				- Un icono de un sol que al clickearlo da cambia el tema de claro a oscuro y se convierte en una luna
+Usar el icono de linkedin de Akar y los de mail y github de Jam para el whoami
+Dentro del canal de contact usar los iconos de Pixel para linkedin y los de Dinkie en el de mail y github

@@ -38,7 +38,7 @@ const InViewImage = ({ src, alt, isTransitioning, currentImageIndex }) => {
 
 const About = () => {
   const { isDark, isMuttActive, setIsMuttActive } = useUser()
-  const { isAuthenticated, user, loginWithRedirect, logout, isLoading } = useAuth()
+  const { isAuthenticated, user, loginWithRedirect, loginWithPopup, logout, isLoading } = useAuth()
   const [showWhoamiContent, setShowWhoamiContent] = useState(false)
   const [headerText, setHeaderText] = useState(isMuttActive ? "mutt" : "whoami")
   const [formError, setFormError] = useState(null)
@@ -53,10 +53,10 @@ const About = () => {
       if (isAuthenticated && user?.email) {
         const savedForm = localStorage.getItem('pendingFormData');
         // Si hay datos pendientes después de la autenticación, activamos shouldSendEmail
-        if (savedForm && !shouldSendEmail) {
-          setShouldSendEmail(true);
-          return;
-        }
+        // if (savedForm && !shouldSendEmail) {
+        //   setShouldSendEmail(true);
+        //   return;
+        // }
         if (savedForm && shouldSendEmail) {
           setSending(true);
           try {
@@ -102,7 +102,10 @@ const About = () => {
   })
   const [sending, setSending] = useState(false)
   const [sendStatus, setSendStatus] = useState(null)
-  const [lastSentEmail, setLastSentEmail] = useState('')
+  // UI Card para la autenticación
+  const [showAuthCard, setShowAuthCard] = useState(false)
+  const [authCardStatus, setAuthCardStatus] = useState('idle') // 'idle' | 'authenticating' | 'error'
+  const [authError, setAuthError] = useState('')
 
   // Función para manejar el cambio de texto y mostrar/ocultar el formulario
   const handleMailClick = () => {
@@ -121,6 +124,11 @@ const About = () => {
     skills: { isVisible: false, canScroll: true, showContent: false },
     experience: { isVisible: false, canScroll: true, showContent: false }
   })
+  // Ref para tener el estado de secciones siempre actualizado en callbacks
+  const sectionsRef = useRef(sections)
+  useEffect(() => {
+    sectionsRef.current = sections
+  }, [sections])
 
   // Referencias unificadas
   const skillsRef = useRef(null)
@@ -188,7 +196,7 @@ const About = () => {
           );
 
           if (sectionId) {
-            const currentSection = sections[sectionId];
+            const currentSection = sectionsRef.current[sectionId];
 
             if (entry.isIntersecting) {
               // Cuando la sección entra en vista
@@ -229,7 +237,7 @@ const About = () => {
         }
       });
     };
-  }, [isScrolling, sections, updateSection, smoothScrollTo, sectionRefs]);
+  }, [isScrolling, updateSection, smoothScrollTo, sectionRefs, isLoading]);
 
 
   // Datos de habilidades organizados por categorías
@@ -274,13 +282,14 @@ const About = () => {
 
   return (
     <div
-      className="min-h-screen transition-colors duration-300 bg-none">
-      {isLoading ? (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+      className="min-h-screen transition-colors duration-300 bg-none relative">
+      {/* Overlay de carga no destructivo (no desmonta el contenido) */}
+      {isLoading && !showAuthCard && (
+        <div className="pointer-events-none absolute inset-0 flex items-start justify-center pt-24">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-500 opacity-75"></div>
         </div>
-      ) : (
-        /* Contenido principal */
+      )}
+      {/* Contenido principal (siempre montado) */}
       <main className="max-w-7xl mx-auto space-y-52">
         {" "}
         {/* Añadido px-6 para padding lateral */}
@@ -308,26 +317,34 @@ const About = () => {
               >
                 {showEmailForm ? (
                   <div className="space-y-4 font-mono">
-                    {/* Formulario siempre visible */
-                      <form className="space-y-4" onSubmit={(e) => {
+                    {/* Formulario siempre visible */}
+                      <form className="space-y-4" onSubmit={async (e) => {
                         e.preventDefault();
+                        // Autenticación en popup (sin redirección)
+                        setShowAuthCard(true);
+                        setAuthCardStatus('authenticating');
+                        setAuthError('');
 
                         try {
                           // Guardamos el formulario
                           localStorage.setItem('pendingFormData', JSON.stringify(formData));
 
-                          // Redirigimos directamente a Auth0
-                          loginWithRedirect({
+                          // Autenticación en popup (sin redirección)
+                          await loginWithPopup({
                             authorizationParams: {
-                              prompt: 'login',
-                            },
-                            appState: {
-                              formPending: true
+                              prompt: 'login'
                             }
                           });
+
+                          // Disparamos el envío al estar autenticado
+                          setShouldSendEmail(true);
+                          setAuthCardStatus('idle');
+                          setShowAuthCard(false);
                         } catch (error) {
                           console.error('Error en el proceso de autenticación:', error);
                           setFormError('Error en el proceso de autenticación. Por favor, intenta de nuevo.');
+                          setAuthError(error?.message || 'No se pudo abrir el popup de autenticación.');
+                          setAuthCardStatus('error');
                         }
                       }}>
                         <div>
@@ -364,7 +381,7 @@ const About = () => {
                           {sending ? 'Enviando...' : 'Enviar Mensaje'}
                         </button>
                         {sendStatus === 'success' && (
-                          <p className="text-green-500 mt-2">
+                          <p className="text-feather mt-2">
                             ¡Mensaje enviado con éxito desde {user?.email}!
                           </p>
                         )}
@@ -372,7 +389,6 @@ const About = () => {
                           <p className="text-red-500 mt-2">Error al enviar el mensaje. Por favor, intenta de nuevo.</p>
                         )}
                       </form>
-                    }
                   </div>
                 ) : (
                   <>
@@ -442,7 +458,7 @@ const About = () => {
 
               {/* Sección de contacto */}
               <div
-                className={`w-48 rounded-xl}`}
+                className={`w-48 rounded-xl`}
               >
                 <h3 className="text-xl font-mono font-bold mb-4 tracking-wide text-center">Contacto</h3>
                 <div className="flex justify-center gap-2 font-mono text-sm">
@@ -583,6 +599,49 @@ const About = () => {
           </div>
         </section>
       </main>
+      {/* Auth Card Modal (sin backdrop) */}
+      {showAuthCard && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+          <div className={`pointer-events-auto rounded-xl shadow-lg w-[90%] max-w-md p-5 border ${isDark ? 'bg-primary border-white/15' : 'bg-secondary border-black/15'}`}>
+            <h4 className="font-mono font-bold text-lg mb-2">Autenticación</h4>
+            {authCardStatus === 'authenticating' && (
+              <div className="flex flex-col items-center gap-3">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-500 opacity-75"></div>
+                <p className="font-mono text-sm opacity-80">Autenticando... completa el popup para continuar.</p>
+              </div>
+            )}
+            {authCardStatus === 'error' && (
+              <div className="space-y-3">
+                <p className="font-mono text-sm text-red-500">{authError}</p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className={`px-3 py-2 rounded-md font-bold text-sm ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'}`}
+                    onClick={() => setShowAuthCard(false)}
+                  >
+                    Cerrar
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-3 py-2 rounded-md font-bold text-sm ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'}`}
+                    onClick={async () => {
+                      try {
+                        await loginWithRedirect({
+                          authorizationParams: { prompt: 'login' },
+                          appState: { returnTo: '/about' }
+                        })
+                      } catch (e) {
+                        console.error('Redirect auth error', e)
+                      }
+                    }}
+                  >
+                    Usar redirección
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   )
