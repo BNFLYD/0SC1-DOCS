@@ -8,7 +8,9 @@ export const useAuth = () => {
     loginWithPopup,
     logout,
     isLoading,
-    error
+    error,
+    getIdTokenClaims,
+    getAccessTokenSilently
   } = useAuth0()
 
   // Función personalizada para cambiar de cuenta
@@ -39,6 +41,8 @@ export const useAuth = () => {
     switchAccount, // Exportamos la nueva función
     logout,
     isLoading,
-    error
+    error,
+    getIdTokenClaims,
+    getAccessTokenSilently
   }
 }

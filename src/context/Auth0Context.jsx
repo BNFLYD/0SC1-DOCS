@@ -6,9 +6,11 @@ export const Auth0Provider = ({ children }) => {
     <Auth0ProviderBase
       domain={import.meta.env.VITE_AUTH0_DOMAIN}
       clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
+      useRefreshTokens={true}
       authorizationParams={{
         redirect_uri: window.location.origin,
       }}
+      cacheLocation="localstorage"
       onRedirectCallback={(appState) => {
         // Usa navigate de react-router para no recargar
         window.history.replaceState(

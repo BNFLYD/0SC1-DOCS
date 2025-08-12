@@ -5,11 +5,12 @@ import { useUser } from "../context/UserContext"
 import { useAuth } from "../hooks/useAuth"
 import { Mail, Github, Linkedin } from "lucide-react"
 import { useInView } from 'react-intersection-observer'
-import emailjs from '@emailjs/browser'
 import TerminalText from "../components/TerminalText"
+import ContactForm from "../components/ContactForm"
 import AmplitudeIndicator from "../components/AmplitudeIndicator"
 import StaticEffect from "../components/UI/StaticEffect"
 import Toast from "../components/UI/Toast"
+import DevErrorBoundary from "../components/DevErrorBoundary"
 import profile from "../assets/yo.jpg"
 import hornero from "../assets/hornero.svg"
 import osci from "../assets/sprite.svg";
@@ -38,74 +39,18 @@ const InViewImage = ({ src, alt, isTransitioning, currentImageIndex }) => {
 
 const About = () => {
   const { isDark, isMuttActive, setIsMuttActive } = useUser()
-  const { isAuthenticated, user, loginWithRedirect, loginWithPopup, logout, isLoading } = useAuth()
+  const { isLoading } = useAuth()
   const [showWhoamiContent, setShowWhoamiContent] = useState(false)
   const [headerText, setHeaderText] = useState(isMuttActive ? "mutt" : "whoami")
-  const [formError, setFormError] = useState(null)
-
-  // Estado para controlar si debemos enviar el email
-  const [shouldSendEmail, setShouldSendEmail] = useState(false);
-
-  // Efecto para manejar el envío del email después de la autenticación
-  useEffect(() => {
-    const handleFormSubmission = async () => {
-      // Solo procedemos si el usuario está autenticado y hay datos pendientes
-      if (isAuthenticated && user?.email) {
-        const savedForm = localStorage.getItem('pendingFormData');
-        // Si hay datos pendientes después de la autenticación, activamos shouldSendEmail
-        // if (savedForm && !shouldSendEmail) {
-        //   setShouldSendEmail(true);
-        //   return;
-        // }
-        if (savedForm && shouldSendEmail) {
-          setSending(true);
-          try {
-            const parsedForm = JSON.parse(savedForm);
-            const emailData = {
-              ...parsedForm,
-              email: user.email
-            };
-
-            await emailjs.send(
-              import.meta.env.VITE_EMAILJS_SERVICE_ID,
-              import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-              emailData,
-              import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-            );
-            setSendStatus('success');
-            setFormData({ name: '', message: '' });
-            setFormError(null);
-            // Limpiamos todo después del éxito
-            localStorage.removeItem('pendingFormData');
-            setShouldSendEmail(false);
-          } catch (error) {
-            console.error('Error sending email:', error);
-            setSendStatus('error');
-            setFormError('Error al enviar el mensaje. Por favor, intenta de nuevo.');
-          } finally {
-            setSending(false);
-          }
-        }
-      }
-    };
-
-    handleFormSubmission();
-  }, [isAuthenticated, user, shouldSendEmail])
+  
   const [showEmailForm, setShowEmailForm] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [isScrolling, setIsScrolling] = useState(false)
   const [hoveredSkill, setHoveredSkill] = useState(null)
-  const [formData, setFormData] = useState({
-    name: '',
-    message: ''
-  })
-  const [sending, setSending] = useState(false)
-  const [sendStatus, setSendStatus] = useState(null)
-  // UI Card para la autenticación
-  const [showAuthCard, setShowAuthCard] = useState(false)
-  const [authCardStatus, setAuthCardStatus] = useState('idle') // 'idle' | 'authenticating' | 'error'
-  const [authError, setAuthError] = useState('')
+  // Estados propios del formulario fueron movidos a ContactForm
+  // Estado para saber si la card de auth del formulario hijo está abierta
+  const [authCardOpenFromChild, setAuthCardOpenFromChild] = useState(false)
 
   // Función para manejar el cambio de texto y mostrar/ocultar el formulario
   const handleMailClick = () => {
@@ -239,6 +184,15 @@ const About = () => {
     };
   }, [isScrolling, updateSection, smoothScrollTo, sectionRefs, isLoading]);
 
+  // Loguear rechazos no manejados para evitar pantallas en blanco silenciosas
+  useEffect(() => {
+    const handler = (e) => {
+      console.error('[unhandledrejection]', e.reason)
+    }
+    window.addEventListener('unhandledrejection', handler)
+    return () => window.removeEventListener('unhandledrejection', handler)
+  }, [])
+
 
   // Datos de habilidades organizados por categorías
   const skillCategories = [
@@ -281,10 +235,11 @@ const About = () => {
   ]
 
   return (
+    <DevErrorBoundary>
     <div
       className="min-h-screen transition-colors duration-300 bg-none relative">
       {/* Overlay de carga no destructivo (no desmonta el contenido) */}
-      {isLoading && !showAuthCard && (
+      {isLoading && !authCardOpenFromChild && (
         <div className="pointer-events-none absolute inset-0 flex items-start justify-center pt-24">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-500 opacity-75"></div>
         </div>
@@ -317,78 +272,11 @@ const About = () => {
               >
                 {showEmailForm ? (
                   <div className="space-y-4 font-mono">
-                    {/* Formulario siempre visible */}
-                      <form className="space-y-4" onSubmit={async (e) => {
-                        e.preventDefault();
-                        // Autenticación en popup (sin redirección)
-                        setShowAuthCard(true);
-                        setAuthCardStatus('authenticating');
-                        setAuthError('');
-
-                        try {
-                          // Guardamos el formulario
-                          localStorage.setItem('pendingFormData', JSON.stringify(formData));
-
-                          // Autenticación en popup (sin redirección)
-                          await loginWithPopup({
-                            authorizationParams: {
-                              prompt: 'login'
-                            }
-                          });
-
-                          // Disparamos el envío al estar autenticado
-                          setShouldSendEmail(true);
-                          setAuthCardStatus('idle');
-                          setShowAuthCard(false);
-                        } catch (error) {
-                          console.error('Error en el proceso de autenticación:', error);
-                          setFormError('Error en el proceso de autenticación. Por favor, intenta de nuevo.');
-                          setAuthError(error?.message || 'No se pudo abrir el popup de autenticación.');
-                          setAuthCardStatus('error');
-                        }
-                      }}>
-                        <div>
-                          <label htmlFor="name" className="block text-sm font-bold mb-2">Nombre</label>
-                          <input
-                            type="text"
-                            id="name"
-                            value={formData.name}
-                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                            className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
-                            placeholder="Tu nombre"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="message" className="block text-sm font-bold mb-2">Mensaje</label>
-                          <textarea
-                            id="message"
-                            rows="4"
-                            value={formData.message}
-                            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                            className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
-                            placeholder="Escribe tu mensaje aquí..."
-                            required
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          disabled={sending}
-                          className={`p-2 rounded-lg font-bold text-left transition-colors ${
-                            isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'
-                          } ${sending ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                          {sending ? 'Enviando...' : 'Enviar Mensaje'}
-                        </button>
-                        {sendStatus === 'success' && (
-                          <p className="text-feather mt-2">
-                            ¡Mensaje enviado con éxito desde {user?.email}!
-                          </p>
-                        )}
-                        {sendStatus === 'error' && (
-                          <p className="text-red-500 mt-2">Error al enviar el mensaje. Por favor, intenta de nuevo.</p>
-                        )}
-                      </form>
+                    {/* Formulario de contacto extraído a componente */}
+                    <ContactForm
+                      isDark={isDark}
+                      onCardOpenChange={setAuthCardOpenFromChild}
+                    />
                   </div>
                 ) : (
                   <>
@@ -565,7 +453,7 @@ const About = () => {
           </div>
         </section>
 
-        {/* Sección de experiencia øøø*/}
+        {/* Sección de experiencia */}
         <section>
           <div
             ref={sectionRefs.experience}
@@ -599,51 +487,8 @@ const About = () => {
           </div>
         </section>
       </main>
-      {/* Auth Card Modal (sin backdrop) */}
-      {showAuthCard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className={`pointer-events-auto rounded-xl shadow-lg w-[90%] max-w-md p-5 border ${isDark ? 'bg-primary border-white/15' : 'bg-secondary border-black/15'}`}>
-            <h4 className="font-mono font-bold text-lg mb-2">Autenticación</h4>
-            {authCardStatus === 'authenticating' && (
-              <div className="flex flex-col items-center gap-3">
-                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-500 opacity-75"></div>
-                <p className="font-mono text-sm opacity-80">Autenticando... completa el popup para continuar.</p>
-              </div>
-            )}
-            {authCardStatus === 'error' && (
-              <div className="space-y-3">
-                <p className="font-mono text-sm text-red-500">{authError}</p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    className={`px-3 py-2 rounded-md font-bold text-sm ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'}`}
-                    onClick={() => setShowAuthCard(false)}
-                  >
-                    Cerrar
-                  </button>
-                  <button
-                    type="button"
-                    className={`px-3 py-2 rounded-md font-bold text-sm ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'}`}
-                    onClick={async () => {
-                      try {
-                        await loginWithRedirect({
-                          authorizationParams: { prompt: 'login' },
-                          appState: { returnTo: '/about' }
-                        })
-                      } catch (e) {
-                        console.error('Redirect auth error', e)
-                      }
-                    }}
-                  >
-                    Usar redirección
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
+    </DevErrorBoundary>
   )
 }
 
