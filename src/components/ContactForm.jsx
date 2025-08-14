@@ -18,6 +18,28 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
   const lastSubmitTs = useRef(0)
   const instanceId = useRef(Math.random().toString(36).slice(2, 8))
 
+  // Envío de acuse al usuario con credenciales de cliente (no afecta el envío principal)
+  const sendClientReceipt = async ({ toEmail, toName }) => {
+    if (!toEmail) return
+    const svc = import.meta.env.VITE_CLIENT_EMAILJS_SERVICE_ID
+    const tpl = import.meta.env.VITE_CLIENT_EMAILJS_TEMPLATE_ID
+    const pub = import.meta.env.VITE_CLIENT_EMAILJS_PUBLIC_KEY || import.meta.env.VITE_CLIENT_EMAILJS__PUBLIC_KEY
+    if (!svc || !tpl || !pub) return
+    const params = {
+      // El template espera: Subject: {{subject}}, To Email: {{email}}, Content: {{message}}
+      email: toEmail,
+      subject: 'Recibimos tu mensaje',
+      message: `Hola ${toName || 'amig@'}, ¡gracias por escribir! Ya recibimos tu mensaje y lo responderemos a la brevedad. Se notificó a Flavio Morales.`,
+    }
+    try {
+      await emailjs.send(svc, tpl, params, pub)
+    } catch (e) {
+      // No interrumpir el flujo principal
+      try { console.warn('[EmailJS][ClientReceipt] fallo de envío:', e?.message || e) } catch {}
+    }
+  }
+
+
   useEffect(() => {
     const currentInstanceId = instanceId.current
     // Restaurar borrador si existe (por flujo de redirección)
@@ -180,6 +202,8 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
                   emailData,
                   import.meta.env.VITE_EMAILJS_PUBLIC_KEY
                 )
+                // Enviar acuse al usuario (no bloqueante para UX)
+                sendClientReceipt({ toEmail: freshEmail, toName: formData.name })
                 setSendStatus('success')
                 setFormData({ name: '', message: '' })
                 setLastSentEmail(freshEmail)
@@ -260,6 +284,8 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
                 emailData,
                 import.meta.env.VITE_EMAILJS_PUBLIC_KEY
               )
+              // Enviar acuse al usuario (no bloqueante)
+              sendClientReceipt({ toEmail: freshEmail, toName: formData.name })
               setSendStatus('success')
               setFormData({ name: '', message: '' })
               setLastSentEmail(freshEmail)

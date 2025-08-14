@@ -27,6 +27,23 @@ const HireChannel = () => {
   const [invalidField, setInvalidField] = useState(null) // 'name' | 'message' | null
   const [invalidMsg, setInvalidMsg] = useState('')
 
+  // Envío de acuse al usuario con credenciales de cliente (no afecta el envío principal)
+  const sendClientReceipt = async ({ toEmail, toName }) => {
+    if (!toEmail) return
+    const svc = import.meta.env.VITE_CLIENT_EMAILJS_SERVICE_ID
+    const tpl = import.meta.env.VITE_CLIENT_EMAILJS_TEMPLATE_ID
+    const pub = import.meta.env.VITE_CLIENT_EMAILJS_PUBLIC_KEY || import.meta.env.VITE_CLIENT_EMAILJS__PUBLIC_KEY
+    if (!svc || !tpl || !pub) return
+    const params = {
+      email: toEmail,
+      subject: 'Recibimos tu mensaje',
+      message: `Hola ${toName || 'amig@'}, ¡gracias por escribir! Ya recibimos tu mensaje y lo responderemos a la brevedad. Se notificó a Flavio Morales.`,
+    }
+    try {
+      await emailjs.send(svc, tpl, params, pub)
+    } catch {}
+  }
+
   const resetAuthState = async () => {
     setShowAuthCard(false)
     setAuthCardStatus('idle')
@@ -102,6 +119,8 @@ const HireChannel = () => {
             { ...draft, email: freshEmail },
             import.meta.env.VITE_EMAILJS_PUBLIC_KEY
           )
+          // Acuse al usuario (no bloqueante)
+          sendClientReceipt({ toEmail: freshEmail, toName: draft?.name })
           setSendStatus('success')
           setFormData({ name: '', message: '' })
         } catch (err) {
@@ -207,6 +226,8 @@ const HireChannel = () => {
                   emailData,
                   import.meta.env.VITE_EMAILJS_PUBLIC_KEY
                 )
+                // Acuse al usuario (no bloqueante)
+                sendClientReceipt({ toEmail: freshEmail, toName: formData.name })
                 setSendStatus('success')
                 setFormData({ name: '', message: '' })
               } catch (err) {
