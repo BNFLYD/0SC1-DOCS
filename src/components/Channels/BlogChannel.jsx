@@ -45,9 +45,21 @@ const BlogChannel = () => {
       </div>
       <Link
         to="/blog"
-        className={`mt-4 px-3 py-1 border rounded-md text-xs font-bold self-start transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'} ${isDark ? "border-white/60 hover:bg-white/10" : "border-black/60 hover:bg-black/10"}`}
+        className={`relative isolate overflow-hidden mt-4 px-3 py-1 border rounded-md text-xs font-bold self-start
+          transition-colors duration-300
+          before:content-[''] before:absolute before:inset-0 before:rounded-full before:z-0
+          before:scale-0 hover:before:scale-150 before:transition-transform before:duration-300 before:ease-out before:origin-[var(--ox)_var(--oy)]
+          transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'}
+          ${isDark ? "border-white/60 text-white hover:text-black before:bg-white" : "border-black/60 text-black hover:text-white before:bg-black"}`}
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect()
+          const ox = ((e.clientX - rect.left) / rect.width) * 100;
+          const oy = ((e.clientY - rect.top) / rect.height) * 100;
+          e.currentTarget.style.setProperty('--ox', `${ox}%`);
+          e.currentTarget.style.setProperty('--oy', `${oy}%`);
+        }}
       >
-        {t.action} →
+        <span className="relative z-10">{t.action} ↗</span>
       </Link>
     </div>
   )

@@ -109,7 +109,7 @@ const CRTScreen = ({ activeChannel, isDistorting }) => {
 
           {/* Líneas de escaneo CRT */}
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none z-30"
             style={{
               background: `repeating-linear-gradient(
                 0deg,
@@ -123,7 +123,7 @@ const CRTScreen = ({ activeChannel, isDistorting }) => {
 
           {/* Efecto de curvatura CRT */}
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none z-30"
             style={{
               background: `radial-gradient(ellipse at center, transparent 70%, ${isDark ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.3)'} 100%)`,
             }}

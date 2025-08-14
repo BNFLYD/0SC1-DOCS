@@ -13,18 +13,12 @@ export const UserProvider = ({ children }) => {
     return savedTheme !== null ? savedTheme === "dark" : true
   })
 
-  const [isMuttActive, setIsMuttActive] = useState(() => {
-    const savedMuttState = localStorage.getItem("muttState")
-    return savedMuttState !== null ? savedMuttState === "true" : false
-  })
+  // No persistimos mutt entre vistas; por defecto false. Solo About decidirá activarlo si hay redirección pendiente.
+  const [isMuttActive, setIsMuttActive] = useState(false)
 
   useEffect(() => {
     localStorage.setItem("userLanguage", language)
   }, [language])
-
-  useEffect(() => {
-    localStorage.setItem("muttState", isMuttActive)
-  }, [isMuttActive])
 
   useEffect(() => {
     localStorage.setItem("userTheme", isDark ? "dark" : "light")

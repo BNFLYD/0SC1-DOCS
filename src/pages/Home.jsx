@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import CRTScreen from "../components/CRTScreen"
 import SkillKnob from "../components/SkillKnob"
 import AmplitudeIndicator from "../components/AmplitudeIndicator"
@@ -11,7 +11,13 @@ import { translations } from "../constants/translations"
 
 const Home = () => {
   const { language, isDark } = useUser()
-  const [activeChannel, setActiveChannel] = useState(null)
+  const [activeChannel, setActiveChannel] = useState(() => {
+    try {
+      return sessionStorage.getItem('ui:activeChannel') || null
+    } catch {
+      return null
+    }
+  })
   const [isDistorting, setIsDistorting] = useState(false)
 
   const handleChannelChange = (channelId) => {
@@ -21,6 +27,26 @@ const Home = () => {
       setIsDistorting(false) // Terminar distorsión
     }, 250) // Duración de la distorsión (ajustable)
   }
+
+  // Restaurar canal al volver de Auth0 y persistir selección
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem('contact:pending') === '1') {
+        setActiveChannel('hire')
+        sessionStorage.setItem('ui:activeChannel', 'hire')
+      }
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    try {
+      if (activeChannel) {
+        sessionStorage.setItem('ui:activeChannel', activeChannel)
+      } else {
+        sessionStorage.removeItem('ui:activeChannel')
+      }
+    } catch {}
+  }, [activeChannel])
 
   // Datos de habilidades y capacidades
   const skills = [

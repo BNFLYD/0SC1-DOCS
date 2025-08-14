@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { useUser } from "../context/UserContext"
 import { useAuth } from "../hooks/useAuth"
-import { Mail, Github, Linkedin } from "lucide-react"
+import { Icon } from "@iconify/react"
 import { useInView } from 'react-intersection-observer'
 import TerminalText from "../components/TerminalText"
 import ContactForm from "../components/ContactForm"
@@ -42,7 +42,7 @@ const About = () => {
   const { isLoading } = useAuth()
   const [showWhoamiContent, setShowWhoamiContent] = useState(false)
   const [headerText, setHeaderText] = useState(isMuttActive ? "mutt" : "whoami")
-  
+
   const [showEmailForm, setShowEmailForm] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -51,6 +51,25 @@ const About = () => {
   // Estados propios del formulario fueron movidos a ContactForm
   // Estado para saber si la card de auth del formulario hijo está abierta
   const [authCardOpenFromChild, setAuthCardOpenFromChild] = useState(false)
+
+  // No persistir mutt entre vistas: al montar decidir por redirect pendiente; al desmontar, resetear
+  useEffect(() => {
+    let pending = false
+    try {
+      pending = sessionStorage.getItem('contact:pending') === '1'
+    } catch {}
+    if (pending) {
+      setHeaderText('mutt')
+      setIsMuttActive(true)
+    } else {
+      setHeaderText('whoami')
+      setIsMuttActive(false)
+    }
+    return () => {
+      // Al salir de About, no conservar mutt
+      setIsMuttActive(false)
+    }
+  }, [setIsMuttActive])
 
   // Función para manejar el cambio de texto y mostrar/ocultar el formulario
   const handleMailClick = () => {
@@ -235,7 +254,6 @@ const About = () => {
   ]
 
   return (
-    <DevErrorBoundary>
     <div
       className="min-h-screen transition-colors duration-300 bg-none relative">
       {/* Overlay de carga no destructivo (no desmonta el contenido) */}
@@ -356,44 +374,56 @@ const About = () => {
                       e.preventDefault();
                       handleMailClick();
                     }}
-                    className={`relative p-3 rounded-lg transition-all duration-200 flex flex-col items-center justify-center group ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"
-                      }`}
+                    className={`relative p-3 rounded-lg transition-all duration-200 flex flex-col items-center justify-center group`}
                     aria-label="Enviar correo electrónico"
                   >
-                    <Mail className="w-5 h-5" />
+                    <Icon
+                      icon="streamline-logos:protonmail-logo-2-block"
+                      width="28"
+                      height="28"
+                      className={`mb-2 mx-auto transition-colors duration-200 ${isDark ? 'text-white' : 'text-black'}`}
+                    />
                     <span
-                      className={`absolute bottom-[-1.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
+                      className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"
                         }`}
                     >
                       Email
                     </span>
                   </a>
                   <a
-                    href="https://github.com/FlavioG01"
-                    className={`relative p-3 rounded-lg transition-all duration-300 flex flex-col items-center justify-center group ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"
-                      }`}
-                    aria-label="Ver perfil de GitHub"
-                  >
-                    <Github className="w-5 h-5" />
-                    <span
-                      className={`absolute bottom-[-1.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
-                        }`}
-                    >
-                      GitHub
-                    </span>
-                  </a>
-                  <a
                     href="https://www.linkedin.com/in/flavio-gabriel-morales-939371184/"
-                    className={`relative p-3 rounded-lg transition-all duration-300 flex flex-col items-center justify-center group ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"
-                      }`}
+                    className={`relative p-3 rounded-lg transition-all duration-300 flex flex-col items-center justify-center group`}
                     aria-label="Ver perfil de LinkedIn"
                   >
-                    <Linkedin className="w-5 h-5" />
+                    <Icon
+                      icon="brandico:linkedin-rect"
+                      width="25"
+                      height="25"
+                      className={`mb-2 mx-auto transition-colors duration-200 ${isDark ? 'text-white' : 'text-black'}`}
+                    />
                     <span
-                      className={`absolute bottom-[-1.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
+                      className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
                         }`}
                     >
                       LinkedIn
+                    </span>
+                  </a>
+                  <a
+                    href="https://github.com/FlavioG01"
+                    className={`relative p-3 rounded-lg transition-all duration-300 flex flex-col items-center justify-center group `}
+                    aria-label="Ver perfil de GitHub"
+                  >
+                    <Icon
+                      icon="jam:github"
+                      width="28"
+                      height="28"
+                      className={`mb-2 mx-auto transition-colors duration-200  ${isDark ? 'text-white ' : 'text-black'}`}
+                    />
+                    <span
+                      className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
+                        }`}
+                    >
+                      GitHub
                     </span>
                   </a>
                 </div>
@@ -488,7 +518,6 @@ const About = () => {
         </section>
       </main>
     </div>
-    </DevErrorBoundary>
   )
 }
 

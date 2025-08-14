@@ -20,7 +20,6 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
 
   useEffect(() => {
     const currentInstanceId = instanceId.current
-    console.log(`[ContactForm ${currentInstanceId}] mount`)
     // Restaurar borrador si existe (por flujo de redirección)
     try {
       const draft = sessionStorage.getItem('contact:draft')
@@ -28,54 +27,58 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
         const parsed = JSON.parse(draft)
         if (parsed && typeof parsed === 'object') {
           setFormData({ name: parsed.name || '', message: parsed.message || '' })
-          console.log(`[ContactForm ${currentInstanceId}] draft restored from sessionStorage`)
         }
       }
     } catch (e) {
-      console.warn(`[ContactForm ${currentInstanceId}] failed to restore draft`, e)
+
     }
 
     // Verificar si venimos de una redirección de Auth0
     const checkRedirectAndSubmit = async () => {
       try {
-        const claims = await getIdTokenClaims()
-        if (!claims) {
-          console.log(`[ContactForm ${currentInstanceId}] No claims found`)
-          return
-        }
+        // Disparar autosubmit si hay flag de pendiente, sin requerir chequear recencia del token
+        let isPending = false
+        try { isPending = sessionStorage.getItem('contact:pending') === '1' } catch {}
 
-        // Verificar si la autenticación es reciente (menos de 10 segundos)
-        const isRecentAuth = Date.now() / 1000 - claims.auth_time < 10
-        console.log(`[ContactForm ${currentInstanceId}] Auth time check:`, {
-          now: Date.now() / 1000,
-          authTime: claims.auth_time,
-          isRecent: isRecentAuth
-        })
-
-        if (isRecentAuth) {
-          console.log(`[ContactForm ${currentInstanceId}] Recent auth detected, preparing submit`)
-          // Forzar un pequeño delay para asegurar que React ha renderizado
+        if (isPending) {
+          // Pequeño delay para que el DOM y estado del padre terminen de montar
+          setShowAuthCard(true)
+          setAuthCardStatus('authenticating')
           setTimeout(() => {
             const form = document.getElementById('contactForm')
             if (form) {
-              console.log(`[ContactForm ${currentInstanceId}] Triggering form submit`)
-              setShowAuthCard(false) // Ocultar el modal
-              setAuthCardStatus('idle')
               form.requestSubmit()
             } else {
-              console.warn(`[ContactForm ${currentInstanceId}] Form not found after redirect`)
             }
-          }, 100)
+          }, 150)
+          return
         }
+
+        // Mantener comportamiento anterior como fallback (por si el flag no está, pero venimos autenticados)
+        try {
+          const claims = await getIdTokenClaims()
+          if (!claims) return
+          const isRecentAuth = Date.now() / 1000 - claims.auth_time < 10
+          if (isRecentAuth) {
+            setTimeout(() => {
+              const form = document.getElementById('contactForm')
+              if (form) {
+                setShowAuthCard(false)
+                setAuthCardStatus('idle')
+                form.requestSubmit()
+              }
+            }, 100)
+          }
+        } catch {}
       } catch (e) {
-        console.warn(`[ContactForm ${currentInstanceId}] Error processing redirect:`, e)
+
       }
     }
 
     checkRedirectAndSubmit()
 
     return () => {
-      console.log(`[ContactForm ${currentInstanceId}] unmount`)
+
     }
   }, [getIdTokenClaims])
 
@@ -84,11 +87,9 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
   }, [showAuthCard, onCardOpenChange])
 
   useEffect(() => {
-    console.warn(`[ContactForm] Email actualizado:`, lastSentEmail)
   }, [lastSentEmail])
 
   const resetAuthState = async () => {
-    console.log(`[ContactForm ${instanceId.current}] resetting auth state`)
     authInFlight.current = false
     setShowAuthCard(false)
     setAuthCardStatus('idle')
@@ -99,7 +100,7 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
         clientId: import.meta.env.VITE_AUTH0_CLIENT_ID
       })
     } catch (e) {
-      console.warn('[ContactForm] Error al limpiar sesión:', e)
+
     }
   }
 
@@ -110,35 +111,19 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
         className="space-y-4"
         onSubmit={async (e) => {
           e.preventDefault()
-          // Log del estado antes del reset
-          console.warn(`[ContactForm ${instanceId.current}] Email antes del reset:`, lastSentEmail)
-          try {
-            const tokenBefore = await getIdTokenClaims()
-            console.warn(`[ContactForm ${instanceId.current}] Token Auth0 antes del reset:`, tokenBefore)
-          } catch (e) {
-            console.warn(`[ContactForm ${instanceId.current}] No hay token antes del reset`)
-          }
 
+          // Limpiar mensajes de envío previos al presionar el botón
+          setSendStatus(null)
           setLastSentEmail(null)
-
-          // Log del estado después del reset
-          try {
-            const tokenAfter = await getIdTokenClaims()
-            console.warn(`[ContactForm ${instanceId.current}] Token Auth0 después del reset:`, tokenAfter)
-          } catch (e) {
-            console.warn(`[ContactForm ${instanceId.current}] No hay token después del reset`)
-          }
 
           setAuthError('')
           try {
             const now = Date.now()
             if (now - lastSubmitTs.current < 800) {
-              console.warn(`[ContactForm ${instanceId.current}] debounce preventing double submit`)
               return
             }
             lastSubmitTs.current = now
             if (authInFlight.current) {
-              console.warn(`[ContactForm ${instanceId.current}] auth already in flight, ignoring submit`)
               return
             }
             // Detectar si venimos de redirección (auto-envío sin popup)
@@ -149,31 +134,35 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
 
             if (isRedirectPending) {
               authInFlight.current = true
-              console.log(`[ContactForm ${instanceId.current}] redirect pending detected: skipping popup and sending with existing session`)
 
-              // Obtener email del token actual
-              let freshEmail = null
-              try {
-                const claims = await getIdTokenClaims({ timeoutInSeconds: 10 })
-                console.log(`[ContactForm ${instanceId.current}] claims after redirect:`, claims)
-                freshEmail = claims?.email || claims?.['https://schemas.openid.net/claims/email'] || null
-              } catch (e) {
-                console.warn('[ContactForm] claims fetch after redirect failed:', e)
-              }
-              if (!freshEmail) {
-                try {
-                  const token = await getAccessTokenSilently()
-                  const domain = import.meta.env.VITE_AUTH0_DOMAIN
-                  const resp = await fetch(`https://${domain}/userinfo`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                  })
-                  const profile = await resp.json()
-                  freshEmail = profile?.email || null
-                  console.log(`[ContactForm ${instanceId.current}] userinfo email after redirect:`, freshEmail)
-                } catch (e) {
-                  console.warn('[ContactForm] userinfo after redirect failed', e)
+              // Obtener email con pequeño retry/backoff: el SDK puede seguir resolviendo el callback
+              const getFreshEmailWithRetry = async () => {
+                const maxAttempts = 8
+                const delay = (ms) => new Promise(r => setTimeout(r, ms))
+                for (let i = 0; i < maxAttempts; i++) {
+                  // 1) claims
+                  try {
+                    const claims = await getIdTokenClaims({ timeoutInSeconds: 5 })
+                    const email = claims?.email || claims?.['https://schemas.openid.net/claims/email'] || null
+                    if (email) return email
+                  } catch {}
+                  // 2) userinfo con token silencioso
+                  try {
+                    const token = await getAccessTokenSilently()
+                    if (token) {
+                      const domain = import.meta.env.VITE_AUTH0_DOMAIN
+                      const resp = await fetch(`https://${domain}/userinfo`, { headers: { Authorization: `Bearer ${token}` } })
+                      const profile = await resp.json()
+                      const email = profile?.email || null
+                      if (email) return email
+                    }
+                  } catch {}
+                  await delay(200 + i * 150)
                 }
+                return null
               }
+
+              const freshEmail = await getFreshEmailWithRetry()
               if (!freshEmail) {
                 setAuthError('No se pudo obtener el email autenticado tras la redirección. Intenta de nuevo.')
                 setAuthCardStatus('error')
@@ -200,7 +189,6 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
                   sessionStorage.removeItem('contact:draft')
                 } catch {}
               } catch (sendErr) {
-                console.error('Error sending email after redirect:', sendErr)
                 setSendStatus('error')
               } finally {
                 setSending(false)
@@ -212,10 +200,8 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
             }
 
             authInFlight.current = true
-            console.log(`[ContactForm ${instanceId.current}] submit: start auth flow (starting popup immediately)`)
 
             // Limpiar cualquier sesión existente de Auth0
-            console.log(`[ContactForm ${instanceId.current}] clearing existing auth session`)
             await logout({
               openUrl: false,
               clientId: import.meta.env.VITE_AUTH0_CLIENT_ID
@@ -232,23 +218,18 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
               }
             })
 
-            console.log(`[ContactForm ${instanceId.current}] popup completed successfully`)
-
             // 2) Obtener email del token fresco
             let freshEmail = null
             try {
               // Forzar obtención de un token fresco
               const claims = await getIdTokenClaims({ timeoutInSeconds: 10 })
-              console.log(`[ContactForm ${instanceId.current}] Verificando claims del nuevo token:`, claims)
               freshEmail = claims?.email || claims?.['https://schemas.openid.net/claims/email'] || null
 
               if (!freshEmail) {
                 throw new Error('No se encontró email en el token')
               }
-
-              console.log(`[ContactForm ${instanceId.current}] Email obtenido del nuevo token:`, freshEmail)
             } catch (e) {
-              console.warn('[ContactForm] Error al obtener email del token:', e)
+
             }
             if (!freshEmail) {
               try {
@@ -259,9 +240,8 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
                 })
                 const profile = await resp.json()
                 freshEmail = profile?.email || null
-                console.log(`[ContactForm ${instanceId.current}] userinfo email:`, freshEmail)
               } catch (e) {
-                console.warn('[ContactForm] userinfo fetch failed', e)
+
               }
             }
             if (!freshEmail) {
@@ -287,11 +267,8 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
               try {
                 sessionStorage.removeItem('contact:pending')
                 sessionStorage.removeItem('contact:draft')
-              } catch (e) {
-                console.warn('[ContactForm] failed to clear draft from sessionStorage', e)
-              }
+              } catch (e) {}
             } catch (sendErr) {
-              console.error('Error sending email:', sendErr)
               setSendStatus('error')
             } finally {
               setSending(false)
@@ -310,12 +287,10 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
             }
             // Popup bloqueado por el navegador
             if (error?.error === 'popup_blocked' || error?.code === 'popup_blocked') {
-              console.warn('[ContactForm] popup blocked by the browser')
               setAuthError('El navegador bloqueó el popup. Habilita pop-ups para este sitio o usa la redirección.')
               setAuthCardStatus('error')
               return
             }
-            console.error('Error en el proceso de autenticación:', error)
             setAuthError(error?.message || 'No se pudo abrir el popup de autenticación.')
             setAuthCardStatus('error')
           }
@@ -329,7 +304,11 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
             type="text"
             id="name"
             value={formData.name}
-            onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+            onChange={(e) => {
+              setSendStatus(null)
+              setLastSentEmail(null)
+              setFormData((prev) => ({ ...prev, name: e.target.value }))
+            }}
             className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
             placeholder="Tu nombre"
             required
@@ -343,7 +322,11 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
             id="message"
             rows="4"
             value={formData.message}
-            onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
+            onChange={(e) => {
+              setSendStatus(null)
+              setLastSentEmail(null)
+              setFormData((prev) => ({ ...prev, message: e.target.value }))
+            }}
             className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
             placeholder="Escribe tu mensaje aquí..."
             required
@@ -368,85 +351,77 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
       </form>
 
       {showAuthCard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none ">
           <div
-            className={`pointer-events-auto rounded-xl shadow-lg w-[90%] max-w-md p-5 border ${isDark ? 'bg-primary border-white/15' : 'bg-secondary border-black/15'
-              }`}
+            className={`pointer-events-auto rounded-xl shadow-lg w-[90%] max-w-md p-5 border relative space-y-3 ${isDark ? 'bg-primary border-white/15' : 'bg-secondary border-black/15'}`}
           >
-            <h4 className="font-mono font-bold text-lg mb-2">Autenticación</h4>
+            <button
+              type="button"
+              aria-label="Cerrar"
+              className={`absolute top-2 right-2 h-8 w-8 flex items-center justify-center rounded-lg text-3xl leading-none ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/10'}`}
+              onClick={async () => {
+                await resetAuthState()
+                setShowAuthCard(false)
+              }}
+            >
+              ×
+            </button>
+            <h4 className="absolute top-2 left-4 font-mono font-bold text-lg">Autenticación</h4>
+            <br/>
             {authCardStatus === 'authenticating' && (
               <div className="flex flex-col items-center gap-3">
                 <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-500 opacity-75"></div>
-                <p className="font-mono text-sm opacity-80">Autenticando... completa el popup para continuar.</p>
+                <p className="pt-16 font-mono text-sm opacity-80">Autenticando... completa el popup para continuar.</p>
               </div>
             )}
             {authCardStatus === 'error' && (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <p className="font-mono text-sm text-red-500">{authError}</p>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    className={`px-3 py-2 rounded-md font-bold text-sm ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'
-                      }`}
-                    onClick={async () => {
-                      await resetAuthState()
-                      setShowAuthCard(false)
-                    }}
-                  >
-                    Cerrar
-                  </button>
-                  <button
-                    type="button"
-                    className={`px-3 py-2 rounded-md font-bold text-sm ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'
-                      }`}
-                    onClick={async () => {
-                      await resetAuthState()
-                      const form = document.getElementById('contactForm')
-                      if (form) form.requestSubmit()
-                    }}
-                  >
-                    Reintentar
-                  </button>
-                  <button
-                    type="button"
-                    className={`px-3 py-2 rounded-md font-bold text-sm ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'
-                      }`}
-                    onClick={async () => {
-                      try {
-                        console.log(`[ContactForm ${instanceId.current}] starting redirect auth flow`)
-                        // Guardar borrador e intención de envío antes de redireccionar
-                        try {
-                          sessionStorage.setItem('contact:pending', '1')
-                          sessionStorage.setItem('contact:draft', JSON.stringify(formData))
-                          console.log(`[ContactForm ${instanceId.current}] draft saved to sessionStorage`)
-                        } catch (e) {
-                          console.warn('[ContactForm] failed to save draft to sessionStorage', e)
-                        }
-                        // Limpiar la sesión antes de redireccionar
-                        await logout({
-                          openUrl: false,
-                          clientId: import.meta.env.VITE_AUTH0_CLIENT_ID
-                        })
-
-                        await loginWithRedirect({
-                          authorizationParams: {
-                            prompt: 'login',
-                            max_age: 0
-                          }
-                        })
-                      } catch (e) {
-                        console.error('Redirect auth error:', e)
-                        await resetAuthState()
-                        setAuthError('Error al redireccionar. Intenta de nuevo.')
-                        setAuthCardStatus('error')
-                      }
-                    }}
-                  >
-                    Usar redirección
-                  </button>
-                </div>
               </div>
             )}
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className={`px-3 py-2 rounded-md font-bold text-sm ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'}`}
+                onClick={async () => {
+                  await resetAuthState()
+                  const form = document.getElementById('contactForm')
+                  if (form) form.requestSubmit()
+                }}
+              >
+                Reintentar
+              </button>
+              <button
+                type="button"
+                className={`px-3 py-2 rounded-md font-bold text-sm ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'}`}
+                onClick={async () => {
+                  try {
+                    try {
+                      sessionStorage.setItem('contact:pending', '1')
+                      sessionStorage.setItem('contact:draft', JSON.stringify(formData))
+                    } catch (e) {}
+                    await logout({
+                      openUrl: false,
+                      clientId: import.meta.env.VITE_AUTH0_CLIENT_ID
+                    })
+                    await loginWithRedirect({
+                      authorizationParams: {
+                        prompt: 'login',
+                        max_age: 0,
+                        redirect_uri: `${window.location.origin}/about`
+                      },
+                      appState: { returnTo: '/about' }
+                    })
+                  } catch (e) {
+                    await resetAuthState()
+                    setAuthError('Error al redireccionar. Intenta de nuevo.')
+                    setAuthCardStatus('error')
+                  }
+                }}
+              >
+                Usar redirección
+              </button>
+            </div>
           </div>
         </div>
       )}
