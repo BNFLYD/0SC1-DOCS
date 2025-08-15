@@ -10,7 +10,6 @@ import ContactForm from "../components/ContactForm"
 import AmplitudeIndicator from "../components/AmplitudeIndicator"
 import StaticEffect from "../components/UI/StaticEffect"
 import Toast from "../components/UI/Toast"
-import DevErrorBoundary from "../components/DevErrorBoundary"
 import profile from "../assets/yo.jpg"
 import hornero from "../assets/hornero.svg"
 import osci from "../assets/sprite.svg";

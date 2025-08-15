@@ -64,6 +64,30 @@
   .info-container {
     @apply mt-8 p-6 border rounded-sm border-current/20;
   }
+
+  /* Code blocks (MDX) */
+  /* rehype-pretty-code + Shiki variables */
+  .prose pre[data-theme] {
+    /* Usa los colores del tema de Shiki inyectados como CSS vars */
+    background-color: var(--shiki-background);
+    color: var(--shiki-foreground);
+    @apply rounded-xl border border-slate-700 p-4 overflow-auto;
+  }
+  .prose code[data-theme] {
+    color: var(--shiki-foreground);
+    background: transparent;
+    @apply font-mono text-[0.95rem];
+  }
+  .prose pre code {
+    /* Cada línea como grid row para line highlighting */
+    display: grid;
+  }
+  .prose pre [data-line] {
+    padding: 0 0.75rem;
+  }
+  .prose pre [data-line][data-highlighted] {
+    background-color: color-mix(in oklab, var(--shiki-background) 85%, white 15%);
+  }
 }
 
 @layer base {
