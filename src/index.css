@@ -65,28 +65,73 @@
     @apply mt-8 p-6 border rounded-sm border-current/20;
   }
 
-  /* Code blocks (MDX) */
-  /* rehype-pretty-code + Shiki variables */
-  .prose pre[data-theme] {
-    /* Usa los colores del tema de Shiki inyectados como CSS vars */
-    background-color: var(--shiki-background);
-    color: var(--shiki-foreground);
-    @apply rounded-xl border border-slate-700 p-4 overflow-auto;
+  /* Code blocks (MDX) - Let Tailwind handle styles */
+  .prose pre {
+    @apply overflow-auto my-4;
   }
-  .prose code[data-theme] {
-    color: var(--shiki-foreground);
-    background: transparent;
-    @apply font-mono text-[0.95rem];
-  }
+
   .prose pre code {
-    /* Cada línea como grid row para line highlighting */
-    display: grid;
+    @apply font-mono text-sm block;
   }
-  .prose pre [data-line] {
-    padding: 0 0.75rem;
+
+  .prose code:not(pre code) {
+    @apply font-mono text-sm px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800;
   }
-  .prose pre [data-line][data-highlighted] {
-    background-color: color-mix(in oklab, var(--shiki-background) 85%, white 15%);
+
+  /* Force mono font for all prose content */
+  .prose {
+    @apply font-mono;
+  }
+
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    @apply font-mono;
+  }
+
+  .prose p, .prose li, .prose blockquote {
+    @apply font-mono;
+  }
+
+  /* rehype-pretty-code dual theme mapping: pick which custom property to use */
+  /* When data-theme='light' on any ancestor (html or container), use --shiki-light */
+  [data-theme='light'] .prose pre code span {
+    color: var(--shiki-light) !important;
+  }
+
+  /* When data-theme='dark', use --shiki-dark */
+  [data-theme='dark'] .prose pre code span {
+    color: var(--shiki-dark) !important;
+  }
+
+  /* Code block title styling - position inside the visual code block */
+  [data-rehype-pretty-code-title] {
+    @apply font-mono font-bold text-xl px-4 py-3 border-b border-feather/10 rounded-t-2xl text-center;
+    margin: 0 !important;
+    margin-bottom: -1px !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+  }
+
+  /* Make title inherit the same background as the code block */
+  [data-theme='light'] [data-rehype-pretty-code-title] {
+    background: #d0d0d0 !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  [data-theme='dark'] [data-rehype-pretty-code-title] {
+    background: #000000 !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  /* Remove top border radius from pre when title exists */
+  [data-rehype-pretty-code-figure] pre {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* Copy button positioning */
+  [data-rehype-pretty-code-figure] {
+    @apply relative;
   }
 }
 

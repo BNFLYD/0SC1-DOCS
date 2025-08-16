@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import typography from '@tailwindcss/typography'
+
 export default {
   content: [
     "./index.html",
@@ -29,7 +31,7 @@ export default {
       colors: {
         // Modo claro
         elementary: "hsl(var(--elementary))",       // Blanco (modo claro) / Negro (modo oscuro)
-        void: "#000000",       // Negro (modo claro) / Blanco (modo oscuro)
+        void: "#000000",
         primary: "#1b1b1b",
         secondary: "#e2e2e3", // e2e2e3 vs d1d4db
         cloud: "#d0d0d0",   // d0d0d0 vs d1d5db
@@ -83,5 +85,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [typography],
 }

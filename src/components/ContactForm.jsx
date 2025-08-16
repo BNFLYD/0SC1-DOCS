@@ -362,10 +362,20 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
           <button
             type="submit"
             disabled={sending || authCardStatus === 'authenticating'}
-            className={`p-2 rounded-lg font-bold text-left transition-colors ${isDark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/10 hover:bg-black/20'
-              } ${sending ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`relative isolate overflow-hidden my-2 px-3 py-1 border rounded-md text-xs font-bold
+              transition-colors duration-300
+              before:content-[''] before:absolute before:inset-0 before:rounded-full
+              before:scale-0 hover:before:scale-150 before:transition-transform before:duration-300 before:ease-out before:origin-[var(--ox)_var(--oy)]
+              ${isDark ? 'border-white/40 text-white hover:text-black before:bg-white' : 'border-black/40 text-black hover:text-white before:bg-black'}`}
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect()
+              const ox = ((e.clientX - rect.left) / rect.width) * 100
+              const oy = ((e.clientY - rect.top) / rect.height) * 100
+              e.currentTarget.style.setProperty('--ox', `${ox}%`)
+              e.currentTarget.style.setProperty('--oy', `${oy}%`)
+            }}
           >
-            {sending ? 'Enviando...' : 'Enviar Mensaje'}
+            <span className="relative z-10 text-md">{sending ? 'Enviando...' : 'Enviar ↗'}</span>
           </button>
           {sendStatus === 'success' && (
             <p className="text-feather text-sm">¡Mensaje enviado con éxito desde {lastSentEmail}!</p>

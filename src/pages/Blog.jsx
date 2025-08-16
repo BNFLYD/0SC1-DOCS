@@ -3,6 +3,7 @@ import { useMemo, useState } from "react"
 import { Icon } from "@iconify/react"
 import { translations } from "../constants/translations"
 import { useUser } from "../context/UserContext"
+import CodeCopyButton from "../components/CodeCopyButton"
 
 function Blog() {
   const { language, isDark } = useUser()
@@ -76,40 +77,28 @@ function Blog() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-4xl font-mono font-bold mb-2 transition-colors">
-          0SC1-D0CS
-        </h1>
-        <p className="text-lg font-mono opacity-80 mb-6">
-          {t.subtitle}
-        </p>
-      </div>
-
       {/* Controles: búsqueda y filtros */}
-      <div className="mb-8 flex flex-col gap-4 space-y-4">
+      <div className="mb-8 flex flex-col gap-4 space-y-4 pt-24">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={language === "es" ? "Buscar por título, resumen o tag..." : "Search by title, excerpt or tag..."}
-          className={`w-full px-8 py-3 rounded-xl outline-none font-mono text-md ${
-            isDark
-              ? "bg-primary text-white placeholder-white/40"
-              : "bg-secondary text-black placeholder-black/40"
-          }`}
+          className={`w-full px-8 py-3 rounded-xl outline-none font-mono text-md ${isDark
+            ? "bg-primary text-white placeholder-white/40"
+            : "bg-secondary text-black placeholder-black/40"
+            }`}
         />
 
         <div className="flex flex-wrap gap-2 items-center">
           <button
-            className={`px-3 py-1 rounded-lg text-sm font-bold border transition-colors ${
-              !activeTag
-                ? isDark
-                  ? "border-white/80 bg-white text-black"
-                  : "border-black/80 bg-black text-white"
-                : isDark
+            className={`px-3 py-1 rounded-lg text-sm font-bold border transition-colors ${!activeTag
+              ? isDark
+                ? "border-white/80 bg-white text-black"
+                : "border-black/80 bg-black text-white"
+              : isDark
                 ? "border-white/40 text-white hover:bg-white/10"
                 : "border-black/40 text-black hover:bg-black/5"
-            }`}
+              }`}
             onClick={() => setActiveTag("")}
           >
             {language === "es" ? "Todos" : "All"}
@@ -117,15 +106,14 @@ function Blog() {
           {allTags.map((tag) => (
             <button
               key={tag}
-              className={`px-3 py-1 rounded-md text-xs font-bold border transition-colors ${
-                activeTag === tag
-                  ? isDark
-                    ? "border-white/80 bg-white text-black"
-                    : "border-black/80 bg-black text-white"
-                  : isDark
+              className={`px-3 py-1 rounded-md text-xs font-bold border transition-colors ${activeTag === tag
+                ? isDark
+                  ? "border-white/80 bg-white text-black"
+                  : "border-black/80 bg-black text-white"
+                : isDark
                   ? "border-white/40 text-white hover:bg-white/10"
                   : "border-black/40 text-black hover:bg-black/5"
-              }`}
+                }`}
               onClick={() => setActiveTag(tag)}
             >
               #{tag}
@@ -142,9 +130,8 @@ function Blog() {
           return (
             <div
               key={post.slug}
-              className={`rounded-2xl overflow-hidden transition-colors ${
-                isDark ? "bg-primary" : "bg-secondary"
-              }`}
+              className={`rounded-2xl overflow-hidden transition-colors ${isDark ? "bg-primary" : "bg-secondary"
+                }`}
             >
               {/* Miniatura / Header */}
               <button
@@ -185,11 +172,17 @@ function Blog() {
 
               {/* Contenido MDX expandido */}
               {isOpen && Comp && (
-                <div className={`px-5 pb-6 pt-1 prose max-w-none ${
-                  isDark ? "prose-invert" : ""
-                }`}>
-                  <Comp />
-                </div>
+                <div
+                className={`px-16 pb-6 pt-1 prose max-w-none ${
+                  isDark
+                    ? "prose-invert prose-pre:bg-void"
+                    : "prose-pre:bg-cloud"
+                } prose-pre:rounded-2xl prose-pre:p-4 prose-code:font-mono`}
+                data-theme={isDark ? 'dark' : 'light'}
+              >
+                <Comp />
+                <CodeCopyButton />
+              </div>
               )}
             </div>
           )

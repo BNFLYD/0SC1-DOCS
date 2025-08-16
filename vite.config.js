@@ -1,4 +1,6 @@
 import path from "path";
+import osciLight from "./src/themes/osci-light.json" assert { type: "json" }
+import osciDark from "./src/themes/osci-dark.json" assert { type: "json" }
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import svgr from "vite-plugin-svgr";
@@ -12,10 +14,12 @@ export default defineConfig({
         [
           rehypePrettyCode,
           {
-            // Tema de Shiki. Alternativas: 'github-dark', 'one-light', etc.
-            theme: "one-dark-pro",
-            keepBackground: true,
-            defaultLang: "js",
+            theme: {
+              light: osciLight,
+              dark: osciDark,
+            },
+            keepBackground: false,
+            defaultLang: 'js',
           },
         ],
       ],
@@ -31,7 +35,6 @@ export default defineConfig({
   server: {
     allowedHosts: [
       'localhost',
-      'cst-rv-comments-spas.trycloudflare.com', // Tu subdominio de TryCloudflare
     ],
   },
 });

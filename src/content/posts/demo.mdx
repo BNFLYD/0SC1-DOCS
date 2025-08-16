@@ -16,10 +16,50 @@ Esto es un parrafo
 
 * Esto es una lista
 
-**Esto es una lista con negrita**
+* **Esto es una lista con negrita**
 
 ```js title="demo.js"
-export const suma = (a,b) => a+b
+// Este codigo se identa segun el lenguaje en este caso JS
+
+export const PI = 3.14159
+const enabled = true
+let count = 0
+var legacy = null
+const notANumber = NaN
+
+const str = "Texto de ejemplo"
+const regex = /foo(bar)?/gi
+
+function add(a, b) {
+  const obj = { key: "value", nested: { inner: 123 } }
+  return a + b
+}
+
+const result = add(1, 2)
+class Person {
+  constructor(name) { this.name = name }
+  greet() { return `Hi, ${this.name}` }
+}
+const user = new Person("Ado")
+
+function Card({ title, children }) {
+  return (
+    <section className="card">
+      <h2>{title}</h2>
+      <div>{children}</div>
+    </section>
+  )
+}
+
+const App = () => (
+  <Card title="Demo">
+    <button onClick={() => console.log(user.greet())}>Click</button>
+  </Card>
+)
+
+export default App
+
 ```
 
-imagen: ![imagen](../src/assets/vaporwave.gif)
+Imagen: ![img](../src/assets/hornero.svg)
+Gif: ![gif](../src/assets/vaporwave.gif)
