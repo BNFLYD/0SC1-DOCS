@@ -8,13 +8,13 @@ import Blog from "./pages/Blog"
 
 function App() {
   return (
-    <Layout>
-      <Routes>
+    <Routes>
+      <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/blog" element={<Blog />} />
-      </Routes>
-    </Layout>
+      </Route>
+    </Routes>
   )
 }
 

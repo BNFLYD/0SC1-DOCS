@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import emailjs from '@emailjs/browser'
+import { Icon } from '@iconify/react'
 
 export default function ContactForm({ isDark, onCardOpenChange }) {
   const { loginWithRedirect, loginWithPopup, getIdTokenClaims, getAccessTokenSilently, logout } = useAuth()
@@ -9,6 +10,9 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
   const [sending, setSending] = useState(false)
   const [sendStatus, setSendStatus] = useState(null)
   const [lastSentEmail, setLastSentEmail] = useState(null)
+  // Validación custom para respetar tema sin permitir envíos vacíos
+  const [invalidField, setInvalidField] = useState(null) // 'name' | 'message' | null
+  const [invalidMsg, setInvalidMsg] = useState('')
 
   // Auth card UI
   const [showAuthCard, setShowAuthCard] = useState(false)
@@ -139,6 +143,21 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
           setLastSentEmail(null)
 
           setAuthError('')
+          // Validación temprana: evita envío con campos vacíos, con UI tematizable
+          const trimmedName = (formData.name || '').trim()
+          const trimmedMsg = (formData.message || '').trim()
+          if (!trimmedName) {
+            setInvalidField('name')
+            setInvalidMsg('Rellene este campo')
+            try { e.currentTarget.querySelector('input[name="name"]').focus() } catch {}
+            return
+          }
+          if (!trimmedMsg) {
+            setInvalidField('message')
+            setInvalidMsg('Rellene este campo')
+            try { e.currentTarget.querySelector('textarea[name="message"]').focus() } catch {}
+            return
+          }
           try {
             const now = Date.now()
             if (now - lastSubmitTs.current < 800) {
@@ -321,52 +340,78 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
             setAuthCardStatus('error')
           }
         }}
-      >
-        <div>
+      noValidate>
+        <div className="relative">
           <label htmlFor="name" className="block text-sm font-bold mb-2">
             Nombre
           </label>
-          <input
-            type="text"
-            id="name"
-            value={formData.name}
-            onChange={(e) => {
-              setSendStatus(null)
-              setLastSentEmail(null)
-              setFormData((prev) => ({ ...prev, name: e.target.value }))
-            }}
-            className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
-            placeholder="Tu nombre"
-            required
-          />
+          <div className="relative">
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={(e) => {
+                setSendStatus(null)
+                setLastSentEmail(null)
+                setFormData((prev) => ({ ...prev, name: e.target.value }))
+                if (invalidField === 'name' && e.target.value.trim()) setInvalidField(null)
+                if (invalidField === 'name' && e.target.value.trim()) setInvalidMsg('')
+              }}
+              className={`w-full p-2 rounded-lg ${isDark ? 'bg-void' : 'bg-cloud'} font-mono ${invalidField === 'name' ? 'pr-36' : ''}`}
+              placeholder="Tu nombre"
+              required
+              aria-invalid={invalidField === 'name'}
+              aria-describedby={invalidField === 'name' ? 'error-name' : undefined}
+            />
+            {invalidField === 'name' && (
+              <div id="error-name" className={`absolute top-2 right-2 pointer-events-none select-none text-sm font-mono rounded-md px-2.5 py-1 flex items-center gap-1 ${isDark ? 'bg-void text-white' : 'bg-cloud text-black'}`}>
+                <span>{invalidMsg}</span>
+                <Icon icon="mdi:alert" width="16" height="16" />
+              </div>
+            )}
+          </div>
         </div>
-        <div>
+        <div className="relative">
           <label htmlFor="message" className="block text-sm font-bold mb-2">
             Mensaje
           </label>
-          <textarea
-            id="message"
-            rows="4"
-            value={formData.message}
-            onChange={(e) => {
-              setSendStatus(null)
-              setLastSentEmail(null)
-              setFormData((prev) => ({ ...prev, message: e.target.value }))
-            }}
-            className={`w-full p-2 rounded-lg border ${isDark ? 'bg-primary border-cloud/40' : 'bg-cloud border-void/40'} font-mono`}
-            placeholder="Escribe tu mensaje aquí..."
-            required
-          />
+          <div className="relative">
+            <textarea
+              id="message"
+              name="message"
+              rows="4"
+              value={formData.message}
+              onChange={(e) => {
+                setSendStatus(null)
+                setLastSentEmail(null)
+                setFormData((prev) => ({ ...prev, message: e.target.value }))
+                if (invalidField === 'message' && e.target.value.trim()) setInvalidField(null)
+                if (invalidField === 'message' && e.target.value.trim()) setInvalidMsg('')
+              }}
+              className={`w-full p-2 rounded-lg ${isDark ? 'bg-void' : 'bg-cloud'} font-mono ${invalidField === 'message' ? 'pr-36' : ''}`}
+              placeholder="Escribe tu mensaje aquí..."
+              required
+              aria-invalid={invalidField === 'message'}
+              aria-describedby={invalidField === 'message' ? 'error-message' : undefined}
+            />
+            {invalidField === 'message' && (
+              <div id="error-message" className={`absolute top-2 right-2 pointer-events-none select-none text-sm font-mono rounded-md px-2.5 py-1 flex items-center gap-1 ${isDark ? 'bg-void text-white' : 'bg-cloud text-black'}`}>
+                <span>{invalidMsg}</span>
+                <Icon icon="mdi:alert" width="16" height="16" />
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           <button
             type="submit"
             disabled={sending || authCardStatus === 'authenticating'}
-            className={`relative isolate overflow-hidden my-2 px-3 py-1 border rounded-md text-xs font-bold
+            className={`relative isolate overflow-hidden my-1 px-3 py-2 rounded-lg text-xs font-bold
               transition-colors duration-300
               before:content-[''] before:absolute before:inset-0 before:rounded-full
               before:scale-0 hover:before:scale-150 before:transition-transform before:duration-300 before:ease-out before:origin-[var(--ox)_var(--oy)]
-              ${isDark ? 'border-white/40 text-white hover:text-black before:bg-white' : 'border-black/40 text-black hover:text-white before:bg-black'}`}
+              ${isDark ? 'bg-void text-white hover:text-black before:bg-white' : 'bg-cloud text-black hover:text-white before:bg-black'}`}
             onMouseMove={(e) => {
               const rect = e.currentTarget.getBoundingClientRect()
               const ox = ((e.clientX - rect.left) / rect.width) * 100

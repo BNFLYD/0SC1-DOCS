@@ -1,15 +1,9 @@
-"use client"
-
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { useUser } from "../../context/UserContext"
-import { translations } from "../../constants/translations"
-import TerminalText from "../TerminalText"
+import TerminalText from "../UI/TerminalText"
 import report from "../../assets/report.png";
 
-const WhoamiChannel = () => {
-  const { language, isDark } = useUser()
-  const t = translations[language].channelContent.whoami
+const WhoamiChannel = ({ language, isDark, t }) => {
   const textColor = isDark ? "text-white" : "text-black"
   const [showContent, setShowContent] = useState(false)
 
@@ -25,7 +19,7 @@ const WhoamiChannel = () => {
       </div>
       <div className={`flex items-start w-full transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
         <div className="text-lg font-mono font-semibold flex flex-col pr-4 " style={{ width: "60%" }}>
-          {t.items.map((item, index) => (
+          {(t?.channelContent?.whoami?.items || []).map((item, index) => (
             <p key={index}>{item}</p>
           ))}
         </div>
@@ -49,7 +43,7 @@ const WhoamiChannel = () => {
           e.currentTarget.style.setProperty('--oy', `${oy}%`);
         }}
       >
-        <span className="relative z-10">{translations[language].about} ↗</span>
+        <span className="relative z-10">{t?.about || 'About'} ↗</span>
       </Link>
     </div>
   )

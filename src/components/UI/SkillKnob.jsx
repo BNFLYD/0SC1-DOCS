@@ -1,9 +1,6 @@
-"use client"
 import { useState, useEffect } from "react"
-import { useUser } from "../context/UserContext"
 
-const SkillKnob = ({ skill, percentage, shouldAnimate = true }) => {
-  const { isDark } = useUser()
+const SkillKnob = ({ skill, percentage, shouldAnimate = true, isDark }) => {
   const [currentRotation, setCurrentRotation] = useState(-90) // Empezamos desde -90 grados
   const rotation = (percentage / 100) * 180 - 90 // El valor final de rotación
 

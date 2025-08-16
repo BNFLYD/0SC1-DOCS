@@ -1,15 +1,11 @@
-"use client"
-
 import { useEffect, useRef } from "react"
-import { useUser } from "../context/UserContext"
 import WhoamiChannel from "../components/Channels/WhoamiChannel"
 import ProjectsChannel from "../components/Channels/ProjectsChannel"
 import BlogChannel from "../components/Channels/BlogChannel"
 import MesmerizerChannel from "../components/Channels/MesmerizerChannel"
-import HireChannel from "./Channels/HireChannel"
+import HireChannel from "../components/Channels/HireChannel"
 
-const CRTScreen = ({ activeChannel, isDistorting }) => {
-  const { isDark } = useUser()
+const CRTScreen = ({ activeChannel, isDistorting, language, isDark, t }) => {
   const canvasRef = useRef(null)
   const animationRef = useRef(null)
 
@@ -99,10 +95,10 @@ const CRTScreen = ({ activeChannel, isDistorting }) => {
             <div
               className={`absolute inset-0 font-mono text-sm ${isDark ? "text-white" : "text-black"} flex flex-col`}
             >
-              {activeChannel === "whoami" && <WhoamiChannel theme={isDark ? "dark" : "light"} />}
-              {activeChannel === "projects" && <ProjectsChannel theme={isDark ? "dark" : "light"} />}
-              {activeChannel === "blog" && <BlogChannel theme={isDark ? "dark" : "light"} />}
-              {activeChannel === "hire" && <HireChannel theme={isDark ? "dark" : "light"} />}
+              {activeChannel === "whoami" && <WhoamiChannel theme={isDark ? "dark" : "light"} language={language} isDark={isDark} t={t} />}
+              {activeChannel === "projects" && <ProjectsChannel theme={isDark ? "dark" : "light"} language={language} isDark={isDark} t={t} />}
+              {activeChannel === "blog" && <BlogChannel theme={isDark ? "dark" : "light"} language={language} isDark={isDark} />}
+              {activeChannel === "hire" && <HireChannel theme={isDark ? "dark" : "light"} isDark={isDark} />}
               {activeChannel === "play" && <MesmerizerChannel theme={isDark ? "dark" : "light"} />}
             </div>
           )}

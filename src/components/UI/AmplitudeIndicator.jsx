@@ -1,10 +1,7 @@
-"use client"
 import { useState, useEffect } from "react"
-import { useUser } from '../context/UserContext'
 import PropTypes from 'prop-types'
 
-const AmplitudeIndicator = ({ skill, percentage, vertical = true, shouldAnimate = true }) => {
-  const { isDark } = useUser()
+const AmplitudeIndicator = ({ skill, percentage, vertical = true, shouldAnimate = true, isDark }) => {
   const [currentValue, setCurrentValue] = useState(0)
   const height = (currentValue / 100) * 40 // Altura máxima reducida
 

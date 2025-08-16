@@ -1,17 +1,12 @@
-"use client"
-
 import { useState } from "react"
 import { Icon } from '@iconify/react'
 import { Sun, Moon, Menu } from "lucide-react"
 import { Link } from "react-router-dom"
-import { useUser } from "../../context/UserContext"
-import { translations } from "../../constants/translations"
 import { languages } from "../../constants/languages"
 import icon from "../../assets/iconb.svg"
 
-const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
+const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t }) => {
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false)
-  const { isDark, setIsDark } = useUser()
 
   const toggleTheme = () => setIsDark(!isDark)
 
@@ -49,7 +44,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
             className={`font-sans font-bold text-sm uppercase tracking-wider relative group ${isDark ? "text-white" : "text-black"
               }`}
           >
-            {translations[currentLanguage].about}
+            {t.about}
             <span
               className="absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-700 group-hover:w-full bg-feather"
             ></span>
@@ -59,7 +54,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
             className={`font-sans font-bold text-sm uppercase tracking-wider relative group ${isDark ? "text-white" : "text-black"
               }`}
           >
-            {translations[currentLanguage].blog}
+            {t.blog}
             <span
               className="absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-700 group-hover:w-full bg-feather"
             ></span>
@@ -74,7 +69,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
               onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
               className={`w-8 h-8 flex items-center justify-center hover:opacity-60 transition-opacity ${isDark ? "text-white" : "text-black"
                 }`}
-              aria-label={translations[currentLanguage].languageSelector}
+              aria-label={t.languageSelector}
             >
               <Icon
                 icon={languages.find(lang => lang.code === currentLanguage)?.icon}
@@ -101,7 +96,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
                         height="20"
                       />
                       <span className={`relative ${currentLanguage === language.code ? "font-bold" : ""}`}>
-                        {translations[currentLanguage][
+                        {t[
                           language.code === "es" ? "spanish" :
                             language.code === "en" ? "english" :
                               language.code === "de" ? "german" : "japanese"
@@ -120,7 +115,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange }) => {
             onClick={toggleTheme}
             className={`w-8 h-8 flex items-center justify-center hover:opacity-60 transition-all duration-300 ${isDark ? "text-white" : "text-black"
               }`}
-            aria-label={translations[currentLanguage].themeToggle[isDark ? "toLight" : "toDark"]}
+            aria-label={t.themeToggle[isDark ? "toLight" : "toDark"]}
           >
             {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
           </button>

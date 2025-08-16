@@ -1,12 +1,8 @@
-"use client"
-
 import { useState, useEffect } from 'react'
 import { ArrowUp } from 'lucide-react'
-import { useUser } from '../../context/UserContext'
 
-const ScrollToTop = () => {
+const ScrollToTop = ({ isDark }) => {
   const [isVisible, setIsVisible] = useState(false)
-  const { isDark } = useUser()
 
   // Mostrar el botón cuando se desplaza hacia abajo
   useEffect(() => {

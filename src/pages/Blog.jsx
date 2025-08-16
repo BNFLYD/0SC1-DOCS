@@ -1,17 +1,14 @@
 "use client"
 import { useMemo, useState } from "react"
+import { useOutletContext } from "react-router-dom"
 import { Icon } from "@iconify/react"
-import { translations } from "../constants/translations"
-import { useUser } from "../context/UserContext"
 import CodeCopyButton from "../components/CodeCopyButton"
 
 function Blog() {
-  const { language, isDark } = useUser()
-  const t = translations[language]
+  const { language, isDark, t } = useOutletContext()
 
   // Cargar todos los componentes MDX de /src/content/posts/*.mdx
   const mdxModules = useMemo(() => {
-    // Eager para tener el componente disponible sin async/await
     return import.meta.glob("../content/posts/*.mdx", { eager: true })
   }, [])
 

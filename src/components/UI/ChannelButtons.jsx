@@ -1,15 +1,9 @@
-"use client"
-import { useUser } from "../context/UserContext"
-import { translations } from "../constants/translations"
-
-const ChannelButtons = ({ activeChannel, onChannelChange }) => {
-
-  const { language, isDark } = useUser()
+const ChannelButtons = ({ activeChannel, onChannelChange, isDark, t }) => {
   const channels = [
-    { id: "whoami", label: translations[language].about },
-    { id: "blog", label: translations[language].blog },
-    { id: "projects", label: translations[language].projects || "Projects" },
-    { id: "hire", label: "Contacto" },
+    { id: "whoami", label: t?.about || "About" },
+    { id: "blog", label: t?.blog || "Blog" },
+    { id: "projects", label: t?.projects || "Projects" },
+    { id: "hire", label: t?.contact || "Contacto" },
     { id: "play", label: "Play" },
   ]
 

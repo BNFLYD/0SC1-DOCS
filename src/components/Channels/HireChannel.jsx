@@ -1,15 +1,11 @@
-"use client"
-
 import { useEffect, useRef, useState } from "react"
 import { Icon } from "@iconify/react"
-import { useUser } from "../../context/UserContext"
 import { useAuth } from "../../hooks/useAuth"
 import emailjs from "@emailjs/browser"
 
-import TerminalText from "../TerminalText"
+import TerminalText from "../UI/TerminalText"
 
-const HireChannel = () => {
-  const { isDark } = useUser()
+const HireChannel = ({ isDark }) => {
   const textColor = isDark ? "text-white" : "text-black"
   const [showContent, setShowContent] = useState(false)
 

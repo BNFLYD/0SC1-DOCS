@@ -1,13 +1,10 @@
-"use client"
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { useUser } from "../../context/UserContext"
 import { translations } from "../../constants/translations"
 import sprite from "../../assets/sprite.svg"
-import TerminalText from "../TerminalText"
+import TerminalText from "../UI/TerminalText"
 
-const BlogChannel = () => {
-  const { language, isDark } = useUser()
+const BlogChannel = ({ language, isDark }) => {
   const textColor = isDark ? "text-white" : "text-black"
   const t = translations[language].channelContent.blog
   const [showContent, setShowContent] = useState(false)

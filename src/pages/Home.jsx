@@ -1,16 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useOutletContext } from "react-router-dom"
 import CRTScreen from "../components/CRTScreen"
-import SkillKnob from "../components/SkillKnob"
-import AmplitudeIndicator from "../components/AmplitudeIndicator"
-import ChannelButtons from "../components/ChannelButtons"
-import SectionFrame from "../components/SectionFrame"
-import { useUser } from "../context/UserContext"
-import { translations } from "../constants/translations"
+import SkillKnob from "../components/UI/SkillKnob"
+import AmplitudeIndicator from "../components/UI/AmplitudeIndicator"
+import ChannelButtons from "../components/UI/ChannelButtons"
+import SectionFrame from "../components/UI/SectionFrame"
 
 const Home = () => {
-  const { language, isDark } = useUser()
+  const { language, isDark, theme, t } = useOutletContext() || {}
   const [activeChannel, setActiveChannel] = useState(() => {
     try {
       return sessionStorage.getItem('ui:activeChannel') || null
@@ -89,7 +88,7 @@ const Home = () => {
             <div className="flex items-start w-full" style={{ maxWidth: "1440px" }}>
             {/* Monitor CRT (40% del ancho) */}
             <div className="p-4" style={{ width: "40%" }}>
-              <CRTScreen theme={isDark ? "dark" : "light"} activeChannel={activeChannel} isDistorting={isDistorting} />
+              <CRTScreen theme={theme} activeChannel={activeChannel} isDistorting={isDistorting} language={language} isDark={isDark} t={t} />
             </div>
 
             {/* Sección derecha (60% del ancho) - se ajusta a la altura del monitor */}
@@ -98,10 +97,10 @@ const Home = () => {
               <div className="flex flex-1" style={{ height: "80%" }}>
                 {/* Habilidades (15% del ancho total = 25% de esta sección) */}
                 <div className="pt-0 pr-2 pb-0 pl-4" style={{ width: "25%" }}>
-                  <SectionFrame title={translations[language].skills.toUpperCase()} theme={isDark ? "dark" : "light"}>
+                  <SectionFrame title={(t?.skills || 'Habilidades').toUpperCase()} isDark={isDark}>
                     <div className="flex flex-col justify-evenly gap-8 items-center h-full py-2">
                       {skills.map((skill) => (
-                        <SkillKnob key={skill.name} skill={skill.name} percentage={skill.percentage} theme={isDark ? "dark" : "light"} />
+                        <SkillKnob key={skill.name} skill={skill.name} percentage={skill.percentage} isDark={isDark} />
                       ))}
                     </div>
                   </SectionFrame>
@@ -111,14 +110,15 @@ const Home = () => {
                 <div className="flex flex-col pt-1 px-2 pb-4" style={{ width: "75%" }}>
                   {/* Frontend (33% del alto) */}
                   <div style={{ height: "33%" }}>
-                    <SectionFrame title={translations[language].frontend.toUpperCase()} theme={isDark ? "dark" : "light"}>
+                    <SectionFrame title={(t?.frontend || 'Frontend').toUpperCase()} isDark={isDark}>
                       <div className="flex justify-between items-center w-full px-4">
                         {frontendCapabilities.map((capability) => (
                           <AmplitudeIndicator
                             key={capability.name}
                             skill={capability.name}
                             percentage={capability.percentage}
-                            theme={isDark ? "dark" : "light"}
+                            shouldAnimate={true}
+                            isDark={isDark}
                           />
                         ))}
                       </div>
@@ -127,14 +127,15 @@ const Home = () => {
 
                   {/* AI (33% del alto) */}
                   <div style={{ height: "33%" }}>
-                    <SectionFrame title={translations[language].ai.toUpperCase()} theme={isDark ? "dark" : "light"}>
+                    <SectionFrame title={(t?.ai || 'IA').toUpperCase()} isDark={isDark}>
                       <div className="flex justify-between items-center w-full px-4">
                         {aiCapabilities.map((capability) => (
                           <AmplitudeIndicator
                             key={capability.name}
                             skill={capability.name}
                             percentage={capability.percentage}
-                            theme={isDark ? "dark" : "light"}
+                            shouldAnimate={true}
+                            isDark={isDark}
                           />
                         ))}
                       </div>
@@ -143,14 +144,15 @@ const Home = () => {
 
                   {/* Backend (33% del alto) */}
                   <div style={{ height: "33%" }}>
-                    <SectionFrame title={translations[language].backend.toUpperCase()} theme={isDark ? "dark" : "light"}>
+                    <SectionFrame title={(t?.backend || 'Backend').toUpperCase()} isDark={isDark}>
                       <div className="flex justify-between items-center w-full px-4">
                         {backendCapabilities.map((capability) => (
                           <AmplitudeIndicator
                             key={capability.name}
                             skill={capability.name}
                             percentage={capability.percentage}
-                            theme={isDark ? "dark" : "light"}
+                            shouldAnimate={true}
+                            isDark={isDark}
                           />
                         ))}
                       </div>
@@ -162,8 +164,8 @@ const Home = () => {
               {/* Fila inferior: Canales (15% del alto) */}
               <div>
                 <div className="pr-2 pl-4">
-                  <SectionFrame title={translations[language].channels.toUpperCase()} theme={isDark ? "dark" : "light"}>
-                    <ChannelButtons activeChannel={activeChannel} onChannelChange={handleChannelChange} theme={isDark ? "dark" : "light"} />
+                  <SectionFrame title={(t?.channels || 'Canales').toUpperCase()} isDark={isDark}>
+                    <ChannelButtons activeChannel={activeChannel} onChannelChange={handleChannelChange} isDark={isDark} t={t} />
                   </SectionFrame>
                 </div>
               </div>

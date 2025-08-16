@@ -1,13 +1,8 @@
-"use client"
 import { useState } from "react"
-import { useUser } from "../../context/UserContext"
-import { translations } from "../../constants/translations"
-import TerminalText from "../TerminalText"
+import TerminalText from "../UI/TerminalText"
 
-const ProjectsChannel = () => {
-  const { language, isDark } = useUser()
+const ProjectsChannel = ({ language, isDark, t }) => {
   const textColor = isDark ? "text-white" : "text-black"
-  const t = translations[language].channelContent.projects
   const [showContent, setShowContent] = useState(false)
 
   return (
@@ -21,9 +16,9 @@ const ProjectsChannel = () => {
         />
       </div>
       <div className={`text-lg font-mono font-semibold transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
-        <p>{t.title}</p>
+        <p>{t?.channelContent?.projects?.title || 'Projects:'}</p>
         <ul className="list-disc list-inside ml-2">
-          {t.items.map((item, index) => (
+          {(t?.channelContent?.projects?.items || []).map((item, index) => (
             <li key={index}>{item}</li>
           ))}
         </ul>
@@ -43,7 +38,7 @@ const ProjectsChannel = () => {
           e.currentTarget.style.setProperty('--oy', `${oy}%`);
         }}
       >
-        <span className="relative z-10">{translations[language].projects} ↗</span>
+        <span className="relative z-10">{t?.projects || 'Projects'} ↗</span>
       </button>
     </div>
   )

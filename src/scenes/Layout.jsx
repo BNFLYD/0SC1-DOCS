@@ -1,10 +1,12 @@
 import Header from "./global/Header"
-import { useUser } from "../context/UserContext"
+import { useGlobalState } from "../hooks/useGlobalState"
 import ScrollToTop from "../components/UI/ScrollToTop"
 import { useEffect } from "react"
+import { Outlet } from "react-router-dom"
 
-const Layout = ({ children }) => {
-  const { isDark } = useUser()
+const Layout = () => {
+  const globalState = useGlobalState()
+  const { isDark } = globalState
 
   // Sync Tailwind dark mode and Shiki theme at the HTML root
   useEffect(() => {
@@ -17,13 +19,14 @@ const Layout = ({ children }) => {
     <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
       isDark ? "bg-void text-white" : "bg-cloud text-black"
     }`}>
-      <Header />
-      <ScrollToTop />
+      <Header globalState={globalState} />
+      <ScrollToTop isDark={isDark} />
       <main className="pt-20">
-        {children}
+        <Outlet context={globalState} />
       </main>
     </div>
   )
 }
 
 export default Layout
+

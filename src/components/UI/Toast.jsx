@@ -1,12 +1,8 @@
-"use client"
-
 import  { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { useUser } from '../../context/UserContext'
 import { Icon } from '@iconify/react'
 
-const Toast = ({ text, icon, visible }) => {
-  const { isDark } = useUser()
+const Toast = ({ text, icon, visible, isDark }) => {
   const [showIcon, setShowIcon] = useState(false)
   const [showText, setShowText] = useState(false)
 
@@ -59,7 +55,8 @@ const Toast = ({ text, icon, visible }) => {
 Toast.propTypes = {
   text: PropTypes.string.isRequired,
   icon: PropTypes.string,
-  visible: PropTypes.bool.isRequired
+  visible: PropTypes.bool.isRequired,
+  isDark: PropTypes.bool
 }
 
 export default Toast

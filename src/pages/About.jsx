@@ -1,18 +1,18 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
-import { useUser } from "../context/UserContext"
 import { useAuth } from "../hooks/useAuth"
 import { Icon } from "@iconify/react"
 import { useInView } from 'react-intersection-observer'
-import TerminalText from "../components/TerminalText"
+import TerminalText from "../components/UI/TerminalText"
 import ContactForm from "../components/ContactForm"
-import AmplitudeIndicator from "../components/AmplitudeIndicator"
+import AmplitudeIndicator from "../components/UI/AmplitudeIndicator"
 import StaticEffect from "../components/UI/StaticEffect"
 import Toast from "../components/UI/Toast"
 import profile from "../assets/yo.jpg"
 import hornero from "../assets/hornero.svg"
 import osci from "../assets/sprite.svg";
+import { useOutletContext } from "react-router-dom"
 
 // Componente para la imagen con intersection observer
 const InViewImage = ({ src, alt, isTransitioning, currentImageIndex }) => {
@@ -37,7 +37,9 @@ const InViewImage = ({ src, alt, isTransitioning, currentImageIndex }) => {
 };
 
 const About = () => {
-  const { isDark, isMuttActive, setIsMuttActive } = useUser()
+  const context = useOutletContext() || {}
+  const { isDark, theme, isMuttActive, setIsMuttActive } = context
+  const safeSetIsMuttActive = typeof setIsMuttActive === 'function' ? setIsMuttActive : () => {}
   const { isLoading } = useAuth()
   const [showWhoamiContent, setShowWhoamiContent] = useState(false)
   const [headerText, setHeaderText] = useState(isMuttActive ? "mutt" : "whoami")
@@ -59,23 +61,23 @@ const About = () => {
     } catch {}
     if (pending) {
       setHeaderText('mutt')
-      setIsMuttActive(true)
+      safeSetIsMuttActive(true)
     } else {
       setHeaderText('whoami')
-      setIsMuttActive(false)
+      safeSetIsMuttActive(false)
     }
     return () => {
       // Al salir de About, no conservar mutt
-      setIsMuttActive(false)
+      safeSetIsMuttActive(false)
     }
-  }, [setIsMuttActive])
+  }, [safeSetIsMuttActive])
 
   // Función para manejar el cambio de texto y mostrar/ocultar el formulario
   const handleMailClick = () => {
     const newState = headerText === "whoami"
     // Actualizamos ambos estados
     setHeaderText(newState ? "mutt" : "whoami")
-    setIsMuttActive(newState)
+    safeSetIsMuttActive(newState)
     // Si volvemos a whoami, ocultamos el formulario inmediatamente
     if (headerText === "mutt") {
       setShowEmailForm(false)
@@ -354,7 +356,7 @@ const About = () => {
                 </div>
                 {isTransitioning && (
                   <StaticEffect
-                    theme={isDark ? "dark" : "light"}
+                    theme={theme}
                     intensity={150}
                     flashProbability={0.2}
                   />
@@ -471,8 +473,9 @@ const About = () => {
                           percentage={skill.percentage}
                           vertical={false}
                           shouldAnimate={sections.skills.showContent}
+                          isDark={isDark}
                         />
-                        <Toast text={skill.toast} icon={skill.icon} visible={hoveredSkill === skill.name} />
+                        <Toast text={skill.toast} icon={skill.icon} visible={hoveredSkill === skill.name} isDark={isDark} />
                       </div>
                     ))}
                   </div>

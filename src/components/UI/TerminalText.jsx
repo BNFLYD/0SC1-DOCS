@@ -1,4 +1,3 @@
-"use client"
 import { useState, useEffect, useRef } from 'react'
 
 const TerminalText = ({ text, className, inView = true, onComplete }) => {
