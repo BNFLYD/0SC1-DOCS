@@ -3,20 +3,20 @@
   "type": "light",
   "semanticHighlighting": true,
   "colors": {
-    "editor.background": "#000000",
-    "editor.foreground": "#56c4b6"
+    "editor.background": "#d0d0d0",
+    "editor.foreground": "#ff3370"
   },
   "tokenColors": [
     { "scope": ["comment", "punctuation.definition.comment"], "settings": { "foreground": "#555555", "fontStyle": "italic" } },
     { "scope": ["keyword", "storage", "storage.type", "storage.modifier"], "settings": { "foreground": "#00aa99" } },
-    { "scope": ["string", "constant.other.symbol"], "settings": { "foreground": "#5555ee" } },
+    { "scope": ["string", "constant.other.symbol"], "settings": { "foreground": "#ff3370" } },
     { "scope": ["string.regexp"], "settings": { "foreground": "#2ca798" } },
-    { "scope": ["entity.name.function", "support.function", "meta.function-call"], "settings": { "foreground": "#ff0077" } },
+    { "scope": ["entity.name.function", "support.function", "meta.function-call"], "settings": { "foreground": "#00aa99" } },
     { "scope": ["variable", "meta.object-literal.key"], "settings": { "foreground": "#333333" } },
     { "scope": ["variable.parameter"], "settings": { "foreground": "#333333" } },
     { "scope": ["entity.name.type", "support.type", "support.class", "support.interface"], "settings": { "foreground": "#bc57ff" } },
-    { "scope": ["constant.numeric", "constant.language", "constant.character"], "settings": { "foreground": "#ff0077" } },
-    { "scope": ["entity.name.tag"], "settings": { "foreground": "#ce7e00" } },
+    { "scope": ["constant.numeric", "constant.language", "constant.character"], "settings": { "foreground": "#ff3370" } },
+    { "scope": ["entity.name.tag"], "settings": { "foreground": "#5555ee" } },
     { "scope": ["support.type.property-name", "meta.property-name"], "settings": { "foreground": "#333333" } },
     { "scope": ["punctuation", "punctuation.separator", "punctuation.section"], "settings": { "foreground": "#333333" } },
     { "scope": ["invalid", "invalid.deprecated"], "settings": { "foreground": "#333333", "background": "#ff0000" } }

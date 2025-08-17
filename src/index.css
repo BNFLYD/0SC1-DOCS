@@ -87,7 +87,11 @@
     @apply font-mono;
   }
 
-  .prose p, .prose li, .prose blockquote {
+  .prose p, .prose li {
+    @apply font-mono text-lg;
+  }
+
+  .prose blockquote {
     @apply font-mono;
   }
 
@@ -122,8 +126,8 @@
     color: hsl(var(--foreground)) !important;
   }
 
-  /* Remove top border radius from pre when title exists */
-  [data-rehype-pretty-code-figure] pre {
+  /* Remove top border radius from pre only when a title is present */
+  [data-rehype-pretty-code-title] + pre {
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important;
     margin-top: 0 !important;
@@ -132,6 +136,123 @@
   /* Copy button positioning */
   [data-rehype-pretty-code-figure] {
     @apply relative;
+  }
+
+  /* Collapsible list caret */
+  .prose .list-caret {
+    display: inline-block;
+    width: 1em;
+    min-width: 1em;
+    margin-right: -1rem;
+    background: transparent;
+    border: none;
+    padding: 0;
+    line-height: 1;
+    font-size: 1.15em; /* slightly larger to match bullet size */
+    cursor: pointer;
+    color: #2ca798; /* feather */
+  }
+  .prose .list-caret:focus {
+    outline: none;           /* no border on mouse click */
+    outline-offset: 0;
+  }
+  .prose .list-caret:focus-visible { /* keep accessibility for keyboard */
+    outline: 2px solid #2ca79833;
+    outline-offset: 2px;
+  }
+  .prose .list-caret:active {
+    outline: none;
+  }
+
+  /* Collapsible list layout: replace bullet/number with absolutely positioned caret */
+  .prose li[data-collapsible-init='1'] {
+    position: relative;
+    list-style: none;      /* remove default marker */
+    padding-left: 1.6rem;    /* room for caret */
+  }
+  .prose li[data-collapsible-init='1'] > .list-caret {
+    position: absolute;
+    left: -0.5em;
+    top: 0.1em;           /* align with first text line */
+    margin: 0;             /* override inline margin */
+  }
+
+  /* Top-level collapsible items: slightly less indent to match default bullet alignment */
+  .prose > ul > li[data-collapsible-init='1'],
+  .prose > ol > li[data-collapsible-init='1'] {
+    padding-left: 0.5rem;
+  }
+
+  /* Only nested collapsible items show caret; top-level keeps bullet */
+  /* Show caret also on top-level so it is clickable (no bullet) */
+  .prose > ul > li[data-collapsible-init='1'],
+  .prose > ol > li[data-collapsible-init='1'] {
+    list-style: none;
+  }
+  .prose > ul > li[data-collapsible-init='1'] > .list-caret,
+  .prose > ol > li[data-collapsible-init='1'] > .list-caret {
+    position: absolute;     /* ensure absolute like the generic rule */
+    display: inline-block;
+    left: -1.35rem;         /* place over where the bullet would sit */
+    top: 0.2em;             /* align vertically with first text line */
+  }
+
+  /* Reduce default indentation for lists within prose */
+  .prose ul,
+  .prose ol {
+    padding-left: 0.01rem;
+  }
+  /* Even smaller indentation for nested lists */
+  .prose ul ul,
+  .prose ol ol,
+  .prose ul ol,
+  .prose ol ul {
+    padding-left: 0.01rem;
+  }
+  /* Match collapsible items padding on deeper levels */
+  .prose ul ul li[data-collapsible-init='1'],
+  .prose ol ol li[data-collapsible-init='1'],
+  .prose ul ol li[data-collapsible-init='1'],
+  .prose ol ul li[data-collapsible-init='1'] {
+    padding-left: 0.85rem;
+  }
+
+  /* List markers (bullets and counters) use feather in light theme */
+  [data-theme='light'] .prose {
+    --tw-prose-bullets: #2ca798;  /* ul markers */
+    --tw-prose-counters: #2ca798; /* ol markers */
+  }
+  [data-theme='light'] .prose ul > li::marker,
+  [data-theme='light'] .prose ol > li::marker {
+    color: #2ca798 !important;
+  }
+  /* Nested lists and lists inside blockquotes (light theme) */
+  [data-theme='light'] .prose blockquote ul > li::marker,
+  [data-theme='light'] .prose blockquote ol > li::marker,
+  [data-theme='light'] .prose ul ul > li::marker,
+  [data-theme='light'] .prose ol ol > li::marker,
+  [data-theme='light'] .prose ul ol > li::marker,
+  [data-theme='light'] .prose ol ul > li::marker {
+    color: #2ca798 !important;
+  }
+
+  /* Dark theme: use feather for list markers too */
+  [data-theme='dark'] .prose {
+    --tw-prose-bullets: #2ca798;  /* ul markers */
+    --tw-prose-counters: #2ca798; /* ol markers */
+  }
+  [data-theme='dark'] .prose ul > li::marker,
+  [data-theme='dark'] .prose ol > li::marker {
+    color: #2ca798 !important;
+  }
+  /* Nested lists and lists inside blockquotes (dark theme) */
+  [data-theme='dark'] .prose blockquote ul > li::marker,
+  [data-theme='dark'] .prose blockquote ol > li::marker,
+  [data-theme='dark'] .prose ul ul > li::marker,
+  [data-theme='dark'] .prose ol ol > li::marker,
+  [data-theme='dark'] .prose ul ol > li::marker,
+  [data-theme='dark'] .prose ol ul > li::marker {
+    color: #2ca798 !important;
   }
 }
 

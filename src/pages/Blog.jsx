@@ -1,8 +1,8 @@
 "use client"
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { useOutletContext } from "react-router-dom"
 import { Icon } from "@iconify/react"
-import CodeCopyButton from "../components/CodeCopyButton"
+import CodeCopyButton from "../components/MarkDownUI/CodeCopyButton"
 
 function Blog() {
   const { language, isDark, t } = useOutletContext()
@@ -21,7 +21,7 @@ function Blog() {
         const meta = (mod && "meta" in mod ? mod.meta : undefined) || {}
         const Comp = mod?.default
         const title = meta.title || slug
-        const date = meta.date || "1970-01-01"
+        const date = meta.date || "2025-08-16"
         const tags = Array.isArray(meta.tags) ? meta.tags : []
         const excerpt = typeof meta.excerpt === "string" ? meta.excerpt : ""
         const cover = typeof meta.cover === "string" ? meta.cover : ""
@@ -169,17 +169,10 @@ function Blog() {
 
               {/* Contenido MDX expandido */}
               {isOpen && Comp && (
-                <div
-                className={`px-16 pb-6 pt-1 prose max-w-none ${
-                  isDark
-                    ? "prose-invert prose-pre:bg-void"
-                    : "prose-pre:bg-cloud"
-                } prose-pre:rounded-2xl prose-pre:p-4 prose-code:font-mono`}
-                data-theme={isDark ? 'dark' : 'light'}
-              >
-                <Comp />
-                <CodeCopyButton />
-              </div>
+                <CollapsibleProse isDark={isDark}>
+                  <Comp />
+                  <CodeCopyButton />
+                </CollapsibleProse>
               )}
             </div>
           )
@@ -196,3 +189,76 @@ function Blog() {
 }
 
 export default Blog
+
+function CollapsibleProse({ isDark, children }) {
+  useEffect(() => {
+    // Initialize collapsible nested lists for all prose containers on mount/update
+    const containers = document.querySelectorAll('[data-prose-collapsible]')
+    containers.forEach((root) => initCollapsibles(root))
+  })
+
+  return (
+    <div
+      className={`px-16 pb-6 pt-1 prose max-w-none ${isDark
+          ? "prose-invert prose-pre:bg-void"
+          : "prose-pre:bg-cloud"
+        } prose-pre:rounded-2xl prose-pre:p-4 prose-code:font-mono`}
+      data-theme={isDark ? 'dark' : 'light'}
+      data-prose-collapsible
+    >
+      {children}
+    </div>
+  )
+}
+
+function initCollapsibles(root) {
+  if (!root || root.__collapsibleInit) return
+  root.__collapsibleInit = true
+
+  const items = Array.from(root.querySelectorAll('li'))
+  items.forEach((li) => {
+    // Only direct child list qualifies
+    const childList = li.querySelector(':scope > ul, :scope > ol')
+    if (!childList) return
+    if (li.dataset.collapsibleInit === '1') return
+    li.dataset.collapsibleInit = '1'
+
+    // Start collapsed
+    childList.hidden = true
+
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.className = 'list-caret'
+    btn.setAttribute('aria-expanded', 'false')
+    btn.setAttribute('title', 'Expandir/colapsar')
+    btn.textContent = '▸'
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      const willOpen = childList.hidden
+      childList.hidden = !willOpen ? true : false
+      btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false')
+      btn.textContent = willOpen ? '▾' : '▸'
+    })
+
+    // Insert caret before the li content
+    li.insertBefore(btn, li.firstChild)
+
+    // Also toggle when clicking the text/content of the LI (but not interactive elements)
+    li.addEventListener('click', (e) => {
+      // Don't react if the click was on the caret button itself
+      if (e.target === btn) return
+      // Ignore clicks inside this item's nested child list
+      if (childList && childList.contains(e.target)) return
+      // Ignore clicks on obvious interactive elements inside the item
+      if (e.target.closest('a, button, input, textarea, select, label, code, pre')) return
+      // Prevent bubbling to parent LIs
+      e.stopPropagation()
+
+      const willOpen = childList.hidden
+      childList.hidden = !willOpen ? true : false
+      btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false')
+      btn.textContent = willOpen ? '▾' : '▸'
+    })
+  })
+}
