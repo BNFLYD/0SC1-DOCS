@@ -24,7 +24,14 @@ const WhoamiChannel = ({ language, isDark, t }) => {
           ))}
         </div>
         <div className=" flex flex-col h-full pl-4" style={{ width: "40%" }}>
-          <img loading="lazy" src={report} alt="report" className="w-auto h-auto rounded-2xl" />
+          <img
+            loading="eager"
+            fetchpriority="high"
+            decoding="auto"
+            src={report}
+            alt="report"
+            className="w-auto h-auto rounded-2xl"
+          />
         </div>
       </div>
       <Link

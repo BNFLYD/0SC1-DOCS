@@ -1,4 +1,3 @@
-"use client"
 import { useMemo, useState, useEffect } from "react"
 import { useOutletContext } from "react-router-dom"
 import { Icon } from "@iconify/react"
@@ -194,7 +193,15 @@ function CollapsibleProse({ isDark, children }) {
   useEffect(() => {
     // Initialize collapsible nested lists for all prose containers on mount/update
     const containers = document.querySelectorAll('[data-prose-collapsible]')
-    containers.forEach((root) => initCollapsibles(root))
+    containers.forEach((root) => {
+      initCollapsibles(root)
+      // Ensure images inside prose are lazy-loaded by default
+      const imgs = root.querySelectorAll('img')
+      imgs.forEach((img) => {
+        if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy')
+        if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async')
+      })
+    })
   })
 
   return (
@@ -222,9 +229,51 @@ function initCollapsibles(root) {
     if (!childList) return
     if (li.dataset.collapsibleInit === '1') return
     li.dataset.collapsibleInit = '1'
+    // Ensure hover only affects the label text wrapper, not the entire LI
+    li.classList.remove('group', 'relative')
 
-    // Start collapsed
-    childList.hidden = true
+    // Start collapsed with inline transition (height + opacity)
+    childList.hidden = false
+    // Don't clip bullets on the left: only hide overflow on Y axis
+    childList.style.overflowY = 'hidden'
+    childList.style.overflowX = 'visible'
+    childList.style.height = '0px'
+    childList.style.opacity = '0'
+    childList.style.transition = 'height 300ms ease-in-out, opacity 300ms ease-in-out'
+    childList.style.willChange = 'height, opacity'
+    // Ensure list markers render outside with room on the left
+    childList.style.listStylePosition = 'outside'
+    childList.style.paddingInlineStart = '1rem'
+    // Prevent the animating list from overlapping and clipping the caret
+    childList.style.position = 'relative'
+    childList.style.zIndex = '0'
+
+    const expand = () => {
+      const h = childList.scrollHeight
+      childList.style.height = h + 'px'
+      childList.style.opacity = '1'
+      // no transform: keep caret visually intact
+      const onEnd = (e) => {
+        if (e.target !== childList || e.propertyName !== 'height') return
+        childList.style.height = 'auto' // allow natural growth after opening
+        childList.removeEventListener('transitionend', onEnd)
+      }
+      childList.addEventListener('transitionend', onEnd)
+    }
+
+    const collapse = () => {
+      // set fixed height before collapsing to 0 so transition can run
+      const h = childList.scrollHeight
+      childList.style.height = h + 'px'
+      // force reflow to apply the height before transitioning to 0
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      childList.offsetHeight
+      childList.style.height = '0px'
+      childList.style.opacity = '0'
+      // no transform: keep caret visually intact
+    }
+
+    let isOpen = false
 
     const btn = document.createElement('button')
     btn.type = 'button'
@@ -232,17 +281,49 @@ function initCollapsibles(root) {
     btn.setAttribute('aria-expanded', 'false')
     btn.setAttribute('title', 'Expandir/colapsar')
     btn.textContent = '▸'
+    // Ensure caret renders above any sibling animations
+    btn.style.position = 'relative'
+    btn.style.zIndex = '2'
 
     btn.addEventListener('click', (e) => {
       e.stopPropagation()
-      const willOpen = childList.hidden
-      childList.hidden = !willOpen ? true : false
-      btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false')
-      btn.textContent = willOpen ? '▾' : '▸'
+      isOpen = !isOpen
+      if (isOpen) {
+        expand()
+      } else {
+        collapse()
+      }
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false')
+      btn.textContent = isOpen ? '▾' : '▸'
     })
 
     // Insert caret before the li content
     li.insertBefore(btn, li.firstChild)
+
+    // Wrap the label (content before the child list) to apply underline on hover
+    // Collect nodes after the caret button up to (but not including) the nested child list
+    const labelWrapper = document.createElement('span')
+    labelWrapper.className = 'relative inline-block group'
+    let cursor = btn.nextSibling
+    const nodesToWrap = []
+    while (cursor && cursor !== childList) {
+      const next = cursor.nextSibling
+      nodesToWrap.push(cursor)
+      cursor = next
+    }
+    if (nodesToWrap.length) {
+      nodesToWrap.forEach(node => labelWrapper.appendChild(node))
+      // Insert the wrapper before the child list (or at the end if no child list found by safety)
+      if (childList && childList.parentNode === li) {
+        li.insertBefore(labelWrapper, childList)
+      } else {
+        li.appendChild(labelWrapper)
+      }
+      // Add the underline element inside the wrapper
+      const underline = document.createElement('span')
+      underline.className = 'underline -bottom-1'
+      labelWrapper.appendChild(underline)
+    }
 
     // Also toggle when clicking the text/content of the LI (but not interactive elements)
     li.addEventListener('click', (e) => {
@@ -255,10 +336,14 @@ function initCollapsibles(root) {
       // Prevent bubbling to parent LIs
       e.stopPropagation()
 
-      const willOpen = childList.hidden
-      childList.hidden = !willOpen ? true : false
-      btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false')
-      btn.textContent = willOpen ? '▾' : '▸'
+      isOpen = !isOpen
+      if (isOpen) {
+        expand()
+      } else {
+        collapse()
+      }
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false')
+      btn.textContent = isOpen ? '▾' : '▸'
     })
   })
 }

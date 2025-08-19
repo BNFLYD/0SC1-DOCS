@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { translations } from "../../constants/translations"
 import sprite from "../../assets/sprite.svg"
@@ -8,6 +8,20 @@ const BlogChannel = ({ language, isDark }) => {
   const textColor = isDark ? "text-white" : "text-black"
   const t = translations[language].channelContent.blog
   const [showContent, setShowContent] = useState(false)
+
+  // Preload del sprite para asegurar descarga temprana (se usa como background-image)
+  useEffect(() => {
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'image'
+    link.href = sprite
+    // @ts-ignore: fetchPriority puede no estar tipado
+    link.fetchPriority = 'high'
+    document.head.appendChild(link)
+    return () => {
+      if (link.parentNode) document.head.removeChild(link)
+    }
+  }, [])
 
   return (
     <div className={`flex flex-col p-8 gap-2 ${textColor}`}>

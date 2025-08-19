@@ -71,11 +71,31 @@
   }
 
   .prose pre code {
-    @apply font-mono text-sm block;
+    @apply font-mono text-base block mx-8;
+  }
+
+  /* Images inside prose (MDX) */
+  .prose img {
+    @apply rounded-2xl;
   }
 
   .prose code:not(pre code) {
-    @apply font-mono text-sm px-1 py-0.5 rounded bg-gray-100 dark:bg-gray-800;
+    /* Inline code: use feather background in both themes */
+    @apply font-mono text-sm px-1 py-0.5 rounded bg-feather/35 dark:bg-feather/35;
+  }
+
+  /* Collapsible nested lists animation */
+  .collapsible {
+    @apply overflow-hidden duration-300 ease-in-out; /* slower & smoother */
+    transition-property: max-height, opacity, transform;
+    max-height: 0;   /* collapsed */
+    opacity: 0;      /* fade */
+    transform: translateY(-4px); /* slight slide up when collapsed */
+  }
+  .collapsible.open {
+    max-height: 2000px; /* large enough for typical content */
+    opacity: 1;
+    transform: translateY(0);
   }
 
   /* Force mono font for all prose content */
@@ -168,7 +188,7 @@
   .prose li[data-collapsible-init='1'] {
     position: relative;
     list-style: none;      /* remove default marker */
-    padding-left: 1.6rem;    /* room for caret */
+    padding-left: 0;    /* room for caret */
   }
   .prose li[data-collapsible-init='1'] > .list-caret {
     position: absolute;
@@ -180,7 +200,55 @@
   /* Top-level collapsible items: slightly less indent to match default bullet alignment */
   .prose > ul > li[data-collapsible-init='1'],
   .prose > ol > li[data-collapsible-init='1'] {
-    padding-left: 0.5rem;
+    padding-left: 0; /* text position controlled by sibling margins */
+  }
+
+  /* Decouple text from caret: move only the content, not the caret */
+  .prose > ul > li[data-collapsible-init='1'] > :not(.list-caret),
+  .prose > ol > li[data-collapsible-init='1'] > :not(.list-caret) {
+    margin-left: -0.7em; /* adjust this to fine-tune the gap */
+  }
+
+  /* Tighter underline ONLY for links in top-level items (mother list) */
+  .prose > ul > li[data-collapsible-init='1'] > :not(.list-caret) a,
+  .prose > ol > li[data-collapsible-init='1'] > :not(.list-caret) a {
+    display: inline !important;                 /* ensure inline underline */
+    line-height: 1 !important;                  /* tighten vertical metrics */
+    margin-bottom: 0 !important;                /* remove any spacing that could push underline */
+    padding-bottom: 0 !important;
+    border-bottom: none !important;             /* in case a border is used instead of text-decoration */
+    text-decoration-line: underline !important;
+    text-underline-offset: -0.08em !important;  /* pull underline even closer */
+    text-decoration-thickness: 0.06em !important; /* consistent thickness */
+    text-decoration-skip-ink: none !important;  /* avoid ink skipping changing perceived gap */
+  }
+
+  /* Normalize line-height for the text block in top-level items to match children */
+  .prose > ul > li[data-collapsible-init='1'] > :not(.list-caret),
+  .prose > ol > li[data-collapsible-init='1'] > :not(.list-caret) {
+    line-height: 1.5;
+  }
+
+  /* Fix underline span offset for mother list: closer to baseline */
+  .prose > ul > li[data-collapsible-init='1'] .relative.inline-block.group > .underline,
+  .prose > ol > li[data-collapsible-init='1'] .relative.inline-block.group > .underline {
+    bottom: -0.05em !important;    /* slightly overlap to match children */
+  }
+
+  /* Remove spacing and block behavior from the p inside the group (top-level only) */
+  .prose > ul > li[data-collapsible-init='1'] .relative.inline-block.group > p,
+  .prose > ol > li[data-collapsible-init='1'] .relative.inline-block.group > p {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
+  }
+
+  /* Remove extra bottom spacing from direct paragraphs in top-level items */
+  .prose > ul > li[data-collapsible-init='1'] > p,
+  .prose > ol > li[data-collapsible-init='1'] > p {
+    margin-bottom: 0;
+    padding-bottom: 0;
   }
 
   /* Only nested collapsible items show caret; top-level keeps bullet */
@@ -193,8 +261,8 @@
   .prose > ol > li[data-collapsible-init='1'] > .list-caret {
     position: absolute;     /* ensure absolute like the generic rule */
     display: inline-block;
-    left: -1.35rem;         /* place over where the bullet would sit */
-    top: 0.2em;             /* align vertically with first text line */
+    left: -1.3rem;          /* nudge caret slightly to the right */
+    top: 0.1em;             /* align vertically with first text line */
   }
 
   /* Reduce default indentation for lists within prose */
@@ -202,19 +270,55 @@
   .prose ol {
     padding-left: 0.01rem;
   }
+  /* Make paragraph-to-list spacing equal to intra-list spacing */
+  .prose p {
+    margin-bottom: 0.2em; /* align with li + li gap */
+  }
+  .prose p + ul,
+  .prose p + ol {
+    margin-top: 0.2em; /* same as between list items */
+  }
+  /* Tighter vertical spacing between items of the same list */
+  .prose ul > li,
+  .prose ol > li {
+    margin-bottom: 0; /* remove extra bottom gap per item */
+  }
+  .prose ul > li + li,
+  .prose ol > li + li {
+    margin-top: 0.15em; /* reduce gap between consecutive items */
+  }
+  /* Also reduce margins of direct paragraphs inside list items */
+  .prose ul > li > p,
+  .prose ol > li > p {
+    margin-top: 0.1em;
+    margin-bottom: 0.1em;
+  }
   /* Even smaller indentation for nested lists */
   .prose ul ul,
   .prose ol ol,
   .prose ul ol,
   .prose ol ul {
-    padding-left: 0.01rem;
+    padding-left: 0rem;
+  }
+  /* Tighter vertical spacing around nested lists */
+  .prose li > ul,
+  .prose li > ol {
+    margin-top: 0.1em;     /* reduce gap from parent text to child list */
+    margin-bottom: 0.1em;  /* reduce gap after child list */
+  }
+  /* Tighter spacing between items inside nested lists */
+  .prose ul ul > li + li,
+  .prose ol ol > li + li,
+  .prose ul ol > li + li,
+  .prose ol ul > li + li {
+    margin-top: 0.12em;
   }
   /* Match collapsible items padding on deeper levels */
   .prose ul ul li[data-collapsible-init='1'],
   .prose ol ol li[data-collapsible-init='1'],
   .prose ul ol li[data-collapsible-init='1'],
   .prose ol ul li[data-collapsible-init='1'] {
-    padding-left: 0.85rem;
+    padding-left: 0rem;
   }
 
   /* List markers (bullets and counters) use feather in light theme */
@@ -258,7 +362,7 @@
 
 @layer utilities {
   .underline {
-    @apply absolute left-0 w-0 h-0.5 transition-all duration-700 bg-feather;
+    @apply absolute left-0 bottom-0 w-0 h-0.5 transition-all duration-700 bg-feather;
   }
   .group:hover .underline {
     @apply w-full;

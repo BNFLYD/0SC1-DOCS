@@ -8,6 +8,10 @@ const CodeCopyButton = () => {
       const codeBlocks = document.querySelectorAll('[data-rehype-pretty-code-figure]:not([data-copy-added])')
 
       codeBlocks.forEach((figure) => {
+        const codeEl = figure.querySelector('pre code')
+        // Skip figures that don't actually contain a fenced code block
+        if (!codeEl) return
+
         figure.setAttribute('data-copy-added', 'true')
         figure.style.position = 'relative'
 
@@ -54,7 +58,7 @@ const CodeCopyButton = () => {
         })
 
         button.onclick = async () => {
-          const code = figure.querySelector('pre code')?.textContent
+          const code = codeEl?.textContent
           if (code) {
             try {
               await navigator.clipboard.writeText(code)

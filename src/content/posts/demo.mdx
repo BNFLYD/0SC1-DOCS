@@ -6,6 +6,10 @@ export const meta = {
   icon: "game-icons:steampunk-goggles"
   }
 
+import MdxImage from '../../components/MarkDownUI/MdxImage.jsx'
+import hornero from '../../assets/hornero.svg'
+import vapor from '../../assets/vaporwave.gif'
+
 # Esto es un archivo mdx
 
 ## Esto es un subtitulo
@@ -16,13 +20,21 @@ export const meta = {
 
 Esto es un parrafo: Waos,  impresionante! Casi que parece que es un formato de texto plano que podemos usar para hacer notas o cosas asi (pd: aguante Logseq).
 
-* Esto es una lista
 
-- **Esto es una lista con negrita** (si tocas el triangulito explota)
-  - Bueno te menti, me dio paja animar la explocion. Esto es una lista anidada dentro de la lista con negrita
-    - Y esto es otra lista anidada, dentro de la lista anidada, dentro de la lista con negrita
-      - creo que se entiende la idea no? ya no quiero anidar mas listas, porfavor.
-      - Osea podes hacer listas anidadas y poner lo que queras dentro de ellas literalmente, mas listas, imagenes, codigo, memes, una tesis completa sobre como centrar un div y luego esconderlo todo bajo la alfombra para que nadie sospeche del semejante acto de desprecio por la humanidad que acabas de escribir. O lo que sea (siempre y cuando sea texto plano, osea es un formato de texto plano no una pantalla magica, no soy Willy Wonka, la concha de tu madre).
+**Esto es una lista:**
+- aca podes poner items de lista (obviamente)
+- bastante util para roadmaps
+- guias
+- la lista del super (no se porque harias publico eso, pero bueno si queres podes)
+- etc
+<></>
+- **Esto es otra lista** (si tocas el triangulito explota)
+  - Bueno te menti, me dio paja animar la explocion. Esto es una lista anidada dentro de la otra lista
+    - Y esto es otra lista anidada, dentro de la lista anidada, dentro de la lista la otra lista
+      - Creo que se entiende la idea no? porfavor deci que si, ya no quiero anidar mas listas.
+
+        Osea podes hacer listas anidadas y poner lo que queras dentro de ellas literalmente, mas listas, imagenes, codigo, memes, una tesis completa sobre como centrar un div y luego esconderlo todo bajo la alfombra para que nadie sospeche del semejante acto de desprecio por la humanidad que acabas de escribir. O lo que sea (siempre y cuando sea texto plano, osea es un formato de texto plano no una pantalla magica, no soy Willy Wonka, la concha de tu madre).
+
 
 Tambien podes hacer cuadros de codigo identado simplemente usando ```  (se llaman backticks) poniendo tu codigo y cerrando con mas backticks, osea esa es la sintaxis, en realidad se ve asi:
 
@@ -73,7 +85,69 @@ Tambien podes hacer lineas de comandos
 ```bash title=""
 npm run dev #comando random
 ```
-Super util para documentacion y tutoriales.
+Super util para documentacion y tutoriales, tambien podes poner comandos dentro del texto por si queres evitar poner cuadros de codigo cuando solo queres dar indicaciones de comandos rapidas como ```pwd ``` o ```cd  C:\random_dir```
 
-Ademas podes poner imagenes: ![img](../src/assets/hornero.svg)
-Gif: ![gif](../src/assets/vaporwave.gif)
+Ademas podes poner imagenes:
+
+<MdxImage
+  src={hornero}
+  alt="Hornero"
+  side="center"
+  loading="lazy"
+  fetchpriority="auto"
+  decoding="async"
+  className="my-2"
+/>
+
+Gif:
+
+<MdxImage
+  src={vapor}
+  alt="Vaporwave"
+  side="left"
+  width={480}
+  height={270}
+  className="my-2"
+>
+  Hola también se puede escribir al lado de la imagen para aprovechar el espacio.
+  Podés poner más párrafos, listas, etc.
+  <MdxImage
+  src={hornero}
+  alt="Hornero"
+  side="center"
+  className="my-2"
+  aspectRatio="16:9"
+  content="contain"
+  />
+  Incluso podemos poner mas imagenes entre medio
+</MdxImage>
+
+<MdxImage
+  src={vapor}
+  alt="Vaporwave"
+  side="center"
+  width={360}
+  height={200}
+  text="Figura de ejemplo."
+/>
+
+<MdxImage
+  src={vapor}
+  alt="Vaporwave"
+  side="right"
+  className="my-2"
+  text="Hola también se puede escribir al lado de la imagen para aprovechar el espacio.
+  Podés poner más párrafos, listas, etc."
+>
+</MdxImage>
+
+<MdxImage
+  src={vapor}
+  alt="Vaporwave"
+  side="center"
+  className="my-2"
+  aspectRatio="16:3"
+  content="cover"
+>
+  Ademas podemos definir un aspect ratio para que la imagen se ajuste a cualquier relacion de aspecto.
+</MdxImage>

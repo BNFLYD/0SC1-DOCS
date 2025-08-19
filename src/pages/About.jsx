@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { useAuth } from "../hooks/useAuth"
 import { Icon } from "@iconify/react"
@@ -15,18 +13,27 @@ import osci from "../assets/sprite.svg";
 import { useOutletContext } from "react-router-dom"
 
 // Componente para la imagen con intersection observer
-const InViewImage = ({ src, alt, isTransitioning, currentImageIndex }) => {
+// Añade prioridad de descarga y tamaño intrínseco para evitar CLS
+const InViewImage = ({ src, alt, isTransitioning, currentImageIndex, w, h, decoding = "auto" }) => {
   const { ref, inView } = useInView({
     threshold: 0.2,
     triggerOnce: false,
   });
 
+  // Tamaños por defecto alineados al contenedor (w-48 h-48 => 192px)
+  const width = w ?? 192;
+  const height = h ?? 192;
+
   return (
     <img
-      loading="lazy"
+      loading="eager"
+      fetchpriority="high"
       ref={ref}
       src={src}
       alt={alt}
+      width={width}
+      height={height}
+      decoding={decoding}
       className={`w-full h-full transition-opacity duration-300
         ${isTransitioning ? 'opacity-0' : 'opacity-100'}
         ${currentImageIndex === 2 ? 'object-contain animate-float' : ''}
@@ -141,6 +148,20 @@ const About = () => {
   }, [isScrolling, setIsScrolling]);
 
   const images = [profile, osci, hornero]
+
+  // Preload del sprite (se usa como background-image, no aplica atributos de <img>)
+  useEffect(() => {
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'image'
+    link.href = osci
+    // @ts-ignore: fetchPriority no está tipado en algunos TS/DOM
+    link.fetchPriority = 'high'
+    document.head.appendChild(link)
+    return () => {
+      if (link.parentNode) document.head.removeChild(link)
+    }
+  }, [])
 
   // Efecto para el IntersectionObserver
   // Función auxiliar para actualizar el estado de una sección
