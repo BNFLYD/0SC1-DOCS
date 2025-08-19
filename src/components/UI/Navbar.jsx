@@ -16,7 +16,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
   }
 
   return (
-    <nav className={`fixed top-0 left-0 w-full px-6 py-4 border-b transition-colors duration-300 z-50 ${isDark ? "bg-primary border-white/20 text-white" : "bg-secondary border-black/20 text-black"
+    <nav className={`fixed top-0 left-0 w-full px-6 py-4 transition-colors duration-300 z-50 ${isDark ? "bg-primary text-white" : "bg-secondary text-black"
       }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo y nombre */}
@@ -32,7 +32,10 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
                 className={`w-8 h-8 ${isDark ? "filter invert-[100%] hue-rotate-180" : "filter invert-[0%] hue-rotate-0"}`}
               />
             </div>
-            <h1 className="text-xl font-mono font-semibold tracking-wider">0SC1-DOCS</h1>
+            <h1 className="relative inline-block group text-xl font-mono font-semibold tracking-wider">
+              0SC1-DOCS
+              <span className="underline -bottom-0"></span>
+            </h1>
           </div>
         </Link>
 
@@ -45,9 +48,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
               }`}
           >
             {t.about}
-            <span
-              className="absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-700 group-hover:w-full bg-feather"
-            ></span>
+            <span className="underline -bottom-1"></span>
           </Link>
           <Link
             to="/blog"
@@ -55,9 +56,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
               }`}
           >
             {t.blog}
-            <span
-              className="absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-700 group-hover:w-full bg-feather"
-            ></span>
+            <span className="underline -bottom-1"></span>
           </Link>
         </div>
 
@@ -67,7 +66,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
           <div className="relative">
             <button
               onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-              className={`w-8 h-8 flex items-center justify-center hover:opacity-60 transition-opacity ${isDark ? "text-white" : "text-black"
+              className={`w-8 h-8 flex items-center justify-center transition-opacity ${isDark ? "text-white" : "text-black"
                 }`}
               aria-label={t.languageSelector}
             >
@@ -80,7 +79,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
 
             {isLanguageMenuOpen && (
               <div
-                className={`absolute right-0 top-full mt-5 w-32 border rounded-sm shadow-lg z-50  ${isDark ? "bg-primary border-white/20 text-white" : "bg-secondary border-black/20 text-black"
+                className={`absolute right-0 top-full mt-5 w-32 rounded-lg shadow-lg z-50  ${isDark ? "bg-primary text-white" : "bg-secondary text-black"
                   }`}
               >
                 {languages.map(language => (
@@ -101,7 +100,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
                             language.code === "en" ? "english" :
                               language.code === "de" ? "german" : "japanese"
                         ]}
-                        <span className="absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-700 group-hover:w-full bg-feather"></span>
+                        <span className="underline -bottom-1"></span>
                       </span>
                     </div>
                   </button>
@@ -113,7 +112,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
           {/* Toggle de tema */}
           <button
             onClick={toggleTheme}
-            className={`w-8 h-8 flex items-center justify-center hover:opacity-60 transition-all duration-300 ${isDark ? "text-white" : "text-black"
+            className={`w-8 h-8 flex items-center justify-center transition-all duration-300 ${isDark ? "text-white" : "text-black"
               }`}
             aria-label={t.themeToggle[isDark ? "toLight" : "toDark"]}
           >

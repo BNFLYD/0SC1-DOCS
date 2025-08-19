@@ -256,6 +256,15 @@
   }
 }
 
+@layer utilities {
+  .underline {
+    @apply absolute left-0 w-0 h-0.5 transition-all duration-700 bg-feather;
+  }
+  .group:hover .underline {
+    @apply w-full;
+  }
+}
+
 @layer base {
   :root {
 
