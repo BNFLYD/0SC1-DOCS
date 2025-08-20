@@ -1,3 +1,12 @@
+import MdxImage from '../../components/MarkDownUI/MdxImage.jsx'
+import sekaide from '../images/sekaide.jpg'
+import gomez from '../images/gomez.jpg'
+import ciudad from '../images/ciudad.jpg'
+import potrerillos from '../images/potrerillos.jpg'
+import leñas from '../images/leñas.jpg'
+import hornero from '../images/hornero.svg'
+import vapor from '../../assets/vaporwave.gif'
+
 export const meta = {
   title: "Demo",
   subtitle: "Osea es una prueba",
@@ -5,10 +14,6 @@ export const meta = {
   tags: ["prueba", "mdx", "react"],
   icon: "game-icons:steampunk-goggles"
   }
-
-import MdxImage from '../../components/MarkDownUI/MdxImage.jsx'
-import hornero from '../../assets/hornero.svg'
-import vapor from '../../assets/vaporwave.gif'
 
 # Esto es un archivo mdx
 
@@ -83,71 +88,85 @@ Te gusta el tema del identador? lo hice basado en la paleta de colores de la Sek
 
 Tambien podes hacer lineas de comandos
 ```bash title=""
-npm run dev #comando random
+npm run dev #comando de ejemplo
 ```
 Super util para documentacion y tutoriales, tambien podes poner comandos dentro del texto por si queres evitar poner cuadros de codigo cuando solo queres dar indicaciones de comandos rapidas como ```pwd ``` o ```cd  C:\random_dir```
 
-Ademas podes poner imagenes:
+**O imagenes normales**
 
 <MdxImage
-  src={hornero}
-  alt="Hornero"
-  side="center"
-  loading="lazy"
-  fetchpriority="auto"
-  decoding="async"
-  className="my-2"
-/>
-
-Gif:
-
-<MdxImage
-  src={vapor}
-  alt="Vaporwave"
+  src={sekaide}
+  alt="Sekaide"
   side="left"
-  width={480}
-  height={270}
+  width={"40%"}
   className="my-2"
->
-  Hola también se puede escribir al lado de la imagen para aprovechar el espacio.
-  Podés poner más párrafos, listas, etc.
-  <MdxImage
-  src={hornero}
-  alt="Hornero"
-  side="center"
-  className="my-2"
-  aspectRatio="16:9"
-  content="contain"
-  />
-  Incluso podemos poner mas imagenes entre medio
-</MdxImage>
-
-<MdxImage
-  src={vapor}
-  alt="Vaporwave"
-  side="center"
-  width={360}
-  height={200}
-  text="Figura de ejemplo."
-/>
-
-<MdxImage
-  src={vapor}
-  alt="Vaporwave"
-  side="right"
-  className="my-2"
-  text="Hola también se puede escribir al lado de la imagen para aprovechar el espacio.
-  Podés poner más párrafos, listas, etc."
->
-</MdxImage>
-
-<MdxImage
-  src={vapor}
-  alt="Vaporwave"
-  side="center"
-  className="my-2"
-  aspectRatio="16:3"
+  aspectRatio="1:1"
   content="cover"
 >
-  Ademas podemos definir un aspect ratio para que la imagen se ajuste a cualquier relacion de aspecto.
+  <>
+    # Como esta imagen de la Sekaide
+    Por cierto también se puede escribir al lado de la imagen para aprovechar el espacio. <br />
+    Lo cual es muy util para que la experiencia de lectura sea mas dinámica y visualmente agradable. <br />
+    Obviamente se puede poner codigo:
+    ```js
+    const miku = 01;
+    ```
+    - O listas anidadas:
+      - O cualquier cosa como en el ejemplo de arriba
+  </>
+</MdxImage>
+<br />
+<MdxImage
+  src={[gomez,ciudad,potrerillos,leñas]}
+  description={["Edificio Gomez","Ciudad de Mendoza","Potrerillos","Las Leñas"]}
+  alt="galery"
+  side="right"
+  width={"40%"}
+  className="my-2"
+  aspectRatio="1:1"
+  content="cover"
+>
+  <>
+    # Ademas podemos definir de que lado va la imagen
+    **Tambien**
+    - Podemos darle una descripcion a cada imagen
+    - Podemos crear carruseles de imagenes
+
+    Que? no me crees? <br />
+    Acercate a la imagen de la derecha y fijate que pasa
+  </>
+  <>
+    # Tambien podes poner arte svg
+    - Como este hornero que cambia de color segun el tema
+
+    <MdxImage
+      src={hornero}
+      alt="Hornero"
+      side="center"
+      className="my-2 invert-[88%] dark:invert-[12%]"
+      width={"100%"}
+      aspectRatio="5:2"
+    />
+
+  </>
+  <>
+    # Y podes poner gifs
+    - Como este fondo vaporwave
+
+    <MdxImage
+      src={vapor}
+      alt="Vaporwave"
+      side="center"
+      className="my-2"
+      width={"90%"}
+      aspectRatio="5:2"
+    />
+
+    - Y le podes asignar un aspect ratio y un tamaño personalizado, al igual que al resto de las imagenes
+  </>
+  <>
+    # Y... bueno tampoco hay mucho mas
+    Son imagenes nada mas
+    pero disfruta un rato del paisaje
+  </>
 </MdxImage>
