@@ -107,6 +107,35 @@
     @apply font-mono;
   }
 
+  /* Remove top padding from H2s inside prose and MDX-rich content */
+  .prose h2,
+  .mdx-rich h2 {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* Remove top padding from H3s inside prose and MDX-rich content */
+  .prose h3,
+  .mdx-rich h3 {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* Remove top padding from H4s inside prose and MDX-rich content */
+  .prose h4,
+  .mdx-rich h4 {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* Remove top padding from paragraphs inside prose and MDX-rich */
+  .prose p,
+  .mdx-rich p {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    padding-bottom: 0rem !important; /* Tailwind space-4 */
+  }
+
   .prose p, .prose li {
     @apply font-mono text-lg;
   }
@@ -159,7 +188,8 @@
   }
 
   /* Collapsible list caret */
-  .prose .list-caret {
+  .prose .list-caret,
+  .mdx-rich .list-caret {
     display: inline-block;
     width: 1em;
     min-width: 1em;
@@ -172,46 +202,57 @@
     cursor: pointer;
     color: #2ca798; /* feather */
   }
-  .prose .list-caret:focus {
+  .prose .list-caret:focus,
+  .mdx-rich .list-caret:focus {
     outline: none;           /* no border on mouse click */
     outline-offset: 0;
   }
-  .prose .list-caret:focus-visible { /* keep accessibility for keyboard */
+  .prose .list-caret:focus-visible, /* keep accessibility for keyboard */
+  .mdx-rich .list-caret:focus-visible {
     outline: 2px solid #2ca79833;
     outline-offset: 2px;
   }
-  .prose .list-caret:active {
+  .prose .list-caret:active,
+  .mdx-rich .list-caret:active {
     outline: none;
   }
 
   /* Collapsible list layout: replace bullet/number with absolutely positioned caret */
-  .prose li[data-collapsible-init='1'] {
+  .prose li[data-collapsible-init='1'],
+  .mdx-rich li[data-collapsible-init='1'] {
     position: relative;
     list-style: none;      /* remove default marker */
     padding-left: 0;    /* room for caret */
   }
-  .prose li[data-collapsible-init='1'] > .list-caret {
+  .prose li[data-collapsible-init='1'] > .list-caret,
+  .mdx-rich li[data-collapsible-init='1'] > .list-caret {
     position: absolute;
-    left: -0.5em;
+    left: -0.6em;
     top: 0.1em;           /* align with first text line */
     margin: 0;             /* override inline margin */
   }
 
   /* Top-level collapsible items: slightly less indent to match default bullet alignment */
   .prose > ul > li[data-collapsible-init='1'],
-  .prose > ol > li[data-collapsible-init='1'] {
+  .prose > ol > li[data-collapsible-init='1'],
+  .mdx-rich > ul > li[data-collapsible-init='1'],
+  .mdx-rich > ol > li[data-collapsible-init='1'] {
     padding-left: 0; /* text position controlled by sibling margins */
   }
 
   /* Decouple text from caret: move only the content, not the caret */
   .prose > ul > li[data-collapsible-init='1'] > :not(.list-caret),
-  .prose > ol > li[data-collapsible-init='1'] > :not(.list-caret) {
+  .prose > ol > li[data-collapsible-init='1'] > :not(.list-caret),
+  .mdx-rich > ul > li[data-collapsible-init='1'] > :not(.list-caret),
+  .mdx-rich > ol > li[data-collapsible-init='1'] > :not(.list-caret) {
     margin-left: -0.7em; /* adjust this to fine-tune the gap */
   }
 
   /* Tighter underline ONLY for links in top-level items (mother list) */
   .prose > ul > li[data-collapsible-init='1'] > :not(.list-caret) a,
-  .prose > ol > li[data-collapsible-init='1'] > :not(.list-caret) a {
+  .prose > ol > li[data-collapsible-init='1'] > :not(.list-caret) a,
+  .mdx-rich > ul > li[data-collapsible-init='1'] > :not(.list-caret) a,
+  .mdx-rich > ol > li[data-collapsible-init='1'] > :not(.list-caret) a {
     display: inline !important;                 /* ensure inline underline */
     line-height: 1 !important;                  /* tighten vertical metrics */
     margin-bottom: 0 !important;                /* remove any spacing that could push underline */
@@ -231,13 +272,17 @@
 
   /* Fix underline span offset for mother list: closer to baseline */
   .prose > ul > li[data-collapsible-init='1'] .relative.inline-block.group > .underline,
-  .prose > ol > li[data-collapsible-init='1'] .relative.inline-block.group > .underline {
+  .prose > ol > li[data-collapsible-init='1'] .relative.inline-block.group > .underline,
+  .mdx-rich > ul > li[data-collapsible-init='1'] .relative.inline-block.group > .underline,
+  .mdx-rich > ol > li[data-collapsible-init='1'] .relative.inline-block.group > .underline {
     bottom: -0.05em !important;    /* slightly overlap to match children */
   }
 
   /* Remove spacing and block behavior from the p inside the group (top-level only) */
   .prose > ul > li[data-collapsible-init='1'] .relative.inline-block.group > p,
-  .prose > ol > li[data-collapsible-init='1'] .relative.inline-block.group > p {
+  .prose > ol > li[data-collapsible-init='1'] .relative.inline-block.group > p,
+  .mdx-rich > ul > li[data-collapsible-init='1'] .relative.inline-block.group > p,
+  .mdx-rich > ol > li[data-collapsible-init='1'] .relative.inline-block.group > p {
     display: inline;
     margin: 0;
     padding: 0;
@@ -246,7 +291,9 @@
 
   /* Remove extra bottom spacing from direct paragraphs in top-level items */
   .prose > ul > li[data-collapsible-init='1'] > p,
-  .prose > ol > li[data-collapsible-init='1'] > p {
+  .prose > ol > li[data-collapsible-init='1'] > p,
+  .mdx-rich > ul > li[data-collapsible-init='1'] > p,
+  .mdx-rich > ol > li[data-collapsible-init='1'] > p {
     margin-bottom: 0;
     padding-bottom: 0;
   }
@@ -254,11 +301,15 @@
   /* Only nested collapsible items show caret; top-level keeps bullet */
   /* Show caret also on top-level so it is clickable (no bullet) */
   .prose > ul > li[data-collapsible-init='1'],
-  .prose > ol > li[data-collapsible-init='1'] {
+  .prose > ol > li[data-collapsible-init='1'],
+  .mdx-rich > ul > li[data-collapsible-init='1'],
+  .mdx-rich > ol > li[data-collapsible-init='1'] {
     list-style: none;
   }
   .prose > ul > li[data-collapsible-init='1'] > .list-caret,
-  .prose > ol > li[data-collapsible-init='1'] > .list-caret {
+  .prose > ol > li[data-collapsible-init='1'] > .list-caret,
+  .mdx-rich > ul > li[data-collapsible-init='1'] > .list-caret,
+  .mdx-rich > ol > li[data-collapsible-init='1'] > .list-caret {
     position: absolute;     /* ensure absolute like the generic rule */
     display: inline-block;
     left: -1.3rem;          /* nudge caret slightly to the right */
@@ -268,28 +319,40 @@
   /* Reduce default indentation for lists within prose */
   .prose ul,
   .prose ol {
-    padding-left: 0.01rem;
+    padding-left: 0.75rem;
+  }
+  .mdx-rich ul,
+  .mdx-rich ol {
+    padding-left: 1rem;
   }
   /* Make paragraph-to-list spacing equal to intra-list spacing */
   .prose p {
     margin-bottom: 0.2em; /* align with li + li gap */
   }
   .prose p + ul,
-  .prose p + ol {
+  .prose p + ol,
+  .mdx-rich p + ul,
+  .mdx-rich p + ol {
     margin-top: 0.2em; /* same as between list items */
   }
   /* Tighter vertical spacing between items of the same list */
   .prose ul > li,
-  .prose ol > li {
+  .prose ol > li,
+  .mdx-rich ul > li,
+  .mdx-rich ol > li {
     margin-bottom: 0; /* remove extra bottom gap per item */
   }
   .prose ul > li + li,
-  .prose ol > li + li {
+  .prose ol > li + li,
+  .mdx-rich ul > li + li,
+  .mdx-rich ol > li + li {
     margin-top: 0.15em; /* reduce gap between consecutive items */
   }
   /* Also reduce margins of direct paragraphs inside list items */
   .prose ul > li > p,
-  .prose ol > li > p {
+  .prose ol > li > p,
+  .mdx-rich ul > li > p,
+  .mdx-rich ol > li > p {
     margin-top: 0.1em;
     margin-bottom: 0.1em;
   }
@@ -298,11 +361,19 @@
   .prose ol ol,
   .prose ul ol,
   .prose ol ul {
-    padding-left: 0rem;
+    padding-left: 0.75rem;
+  }
+  .mdx-rich ul ul,
+  .mdx-rich ol ol,
+  .mdx-rich ul ol,
+  .mdx-rich ol ul {
+    padding-left: 0.1rem !important;
   }
   /* Tighter vertical spacing around nested lists */
   .prose li > ul,
-  .prose li > ol {
+  .prose li > ol,
+  .mdx-rich li > ul,
+  .mdx-rich li > ol {
     margin-top: 0.1em;     /* reduce gap from parent text to child list */
     margin-bottom: 0.1em;  /* reduce gap after child list */
   }
@@ -310,15 +381,31 @@
   .prose ul ul > li + li,
   .prose ol ol > li + li,
   .prose ul ol > li + li,
-  .prose ol ul > li + li {
+  .prose ol ul > li + li,
+  .mdx-rich ul ul > li + li,
+  .mdx-rich ol ol > li + li,
+  .mdx-rich ul ol > li + li,
+  .mdx-rich ol ul > li + li {
     margin-top: 0.12em;
   }
   /* Match collapsible items padding on deeper levels */
   .prose ul ul li[data-collapsible-init='1'],
   .prose ol ol li[data-collapsible-init='1'],
   .prose ul ol li[data-collapsible-init='1'],
-  .prose ol ul li[data-collapsible-init='1'] {
+  .prose ol ul li[data-collapsible-init='1'],
+  .mdx-rich ul ul li[data-collapsible-init='1'],
+  .mdx-rich ol ol li[data-collapsible-init='1'],
+  .mdx-rich ul ol li[data-collapsible-init='1'],
+  .mdx-rich ol ul li[data-collapsible-init='1'] {
     padding-left: 0rem;
+  }
+
+  /* Ensure child lists under collapsible parents have visible markers and indent */
+  .mdx-rich li[data-collapsible-init='1'] > ul,
+  .mdx-rich li[data-collapsible-init='1'] > ol {
+    /* Use inside so markers are not clipped by any overflow on ancestors */
+    list-style-position: inside;
+    padding-left: 0.75rem;
   }
 
   /* List markers (bullets and counters) use feather in light theme */
@@ -358,7 +445,57 @@
   [data-theme='dark'] .prose ol ul > li::marker {
     color: #2ca798 !important;
   }
+
+  /* Component-only list padding: apply extra indent in component wrappers.
+     Use descendant selector so it works even if MDX inserts wrappers. */
+  .mdx-rich.mdx-pad ul,
+  .mdx-rich.mdx-pad ol {
+    padding-left: 0.5rem !important; /* pl-6 */
+  }
 }
+
+/* Restore markers for nested lists in MDX components (MdxImage/MdxContent) */
+.mdx-rich ul,
+.mdx-rich ol {
+  list-style-position: outside;
+}
+.mdx-rich ul { list-style-type: disc; }
+.mdx-rich ol { list-style-type: decimal; }
+.mdx-rich ul ul { list-style-type: circle; }
+.mdx-rich ul ul ul { list-style-type: square; }
+.mdx-rich ol ol { list-style-type: lower-alpha; }
+.mdx-rich ol ol ol { list-style-type: lower-roman; }
+.mdx-rich ul li:not([data-collapsible-init='1']) {
+  list-style: disc outside;
+}
+.mdx-rich ol li:not([data-collapsible-init='1']) {
+  list-style: decimal outside;
+}
+/* Ensure top-level (first-level) normal items keep their marker */
+.mdx-rich > ul > li:not([data-collapsible-init='1']) { list-style: disc outside !important; }
+.mdx-rich > ol > li:not([data-collapsible-init='1']) { list-style: decimal outside !important; }
+/* Ensure LIs render as list items (some resets/utilities may switch to block) */
+.mdx-rich li:not([data-collapsible-init='1']) {
+  display: list-item;
+}
+/* Ensure nested lists inside mdx-pad keep some indent so markers are visible */
+.mdx-rich.mdx-pad ul ul,
+.mdx-rich.mdx-pad ol ol,
+.mdx-rich.mdx-pad ul ol,
+.mdx-rich.mdx-pad ol ul {
+  padding-left: 1rem !important;
+}
+
+/* Target ONLY child lists nested under a parent item inside .mdx-rich */
+/* Keep marker outside; padding handled by nested selectors above */
+.mdx-rich li > ul,
+.mdx-rich li > ol { list-style-position: outside !important; }
+/* UL nested levels: match mother marker */
+.mdx-rich ul > li > ul,
+.mdx-rich ul > li > ul > li > ul { list-style-type: disc !important; }
+/* OL nested levels: match mother marker */
+.mdx-rich ol > li > ol,
+.mdx-rich ol > li > ol > li > ol { list-style-type: decimal !important; }
 
 @layer utilities {
   .underline {
@@ -489,4 +626,24 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Smooth fade-in for MDX carousel image and description */
+@layer utilities {
+  @keyframes mdx-fade-in {
+    from { opacity: 0; transform: translateY(2px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .mdx-fade-in {
+    animation: mdx-fade-in 220ms ease-out;
+    will-change: opacity, transform;
+  }
+}
+
+/* Paragraph alignment control for MdxContent via data-textalign */
+@layer components {
+  .mdx-rich[data-textalign='left'] > p { text-align: left; }
+  .mdx-rich[data-textalign='center'] > p { text-align: center; }
+  .mdx-rich[data-textalign='right'] > p { text-align: right; }
+  .mdx-rich[data-textalign='justify'] > p { text-align: justify; }
 }

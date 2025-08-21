@@ -1,4 +1,5 @@
 import MdxImage from '../../components/MarkDownUI/MdxImage.jsx'
+import MdxContent from '../../components/MarkDownUI/MdxContent.jsx'
 import sekaide from '../images/sekaide.jpg'
 import gomez from '../images/gomez.jpg'
 import ciudad from '../images/ciudad.jpg'
@@ -10,7 +11,7 @@ import vapor from '../../assets/vaporwave.gif'
 export const meta = {
   title: "Demo",
   subtitle: "Osea es una prueba",
-  date: "2025-08-14",
+  date: "2025-08-20",
   tags: ["prueba", "mdx", "react"],
   icon: "game-icons:steampunk-goggles"
   }
@@ -91,8 +92,12 @@ Tambien podes hacer lineas de comandos
 npm run dev #comando de ejemplo
 ```
 Super util para documentacion y tutoriales, tambien podes poner comandos dentro del texto por si queres evitar poner cuadros de codigo cuando solo queres dar indicaciones de comandos rapidas como ```pwd ``` o ```cd  C:\random_dir```
+<br />
+# Como en cualquier blog generico, podes poner imagenes
 
-**O imagenes normales**
+Lo que hace que podamos retener la atencion del lector y crear puntos de referencia visual y descripciones graficas sobre lo que trata de retratar el autor
+
+<br />
 
 <MdxImage
   src={sekaide}
@@ -104,20 +109,21 @@ Super util para documentacion y tutoriales, tambien podes poner comandos dentro 
   content="cover"
 >
   <>
-    # Como esta imagen de la Sekaide
+    ## Como esta imagen de la Sekaide
     Por cierto también se puede escribir al lado de la imagen para aprovechar el espacio. <br />
     Lo cual es muy util para que la experiencia de lectura sea mas dinámica y visualmente agradable. <br />
     Obviamente se puede poner codigo:
     ```js
     const miku = 01;
     ```
-    - O listas anidadas:
-      - O cualquier cosa como en el ejemplo de arriba
+    - Lista normales
+    - O listas anidadas
+      - O cualquier cosa como mas arriba
   </>
 </MdxImage>
 <br />
 <MdxImage
-  src={[gomez,ciudad,potrerillos,leñas]}
+  src={[gomez,potrerillos,ciudad,leñas]}
   description={["Edificio Gomez","Ciudad de Mendoza","Potrerillos","Las Leñas"]}
   alt="galery"
   side="right"
@@ -127,7 +133,7 @@ Super util para documentacion y tutoriales, tambien podes poner comandos dentro 
   content="cover"
 >
   <>
-    # Ademas podemos definir de que lado va la imagen
+    ## Ademas podemos definir de que lado va la imagen
     **Tambien**
     - Podemos darle una descripcion a cada imagen
     - Podemos crear carruseles de imagenes
@@ -136,7 +142,7 @@ Super util para documentacion y tutoriales, tambien podes poner comandos dentro 
     Acercate a la imagen de la derecha y fijate que pasa
   </>
   <>
-    # Tambien podes poner arte svg
+    ## Tambien podes poner arte svg
     - Como este hornero que cambia de color segun el tema
 
     <MdxImage
@@ -150,7 +156,7 @@ Super util para documentacion y tutoriales, tambien podes poner comandos dentro 
 
   </>
   <>
-    # Y podes poner gifs
+    ## Y podes poner gifs
     - Como este fondo vaporwave
 
     <MdxImage
@@ -158,15 +164,99 @@ Super util para documentacion y tutoriales, tambien podes poner comandos dentro 
       alt="Vaporwave"
       side="center"
       className="my-2"
-      width={"90%"}
+      width={"80%"}
       aspectRatio="5:2"
     />
 
     - Y le podes asignar un aspect ratio y un tamaño personalizado, al igual que al resto de las imagenes
   </>
   <>
-    # Y... bueno tampoco hay mucho mas
-    Son imagenes nada mas
-    pero disfruta un rato del paisaje
+    ## Y... bueno tampoco hay mucho mas
+    Osea nomas es un componente que define el tamaño la posicion y el aspect ratio de la imagen
+
   </>
 </MdxImage>
+
+<br />
+
+## Ejemplo: contenido en columnas
+
+<MdxContent
+  col={3}
+  width={"1fr"}
+  gap={16}
+>
+  <>
+    ## Título de columna 1
+    Texto 1
+    - Lista 1
+  </>
+  <>
+    ## Título de columna 2
+    Texto 2
+    - Lista 2
+  </>
+  <>
+    ## Título de columna 3
+    Texto 3
+    - Lista 3
+  </>
+</MdxContent>
+
+<br />
+
+<MdxContent
+  col={3}
+  width={["25%","50%","25%"]}
+  gap={20}
+  textAlign={["","justify",""]}
+  dividers={true}
+  dividerClass="border-l border-feather pl-4"
+>
+  <>
+    ## Título de columna 1
+    Texto 1
+    - Lista 1
+  </>
+  <>
+    ## Título de columna 2
+
+    <MdxImage
+      src={sekaide}
+      alt="Sekaide"
+      side="center"
+      width={"40%"}
+      aspectRatio="1:1"
+      content="cover"
+      description="Sekaide"
+      className="my-2 rounded-full"
+    >
+
+    <>
+    ### *esto se puede reiterar infinitas veces*
+    bla bla bla
+
+    ---
+    </>
+
+    </MdxImage>
+
+    Texto 2
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
+    - Lista que por alguna razon esta desfasada
+    - Lista madre anidada
+      - Lista madre anidada
+  </>
+  <>
+    ## Título de columna 3
+    Texto 3
+    - Lista 3
+  ---
+  </>
+</MdxContent>
+
+---

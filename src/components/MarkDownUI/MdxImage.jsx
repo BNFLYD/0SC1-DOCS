@@ -19,7 +19,48 @@ export default function MdxImage({
   breakpoint = "", // "" = fila siempre; usa "md" si querés activar desde md
   aspectRatio, // e.g. "16:9", "4:3", "3:2", "1:1" o "ancho:alto"
   content = "cover", // object-fit: cover | contain | fill | none | scale-down
+  // NUEVO: layout de contenido en columnas
+  contentLayout = "slides", // slides | columns
+  columns = 1,
+  columnsMd,
+  columnsLg,
+  columnGap = 4, // tailwind gap-x unidad (e.g. 4 -> gap-x-4)
 }) {
+  // Helper: crea un overlay de imagen a pantalla completa y lo cierra con click o Esc
+  const showOverlay = (src, alt = '') => {
+    try {
+      const overlay = document.createElement('div')
+      overlay.style.position = 'fixed'
+      overlay.style.inset = '0'
+      overlay.style.background = 'rgba(0,0,0,0.85)'
+      overlay.style.display = 'flex'
+      overlay.style.alignItems = 'center'
+      overlay.style.justifyContent = 'center'
+      overlay.style.zIndex = '9999'
+
+      const img = document.createElement('img')
+      img.src = src
+      img.alt = alt
+      img.style.maxWidth = '90vw'
+      img.style.maxHeight = '90vh'
+      img.style.objectFit = 'contain'
+      img.style.boxShadow = '0 10px 40px rgba(0,0,0,0.5)'
+      img.style.cursor = 'zoom-out'
+
+      const close = () => {
+        window.removeEventListener('keydown', onKey)
+        overlay.removeEventListener('click', onOverlayClick)
+        overlay.remove()
+      }
+      const onKey = (e) => { if (e.key === 'Escape') close() }
+      const onOverlayClick = () => close()
+      overlay.addEventListener('click', onOverlayClick)
+      window.addEventListener('keydown', onKey)
+
+      overlay.appendChild(img)
+      document.body.appendChild(overlay)
+    } catch (_) { /* noop */ }
+  }
   const normalizedAspect = (() => {
     if (!aspectRatio) return null
     if (typeof aspectRatio === 'string') {
@@ -73,86 +114,165 @@ export default function MdxImage({
 
   const ImgBox = (
     <div
-      className={`shrink-0 ${containerClass ? '' : ''}`}
+      className={`${containerClass ? '' : ''}`}
       style={{
-        // si se provee width (px o %), respetarlo para calcular altura con aspect-ratio
+        // controla el ancho total del bloque (imagen + caption)
         width: cssWidth,
-        // si se provee height sin aspect, dejamos que el <img> lo maneje
-        aspectRatio: normalizedAspect || undefined,
-        position: 'relative',
       }}
-      onClick={handleClick}
       onMouseEnter={() => isCarousel && setHover(true)}
       onMouseLeave={() => isCarousel && setHover(false)}
     >
-      <img
-        src={currentSrc}
-        alt={alt}
-        width={widthAttr}
-        height={height}
-        loading={loading}
-        fetchpriority={fetchpriority}
-        decoding={decoding}
-        className={`rounded-2xl ${className}`}
+      <div
         style={{
-          display: 'block',
-          width: normalizedAspect ? '100%' : cssWidth,
-          height: normalizedAspect ? '100%' : undefined,
-          objectFit: content,
+          position: 'relative',
+          aspectRatio: normalizedAspect || undefined,
+          width: '100%',
         }}
-      />
-      {isCarousel && (
-        <>
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: 8,
-              transform: 'translateY(-50%)',
-              background: 'transparent',
-              color: '#2ca798',
-              borderRadius: 0,
-              padding: 0,
-              fontSize: 20,
-              lineHeight: 1,
-              opacity: hover ? 1 : 0,
-              transition: 'opacity 120ms ease',
-              pointerEvents: 'none',
-              userSelect: 'none',
-              zIndex: 20,
-              fontWeight: 1000,
-            }}
-            aria-hidden
-          >
-            ◀
-          </div>
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              right: 8,
-              transform: 'translateY(-50%)',
-              background: 'transparent',
-              color: '#2ca798',
-              borderRadius: 0,
-              padding: 0,
-              fontSize: 20,
-              lineHeight: 1,
-              opacity: hover ? 1 : 0,
-              transition: 'opacity 120ms ease',
-              pointerEvents: 'none',
-              userSelect: 'none',
-              zIndex: 20,
-              fontWeight: 1000,
-            }}
-            aria-hidden
-          >
-            ▶
-          </div>
-        </>
-      )}
+      >
+        <img
+          key={currentSrc}
+          src={currentSrc}
+          alt={alt}
+          width={widthAttr}
+          height={height}
+          loading={loading}
+          fetchpriority={fetchpriority}
+          decoding={decoding}
+          data-mdximage="1"
+          onClick={() => showOverlay(currentSrc, alt)}
+          className={`mdx-fade-in ${(() => {
+            // Si el usuario ya pasó alguna clase rounded*, no aplicar el default
+            const hasRounded = typeof className === 'string' && /(^|\s)rounded(?:-[a-z0-9-]+)?(\s|$)/i.test(className)
+            return hasRounded ? '' : 'rounded-2xl'
+          })()} ${className}`.trim()}
+          style={{
+            display: 'block',
+            width: '100%',
+            height: normalizedAspect ? '100%' : undefined,
+            objectFit: content,
+            cursor: 'zoom-in',
+            // Forzar el radio si el usuario pasó rounded-full/rounded-none
+            borderRadius: (() => {
+              if (typeof className === 'string') {
+                if (/(^|\s)rounded-none(\s|$)/i.test(className)) return '0px'
+                if (/(^|\s)rounded-full(\s|$)/i.test(className)) return '9999px'
+              }
+              return undefined
+            })(),
+          }}
+        />
+        {isCarousel && (
+          <>
+            {/* Transparent click zones for easier navigation (reduced width) */}
+            <div
+              onClick={(e) => {
+                e.stopPropagation()
+                setIdx((i) => (i - 1 + src.length) % src.length)
+              }}
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '12%',
+                height: '80%',
+                background: 'transparent',
+                zIndex: 25,
+              }}
+              aria-label="Zona anterior"
+            />
+            <div
+              onClick={(e) => {
+                e.stopPropagation()
+                setIdx((i) => (i + 1) % src.length)
+              }}
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: '12%',
+                height: '80%',
+                background: 'transparent',
+                zIndex: 25,
+              }}
+              aria-label="Zona siguiente"
+            />
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: 8,
+                transform: 'translateY(-50%)',
+                background: 'transparent',
+                color: '#2ca798',
+                borderRadius: 0,
+                padding: 0,
+                fontSize: 20,
+                lineHeight: 1,
+                opacity: hover ? 1 : 0,
+                transition: 'opacity 120ms ease',
+                pointerEvents: 'auto',
+                userSelect: 'none',
+                zIndex: 30,
+                fontWeight: 1000,
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label="Imagen anterior"
+              onClick={() => setIdx((i) => (i - 1 + src.length) % src.length)}
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setIdx((i) => (i - 1 + src.length) % src.length)
+                }
+              }}
+            >
+              ◀
+            </div>
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                right: 8,
+                transform: 'translateY(-50%)',
+                background: 'transparent',
+                color: '#2ca798',
+                borderRadius: 0,
+                padding: 0,
+                fontSize: 20,
+                lineHeight: 1,
+                opacity: hover ? 1 : 0,
+                transition: 'opacity 120ms ease',
+                pointerEvents: 'auto',
+                userSelect: 'none',
+                zIndex: 30,
+                fontWeight: 1000,
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label="Imagen siguiente"
+              onClick={() => setIdx((i) => (i + 1) % src.length)}
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setIdx((i) => (i + 1) % src.length)
+                }
+              }}
+            >
+              ▶
+            </div>
+          </>
+        )}
+      </div>
       {currentDescription != null && (
-        <div className={`w-full text-center mt-2 ${textClass}`}>
+        <div key={typeof currentDescription === 'string' ? currentDescription : idx} className={`w-full text-center mt-2 mdx-fade-in ${textClass}`}>
           {currentDescription}
         </div>
       )}
@@ -164,8 +284,72 @@ export default function MdxImage({
     const bp = hasBp ? `${breakpoint.trim()}:` : ""
 
     const Img = ImgBox
+    // No añadimos paddings/margins laterales aquí; el espaciado de listas lo maneja index.css
+    const listAdjust = ""
+
+    // Helper: clases para multi-columnas
+    const colClass = (() => {
+      // Sanitizar valores aceptados (1..6)
+      const clamp = (n) => {
+        const v = Number(n)
+        if (Number.isNaN(v) || v < 1) return 1
+        if (v > 6) return 6
+        return v
+      }
+      const baseCols = clamp(columns)
+      const mdCols = columnsMd != null ? clamp(columnsMd) : null
+      const lgCols = columnsLg != null ? clamp(columnsLg) : null
+      const parts = [`columns-${baseCols}`]
+      if (mdCols) parts.push(`md:columns-${mdCols}`)
+      if (lgCols) parts.push(`lg:columns-${lgCols}`)
+      const gap = typeof columnGap === 'number' ? `gap-x-${columnGap}` : (columnGap || 'gap-x-4')
+      parts.push(gap)
+      // evitar cortes feos
+      parts.push('[&>*]:break-inside-avoid')
+      return parts.join(' ')
+    })()
+
+    // contentLayout: columns => mostramos TODOS los children en columnas
+    if (contentLayout === 'columns') {
+      // center: imagen centrada arriba y columnas debajo a todo el ancho
+      if (side === 'center') {
+        return (
+          <div className={`flex flex-col items-center gap-3 ${containerClass}`}>
+            {Img}
+            <div className={`w-full ${colClass} mdx-rich mdx-pad ${textClass} ${listAdjust}`}>
+              {childrenArray}
+            </div>
+          </div>
+        )
+      }
+
+      // left/right: imagen a un lado y columnas al otro
+      const Columns = (
+        <div className={`flex-1 min-w-0 ${colClass} mdx-rich mdx-pad ${textClass} ${listAdjust}`}>
+          {childrenArray}
+        </div>
+      )
+      const contentCols = side === 'right' ? (
+        <>
+          {Columns}
+          {Img}
+        </>
+      ) : (
+        <>
+          {Img}
+          {Columns}
+        </>
+      )
+      return (
+        <div className={`${bp}flex gap-4 items-start ${containerClass}`}>
+          {contentCols}
+        </div>
+      )
+    }
+
+    // contentLayout: slides (comportamiento previo)
     const Txt = (
-      <div className={`flex-1 min-w-0 ${textClass}`}>{currentSlide}</div>
+      <div className={`flex-1 min-w-0 mdx-rich mdx-pad ${textClass} ${listAdjust}`}>{currentSlide}</div>
     )
 
     // Caso especial: side="center" con texto (children) => columna centrada
@@ -173,7 +357,7 @@ export default function MdxImage({
       return (
         <div className={`flex flex-col items-center gap-3 ${containerClass}`}>
           {Img}
-          <div className={`w-full text-center ${textClass}`}>{currentSlide}</div>
+          <div className={`w-full text-center mdx-rich mdx-pad ${textClass} ${listAdjust}`}>{currentSlide}</div>
         </div>
       )
     }
@@ -208,14 +392,14 @@ export default function MdxImage({
         ? "float-right ml-4"
         : side === "left"
         ? "float-left mr-4"
-        : "block mx-auto";
+        : "flex justify-center w-full";
   } else {
     sideClass =
       side === "right"
         ? "block ml-auto"
         : side === "left"
         ? "block mr-auto"
-        : "block mx-auto";
+        : "flex justify-center w-full";
   }
 
   return (

@@ -204,6 +204,62 @@ function CollapsibleProse({ isDark, children }) {
     })
   })
 
+  // Delegated click-to-zoom for native markdown images (exclude MdxImage)
+  useEffect(() => {
+    const containers = Array.from(document.querySelectorAll('[data-prose-collapsible]'))
+    if (!containers.length) return
+
+    const showOverlay = (src, alt = '') => {
+      try {
+        const overlay = document.createElement('div')
+        overlay.style.position = 'fixed'
+        overlay.style.inset = '0'
+        overlay.style.background = 'rgba(0,0,0,0.85)'
+        overlay.style.display = 'flex'
+        overlay.style.alignItems = 'center'
+        overlay.style.justifyContent = 'center'
+        overlay.style.zIndex = '9999'
+
+        const img = document.createElement('img')
+        img.src = src
+        img.alt = alt
+        img.style.maxWidth = '90vw'
+        img.style.maxHeight = '90vh'
+        img.style.objectFit = 'contain'
+        img.style.boxShadow = '0 10px 40px rgba(0,0,0,0.5)'
+        img.style.cursor = 'zoom-out'
+
+        const close = () => {
+          window.removeEventListener('keydown', onKey)
+          overlay.removeEventListener('click', onOverlayClick)
+          overlay.remove()
+        }
+        const onKey = (e) => { if (e.key === 'Escape') close() }
+        const onOverlayClick = () => close()
+        overlay.addEventListener('click', onOverlayClick)
+        window.addEventListener('keydown', onKey)
+
+        overlay.appendChild(img)
+        document.body.appendChild(overlay)
+      } catch (_) { /* noop */ }
+    }
+
+    const handler = (e) => {
+      const target = e.target
+      if (!(target instanceof HTMLElement)) return
+      if (target.tagName.toLowerCase() !== 'img') return
+      if (target.getAttribute('data-mdximage') === '1') return
+      // native markdown image
+      const src = target.currentSrc || target.getAttribute('src')
+      if (!src) return
+      e.stopPropagation()
+      showOverlay(src, target.getAttribute('alt') || '')
+    }
+
+    containers.forEach((root) => root.addEventListener('click', handler))
+    return () => containers.forEach((root) => root.removeEventListener('click', handler))
+  }, [])
+
   return (
     <div
       className={`px-16 pb-6 pt-1 prose max-w-none ${isDark
@@ -244,33 +300,66 @@ function initCollapsibles(root) {
     // Ensure list markers render outside with room on the left
     childList.style.listStylePosition = 'outside'
     childList.style.paddingInlineStart = '1rem'
+    // Force marker type so bullets/numbers are visible regardless of external CSS
+    childList.style.listStyleType = childList.tagName === 'UL' ? 'disc' : 'decimal'
     // Prevent the animating list from overlapping and clipping the caret
     childList.style.position = 'relative'
     childList.style.zIndex = '0'
 
-    const expand = () => {
-      const h = childList.scrollHeight
-      childList.style.height = h + 'px'
-      childList.style.opacity = '1'
-      // no transform: keep caret visually intact
-      const onEnd = (e) => {
-        if (e.target !== childList || e.propertyName !== 'height') return
-        childList.style.height = 'auto' // allow natural growth after opening
-        childList.removeEventListener('transitionend', onEnd)
+    // Transition management: allow interruption and restart cleanly
+    let endHandler = null
+    const TRANSITION = 'height 300ms ease-in-out, opacity 300ms ease-in-out'
+    const cancelEndHandler = () => {
+      if (endHandler) {
+        childList.removeEventListener('transitionend', endHandler)
+        endHandler = null
       }
-      childList.addEventListener('transitionend', onEnd)
+    }
+    const forceReflow = () => void childList.offsetHeight
+    const getCurrentHeight = () => childList.getBoundingClientRect().height
+    const withNoTransition = (fn) => {
+      const prev = childList.style.transition
+      childList.style.transition = 'none'
+      fn()
+      forceReflow()
+      childList.style.transition = TRANSITION
+    }
+
+    const expand = () => {
+      cancelEndHandler()
+      // Start from current height (could be mid-animation)
+      withNoTransition(() => {
+        const current = getCurrentHeight()
+        childList.style.height = current + 'px'
+        childList.style.opacity = '1'
+      })
+      // Animate to full height
+      const target = childList.scrollHeight
+      childList.style.height = target + 'px'
+      endHandler = (e) => {
+        if (e.target !== childList || e.propertyName !== 'height') return
+        // Lock open state to natural height
+        childList.style.transition = 'none'
+        childList.style.height = 'auto'
+        forceReflow()
+        childList.style.transition = TRANSITION
+        cancelEndHandler()
+      }
+      childList.addEventListener('transitionend', endHandler)
     }
 
     const collapse = () => {
-      // set fixed height before collapsing to 0 so transition can run
-      const h = childList.scrollHeight
-      childList.style.height = h + 'px'
-      // force reflow to apply the height before transitioning to 0
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      childList.offsetHeight
+      cancelEndHandler()
+      // If currently 'auto' or animating, measure and set fixed start height
+      withNoTransition(() => {
+        const current = getCurrentHeight()
+        childList.style.height = current + 'px'
+        childList.style.opacity = '1'
+      })
+      forceReflow()
+      // Animate to closed
       childList.style.height = '0px'
       childList.style.opacity = '0'
-      // no transform: keep caret visually intact
     }
 
     let isOpen = false
