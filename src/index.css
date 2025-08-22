@@ -452,6 +452,14 @@
   .mdx-rich.mdx-pad ol {
     padding-left: 0.5rem !important; /* pl-6 */
   }
+
+  /* Global <br> spacing: reduce vertical gap to ~half of default */
+  br {
+    display: block;           /* make spacing controllable */
+    margin-top: 0 !important; /* no extra space above */
+    margin-bottom: 0.7em !important; /* roughly half the typical line box */
+    line-height: 0;           /* avoid inheriting line-height gap */
+  }
 }
 
 /* Restore markers for nested lists in MDX components (MdxImage/MdxContent) */
@@ -646,4 +654,14 @@
   .mdx-rich[data-textalign='center'] > p { text-align: center; }
   .mdx-rich[data-textalign='right'] > p { text-align: right; }
   .mdx-rich[data-textalign='justify'] > p { text-align: justify; }
+}
+
+/* Force all HR to feather, including inside .prose */
+@layer utilities {
+  /* Tailwind Typography uses --tw-prose-hr variable inside .prose */
+  .prose { --tw-prose-hr: #2ca798; }
+  /* Halve vertical spacing for hr inside prose (from ~3em to 1.5em) */
+  .prose hr { margin-top: 1.5em; margin-bottom: 1.5em; }
+  /* Any other hr (outside prose or in components) */
+  hr { border-color: #2ca798; color: #2ca798; margin-top: 0.25em; margin-bottom: 0.25em; }
 }

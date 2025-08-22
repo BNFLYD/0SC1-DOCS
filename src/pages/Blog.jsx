@@ -3,6 +3,18 @@ import { useOutletContext } from "react-router-dom"
 import { Icon } from "@iconify/react"
 import CodeCopyButton from "../components/MarkDownUI/CodeCopyButton"
 
+// Parse YYYY-MM-DD as a local date (avoids UTC shift showing previous day)
+function parseLocalDate(iso) {
+  try {
+    if (!iso || typeof iso !== 'string') return new Date(0)
+    const [y, m, d] = iso.split('-').map(Number)
+    if (!y || !m || !d) return new Date(iso)
+    return new Date(y, (m - 1), d)
+  } catch (_) {
+    return new Date(0)
+  }
+}
+
 function Blog() {
   const { language, isDark, t } = useOutletContext()
 
@@ -36,7 +48,7 @@ function Blog() {
           subtitle,
           icon,
           Component: Comp,
-          _date: date ? new Date(date) : new Date(0),
+          _date: parseLocalDate(date),
         }
       })
       .filter((p) => Boolean(p.Component))
@@ -156,7 +168,7 @@ function Blog() {
                     {post.excerpt}
                   </p>
                   <p className="font-mono text-xs mt-1">
-                    {new Date(post.date).toLocaleDateString(language === "es" ? "es-AR" : "en-US", {
+                    {post._date.toLocaleDateString(language === "es" ? "es-AR" : "en-US", {
                       year: "numeric",
                       month: "short",
                       day: "2-digit",

@@ -7,6 +7,7 @@ import potrerillos from '../images/potrerillos.jpg'
 import leñas from '../images/leñas.jpg'
 import hornero from '../images/hornero.svg'
 import vapor from '../../assets/vaporwave.gif'
+import YouTubeEmbed from '../../components/MarkDownUI/YouTubeEmbed.jsx'
 
 export const meta = {
   title: "Demo",
@@ -25,7 +26,6 @@ export const meta = {
 #### Y hay como 2 mas despues de este, pero la verdad que no tiene sentido usar mas subtitulos mas alla de este, porque son imperceptibles con los parrafos
 
 Esto es un parrafo: Waos,  impresionante! Casi que parece que es un formato de texto plano que podemos usar para hacer notas o cosas asi (pd: aguante Logseq).
-
 
 **Esto es una lista:**
 - aca podes poner items de lista (obviamente)
@@ -123,7 +123,7 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
 </MdxImage>
 <br />
 <MdxImage
-  src={[gomez,potrerillos,ciudad,leñas]}
+  src={[gomez,ciudad,potrerillos,leñas]}
   description={["Edificio Gomez","Ciudad de Mendoza","Potrerillos","Las Leñas"]}
   alt="galery"
   side="right"
@@ -183,30 +183,6 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
 
 <MdxContent
   col={3}
-  width={"1fr"}
-  gap={16}
->
-  <>
-    ## Título de columna 1
-    Texto 1
-    - Lista 1
-  </>
-  <>
-    ## Título de columna 2
-    Texto 2
-    - Lista 2
-  </>
-  <>
-    ## Título de columna 3
-    Texto 3
-    - Lista 3
-  </>
-</MdxContent>
-
-<br />
-
-<MdxContent
-  col={3}
   width={["25%","50%","25%"]}
   gap={20}
   textAlign={["","justify",""]}
@@ -235,8 +211,6 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
     <>
     ### *esto se puede reiterar infinitas veces*
     bla bla bla
-
-    ---
     </>
 
     </MdxImage>
@@ -255,8 +229,37 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
     ## Título de columna 3
     Texto 3
     - Lista 3
-  ---
   </>
 </MdxContent>
 
----
+    <YouTubeEmbed
+      url="https://www.youtube.com/watch?v=adadas"
+      title="Como crear tu propia distro linux usando IA"
+      description="Y sobrevivir a la funa"
+      autoplay={false}
+      controls={true}
+      side="center"
+      ratio="16:10"
+      width="100%"
+      className="my-6"
+      markers={[
+      { label: "Intro 0:00", time: "0:00" },
+      { label: "Rust es mejor que C++ 6:45", time: "6:45" },
+      { label: "Tuve que huir a Kiribati 15:10", time: "15:10" }
+      ]}
+    >
+      <MdxImage
+        src={sekaide}
+        alt="Sekaide"
+        side="left"
+        width={"6%"}
+        aspectRatio="1:1"
+        content="cover"
+        className="my-0 rounded-full text-my-8"
+        >
+        <>
+        <br />
+        ## sekaide
+        </>
+      </MdxImage>
+    </YouTubeEmbed>
