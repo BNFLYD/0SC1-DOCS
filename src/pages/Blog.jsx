@@ -1,7 +1,8 @@
-import { useMemo, useState, useEffect } from "react"
-import { useOutletContext } from "react-router-dom"
+import { useMemo, useState, useEffect, useRef } from "react"
+import { useOutletContext, useLocation, useNavigate } from "react-router-dom"
 import { Icon } from "@iconify/react"
 import CodeCopyButton from "../components/MarkDownUI/CodeCopyButton"
+import { Scrollbar } from "../components/UI/Scrollbar"
 
 // Parse YYYY-MM-DD as a local date (avoids UTC shift showing previous day)
 function parseLocalDate(iso) {
@@ -17,6 +18,8 @@ function parseLocalDate(iso) {
 
 function Blog() {
   const { language, isDark, t } = useOutletContext()
+  const location = useLocation()
+  const navigate = useNavigate()
 
   // Cargar todos los componentes MDX de /src/content/posts/*.mdx
   const mdxModules = useMemo(() => {
@@ -58,6 +61,34 @@ function Blog() {
   const [query, setQuery] = useState("")
   const [activeTag, setActiveTag] = useState("")
   const [expandedSlug, setExpandedSlug] = useState("")
+
+  // Sync expanded post with URL (?post=slug)
+  useEffect(() => {
+    const sp = new URLSearchParams(location.search)
+    const s = sp.get('post') || ""
+    setExpandedSlug(s)
+  }, [location.search])
+
+  const toggleExpanded = (slug) => {
+    const isOpen = expandedSlug === slug
+    const sp = new URLSearchParams(location.search)
+    if (isOpen) sp.delete('post'); else sp.set('post', slug)
+    navigate({ search: sp.toString() ? `?${sp.toString()}` : "" }, { replace: true })
+    setExpandedSlug(isOpen ? "" : slug)
+  }
+
+  const sharePost = async (slug, title) => {
+    try {
+      const url = new URL(window.location.href)
+      url.searchParams.set('post', slug)
+      const shareUrl = url.toString()
+      if (navigator.share) {
+        await navigator.share({ title, url: shareUrl })
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl)
+      }
+    } catch (_) { /* noop */ }
+  }
 
   // Tags únicas disponibles para filtros
   const allTags = useMemo(() => {
@@ -136,59 +167,84 @@ function Blog() {
           const isOpen = expandedSlug === post.slug
           const Comp = post.Component
           return (
-            <div
-              key={post.slug}
-              className={`rounded-2xl overflow-hidden transition-colors ${isDark ? "bg-primary" : "bg-secondary"
-                }`}
-            >
-              {/* Miniatura / Header */}
-              <button
-                className={`w-full text-left p-5 flex items-center gap-4 hover:bg-current/5 transition-colors`}
-                onClick={() => setExpandedSlug(isOpen ? "" : post.slug)}
-                aria-expanded={isOpen}
+            <div key={post.slug} className="relative">
+              <div
+                className={`rounded-2xl overflow-hidden transition-colors ${isDark ? "bg-primary" : "bg-secondary"}`}
               >
-                {/* Cover simple (si hubiera) */}
-                <div className="h-20 w-28 rounded-md bg-current/10 shrink-0 overflow-hidden flex items-center justify-center">
-                  {post.icon ? (
-                    <Icon icon={post.icon} className={`text-7xl hover:text-feather opacity-80 ${isDark ? "text-white" : "text-black"}`} />
-                  ) : (
-                    <span className="text-xs font-mono opacity-70">{post.tags?.[0] || "MDX"}</span>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-mono text-lg font-bold">
-                    {post.title}
-                  </h3>
-                  {post.subtitle && (
-                    <p className="font-mono text-sm font-semibold opacity-80">
-                      {post.subtitle}
+                {/* Miniatura / Header */}
+                <div
+                  className={`w-full p-5 flex items-center gap-4 cursor-pointer`}
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={isOpen}
+                  onClick={() => toggleExpanded(post.slug)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      toggleExpanded(post.slug)
+                    }
+                  }}
+                >
+                  {/* Cover simple (si hubiera) */}
+                  <div className="h-20 w-28 rounded-md bg-current/10 shrink-0 overflow-hidden flex items-center justify-center">
+                    {post.icon ? (
+                      <Icon icon={post.icon} className={`text-7xl hover:text-feather opacity-80 ${isDark ? "text-white" : "text-black"}`} />
+                    ) : (
+                      <span className="text-xs font-mono opacity-70">{post.tags?.[0] || "MDX"}</span>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-mono text-lg font-bold">
+                      {post.title}
+                    </h3>
+                    {post.subtitle && (
+                      <p className="font-mono text-sm font-semibold opacity-80">
+                        {post.subtitle}
+                      </p>
+                    )}
+                    <p className="font-mono text-sm line-clamp-2">
+                      {post.excerpt}
                     </p>
-                  )}
-                  <p className="font-mono text-sm line-clamp-2">
-                    {post.excerpt}
-                  </p>
-                  <p className="font-mono text-xs mt-1">
-                    {post._date.toLocaleDateString(language === "es" ? "es-AR" : "en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "2-digit",
-                    })}
-                    {post.tags?.length ? ` · ${post.tags.join(", ")}` : ""}
-                  </p>
+                    <p className="font-mono text-xs mt-1">
+                      {post._date.toLocaleDateString(language === "es" ? "es-AR" : "en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "2-digit",
+                      })}
+                      {post.tags?.length ? ` · ${post.tags.join(", ")}` : ""}
+                    </p>
+                  </div>
+                  {/* Acciones a la derecha: caret + compartir */}
+                  <div className="ml-4 shrink-0 flex items-center gap-2">
+                    <button
+                      type="button"
+                      aria-label={language === 'es' ? 'Compartir enlace' : 'Share link'}
+                      className={`w-8 h-8 transition-colors flex items-center justify-center ${isDark ? 'text-white hover:text-feather' : 'text-black hover:text-feather'}`}
+                      onClick={(e) => { e.stopPropagation(); sharePost(post.slug, post.title) }}
+                      title={language === 'es' ? 'Compartir' : 'Share'}
+                    >
+                      <Icon icon="bxs:copy" className="text-xl" />
+                    </button>
+                  </div>
                 </div>
-              </button>
 
-              {/* Contenido MDX expandido */}
-              {isOpen && Comp && (
-                <CollapsibleProse isDark={isDark}>
-                  <Comp />
-                  <CodeCopyButton />
-                </CollapsibleProse>
+                {/* Contenido MDX expandido dentro del card, SIN scrollbar adentro */}
+                {isOpen && Comp && (
+                  <div id={`post-${post.slug}`} className="min-w-0">
+                    <CollapsibleProse isDark={isDark}>
+                      <Comp />
+                      <CodeCopyButton />
+                    </CollapsibleProse>
+                  </div>
+                )}
+              </div>
+              {/* Scrollbar totalmente fuera del card, a la derecha */}
+              {isOpen && (
+                <Scrollbar targetId={`post-${post.slug}`} />
               )}
             </div>
           )
         })}
-
         {!filtered.length && (
           <p className="font-mono text-sm opacity-70">
             {language === "es" ? "Sin resultados" : "No results"}
@@ -275,8 +331,8 @@ function CollapsibleProse({ isDark, children }) {
   return (
     <div
       className={`px-16 pb-6 pt-1 prose max-w-none ${isDark
-          ? "prose-invert prose-pre:bg-void"
-          : "prose-pre:bg-cloud"
+        ? "prose-invert prose-pre:bg-void"
+        : "prose-pre:bg-cloud"
         } prose-pre:rounded-2xl prose-pre:p-4 prose-code:font-mono`}
       data-theme={isDark ? 'dark' : 'light'}
       data-prose-collapsible
@@ -285,6 +341,8 @@ function CollapsibleProse({ isDark, children }) {
     </div>
   )
 }
+
+// Scrollbar moved to ../components/UI/Scrollbar
 
 function initCollapsibles(root) {
   if (!root || root.__collapsibleInit) return

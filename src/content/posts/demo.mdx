@@ -8,6 +8,7 @@ import leñas from '../images/leñas.jpg'
 import hornero from '../images/hornero.svg'
 import vapor from '../../assets/vaporwave.gif'
 import YouTubeEmbed from '../../components/MarkDownUI/YouTubeEmbed.jsx'
+import Icon from '../../components/MarkDownUI/Icon.jsx'
 
 export const meta = {
   title: "Demo",
@@ -122,6 +123,8 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
   </>
 </MdxImage>
 <br />
+<br />
+
 <MdxImage
   src={[gomez,ciudad,potrerillos,leñas]}
   description={["Edificio Gomez","Ciudad de Mendoza","Potrerillos","Las Leñas"]}
@@ -177,7 +180,6 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
   </>
 </MdxImage>
 
-<br />
 
 ## Ejemplo: contenido en columnas
 
@@ -263,3 +265,31 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
         </>
       </MdxImage>
     </YouTubeEmbed>
+
+<Icon
+name="line-md:github-loop"
+size="40%"
+className="align-middle mr-2"
+url="https://github.com/tu-org"
+className="my-0"
+>
+</Icon>
+
+<Icon
+image
+name={sekaide}
+size="40%"
+objectFit="cover"
+className="my-0"
+url="https://github.com/tu-org"
+ >
+</Icon>
+<Icon
+  items={[
+    { name: sekaide, image: true, size: '10%', objectFit: 'cover', url: 'https://github.com/tu-org' },
+    { name:'line-md:github-loop', size:'11%', url: 'https://github.com/tu-org' },
+  ]}
+  itemsDirection="row"
+  itemsContainerClass="items-center"
+>
+</Icon>

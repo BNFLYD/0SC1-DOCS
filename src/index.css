@@ -665,3 +665,23 @@
   /* Any other hr (outside prose or in components) */
   hr { border-color: #2ca798; color: #2ca798; margin-top: 0.25em; margin-bottom: 0.25em; }
 }
+
+/* Inline icons inside prose: keep surrounding text in the same paragraph line */
+@layer components {
+  /* The span rendered by Icon for arrays */
+  .mdx-inline-icons { vertical-align: middle; }
+  .mdx-inline-icons::before, .mdx-inline-icons::after { content: "\00a0"; }
+
+  /* Make the paragraph that contains only the icons behave inline */
+  .prose p:has(> .mdx-inline-icons) {
+    display: inline;
+    margin: 0;
+    padding: 0;
+  }
+  /* Also make the previous paragraph inline when followed by an icons-only paragraph */
+  .prose p:has(+ p:has(> .mdx-inline-icons)) { display: inline; }
+  /* And the next paragraph inline so text continues on the same line */
+  .prose p:has(> .mdx-inline-icons) + p { display: inline; }
+}
+
+ 
