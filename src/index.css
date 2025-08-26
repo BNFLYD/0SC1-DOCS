@@ -646,6 +646,7 @@
     animation: mdx-fade-in 220ms ease-out;
     will-change: opacity, transform;
   }
+
 }
 
 /* Paragraph alignment control for MdxContent via data-textalign */
