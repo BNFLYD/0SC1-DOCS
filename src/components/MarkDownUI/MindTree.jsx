@@ -79,7 +79,7 @@ function enhanceTree(nodes, path = []) {
   })
 }
 
-export default function MindTree({ children, className = "", dark = true, height = undefined }) {
+export default function MindTree({ children, className = "", dark = true, height = undefined, connectorStartRatio = 0.8, connectorMinDx = 28 }) {
   // Usar variantes de Tailwind para color de texto según modo
   const theme = 'text-primary dark:text-white'
 
@@ -152,7 +152,14 @@ export default function MindTree({ children, className = "", dark = true, height
 
   // Estado por nodo (abrir/cerrar). Almaceno en un diccionario id->open para no recrear funciones.
   const [openMap, setOpenMap] = useState(() => ({}))
-  const toggle = (id) => setOpenMap((m) => ({ ...m, [id]: !m[id] }))
+  const [lastExpandedDepth, setLastExpandedDepth] = useState(null)
+  const toggle = (id) => {
+    const depth = id.split('.').length - 1
+    const willOpen = !(openMap[id] ?? false)
+    setOpenMap((m) => ({ ...m, [id]: !m[id] }))
+    // Al expandir, la nueva columna visible es depth+1
+    setLastExpandedDepth(willOpen ? depth + 1 : null)
+  }
 
   // Construir árbol con ids y banderas open
   const tree = useMemo(() => {
@@ -272,16 +279,16 @@ export default function MindTree({ children, className = "", dark = true, height
           </div>
           {hasChildren && (
             <button
-              ref={(el) => {
-                if (el) caretRefs.current[node.id] = el; else delete caretRefs.current[node.id]
-              }}
-              type="button"
-              className="px-0.5 text-feather/90 hover:text-feather text-2xl leading-none inline-flex items-center justify-center"
-              aria-label={isOpen ? 'Colapsar' : 'Expandir'}
-              onClick={() => toggle(node.id)}
-            >
-              {'▸'}
-            </button>
+            ref={(el) => {
+              if (el) caretRefs.current[node.id] = el; else delete caretRefs.current[node.id]
+            }}
+            type="button"
+            className="px-0.5 text-feather hover:text-feather text-2xl leading-none inline-flex items-center justify-center relative -top-0.5"
+            aria-label={isOpen ? 'Colapsar' : 'Expandir'}
+            onClick={() => toggle(node.id)}
+          >
+            {'▸'}
+          </button>
           )}
         </span>
       </div>
@@ -455,9 +462,10 @@ export default function MindTree({ children, className = "", dark = true, height
   })()
 
   // SVG overlay para conectar caret padre -> bullet hijo
-  const ConnectorsSvg = ({ rootRef, nodesByDepth, colorClass = '' }) => {
+  const ConnectorsSvg = ({ rootRef, nodesByDepth, colorClass = '', connectorStartRatio, connectorMinDx, lastExpandedDepth }) => {
     const [state, setState] = React.useState({ w: 0, h: 0, paths: [] })
     const rafId = React.useRef(0)
+    const pathRefs = React.useRef([])
 
     const build = React.useCallback(() => {
       const rootEl = rootRef.current
@@ -497,7 +505,25 @@ export default function MindTree({ children, className = "", dark = true, height
       const paths = []
       // Importante: NO sumar scroll aquí. El SVG está dentro del mismo contenedor scrolleable,
       // por lo que se traslada junto al contenido. Medimos posiciones relativas a rootBox.
-      const Y_OFFSET = 2 // px hacia abajo en ambos extremos
+      const Y_OFFSET = 1 // px hacia abajo en ambos extremos
+      // Calcular, por nivel, el borde derecho máximo del contenedor de fila, para que la curvatura
+      // comience alineada verticalmente en ese punto para todos los subniveles del mismo nivel.
+      const bendXByDepth = []
+      for (let d = 1; d < nodesByDepth.length; d++) {
+        let maxRight = -Infinity
+        for (const child of nodesByDepth[d]) {
+          const childId = child.id
+          const bulletEl = bulletRefs.current[childId]
+          if (!bulletEl) continue
+          // Contenedor de fila y contenedor de contenido (columna)
+          const rowEl = bulletEl.closest('span.inline-flex') || bulletEl.parentElement
+          const contentEl = rowEl?.querySelector('div.inline-block') || rowEl
+          const cr = contentEl?.getBoundingClientRect()
+          if (cr && Number.isFinite(cr.right)) maxRight = Math.max(maxRight, cr.right)
+        }
+        // -1px para evitar que la curva invada visualmente la columna
+        bendXByDepth[d] = Number.isFinite(maxRight) ? (maxRight - rootBox.left - 1) : undefined
+      }
       for (let d = 1; d < nodesByDepth.length; d++) {
         for (const child of nodesByDepth[d]) {
           const childId = child.id
@@ -513,14 +539,58 @@ export default function MindTree({ children, className = "", dark = true, height
           const y1 = (lineCenterY[parentId] ?? (c.top - rootBox.top + c.height / 2)) + Y_OFFSET
           const x2 = b.left - rootBox.left + b.width / 2
           const y2 = (lineCenterY[childId] ?? (b.top - rootBox.top + b.height / 2)) + Y_OFFSET
-          const dx = Math.max(28, (x2 - x1) * 0.45)
-          const dPath = `M ${x1},${y1} C ${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`
-          paths.push(dPath)
+          // Determinar ratio por nivel: acepta number | array | function
+          let ratio
+          if (typeof connectorStartRatio === 'function') {
+            try { ratio = connectorStartRatio(d, { x1, y1, x2, y2, parentId, childId }) } catch { ratio = 0.8 }
+          } else if (Array.isArray(connectorStartRatio)) {
+            ratio = connectorStartRatio[Math.min(d, connectorStartRatio.length - 1)]
+          } else {
+            ratio = connectorStartRatio
+          }
+          if (!Number.isFinite(ratio)) ratio = 0.8
+          const minDx = Number.isFinite(connectorMinDx) ? connectorMinDx : 28
+          const bendX = bendXByDepth[d]
+          // No permitir que el punto de quiebre quede a la derecha del bullet
+          const DISJ_OFFSET = 25 // px hacia la izquierda
+          const effectiveBendX = Number.isFinite(bendX) ? Math.min(bendX - DISJ_OFFSET, x2 - minDx) : undefined
+          const SMOOTH = 8 // px: cuánto antes empezar a curvar y suavizar la tangente
+          let dPath
+          if (Number.isFinite(effectiveBendX) && effectiveBendX > x1 + minDx + 1) {
+            // Terminar el tramo recto un poco antes del borde de la columna
+            const sX = Math.max(x1 + minDx, effectiveBendX - SMOOTH)
+            const cX = sX + SMOOTH // control levemente a la derecha para continuidad de tangente
+            dPath = `M ${x1},${y1} L ${sX},${y1} C ${cX},${y1} ${cX},${y2} ${x2},${y2}`
+          } else {
+            // Fallback: curvatura simétrica por ratio/min
+            const dx = Math.max(minDx, (x2 - x1) * ratio)
+            dPath = `M ${x1},${y1} C ${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`
+          }
+          paths.push({ d: dPath, depth: d })
         }
       }
       // Usar dimensiones del contenido completo para que el SVG no recorte
       setState({ w: rootEl.scrollWidth, h: rootEl.scrollHeight, paths })
     }, [rootRef, nodesByDepth])
+
+    // Animación de trazo: dibujar desde el caret hacia el bullet en ~200ms
+    React.useEffect(() => {
+      pathRefs.current.forEach((el) => {
+        if (!el) return
+        // Animar solo si corresponde al nivel recién expandido
+        const d = Number(el.dataset.depth)
+        if (!Number.isFinite(d) || d !== lastExpandedDepth) return
+        // Preparar estilo para animación
+        el.style.transition = 'stroke-dashoffset 500ms ease-out, opacity 500ms ease-out'
+        el.style.strokeDasharray = '1'
+        el.style.strokeDashoffset = '1'
+        el.style.opacity = '0.001'
+        requestAnimationFrame(() => {
+          el.style.strokeDashoffset = '0'
+          el.style.opacity = '1'
+        })
+      })
+    }, [state.paths, lastExpandedDepth])
 
     // Programa el build tras dos frames para esperar a que el layout/recursos se asienten
     const scheduleBuild = React.useCallback(() => {
@@ -595,8 +665,18 @@ export default function MindTree({ children, className = "", dark = true, height
         height={state.h}
         viewBox={`0 0 ${state.w} ${state.h}`}
       >
-        {state.paths.map((d, i) => (
-          <path key={i} d={d} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        {state.paths.map((p, i) => (
+          <path
+            key={i}
+            ref={(el) => (pathRefs.current[i] = el)}
+            d={p.d}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            pathLength={1}
+            data-depth={p.depth}
+          />
         ))}
       </svg>
     )
@@ -765,6 +845,9 @@ export default function MindTree({ children, className = "", dark = true, height
           rootRef={innerRef}
           nodesByDepth={byDepth}
           colorClass={'text-primary dark:text-cloud'}
+          connectorStartRatio={connectorStartRatio}
+          connectorMinDx={connectorMinDx}
+          lastExpandedDepth={lastExpandedDepth}
         />
       </div>
     </div>
