@@ -86,9 +86,50 @@ function Blog() {
       // Release the guard on next tick
       setTimeout(() => { isClearingRef.current = false }, 0)
     } else {
-      sp.set('post', slug)
-      navigate({ search: sp.toString() ? `?${sp.toString()}` : "" }, { replace: true })
-      setExpandedSlug(slug)
+      // Animate list scroll so the selected card reaches the top, then expand
+      const container = document.getElementById('post-list')
+      const card = document.getElementById(`card-${slug}`)
+      const expandNow = () => {
+        sp.set('post', slug)
+        navigate({ search: sp.toString() ? `?${sp.toString()}` : "" }, { replace: true })
+        setExpandedSlug(slug)
+      }
+      // If we can't animate, expand immediately
+      if (!container || !card) { expandNow(); return }
+      // Only meaningful if the list is scrollable (no post open yet)
+      const isScrollable = container.scrollHeight > container.clientHeight
+      if (!isScrollable) { expandNow(); return }
+
+      // Compute the desired scrollTop so that the card touches the top of the container
+      const cRect = container.getBoundingClientRect()
+      const pRect = card.getBoundingClientRect()
+      const desired = container.scrollTop + (pRect.top - cRect.top)
+      const threshold = 2
+      if (Math.abs(container.scrollTop - desired) <= 4) { expandNow(); return }
+
+      try {
+        container.scrollTo({ top: desired, behavior: 'smooth' })
+      } catch (_) {
+        container.scrollTop = desired
+        expandNow()
+        return
+      }
+
+      let rafId = 0
+      let startTs = 0
+      const maxMs = 900
+      const check = (ts) => {
+        if (!startTs) startTs = ts || 0
+        const done = Math.abs(container.scrollTop - desired) <= threshold
+        const timedOut = (ts || 0) - startTs > maxMs
+        if (done || timedOut) {
+          if (rafId) cancelAnimationFrame(rafId)
+          expandNow()
+          return
+        }
+        rafId = requestAnimationFrame(check)
+      }
+      rafId = requestAnimationFrame(check)
     }
   }
 
@@ -128,6 +169,11 @@ function Blog() {
       .filter((p) => matchesQuery(p) && matchesTag(p))
       .sort((a, b) => b._date - a._date)
   }, [normalized, query, activeTag])
+
+  // When a post is expanded, hide the rest from the list
+  const visiblePosts = expandedSlug
+    ? filtered.filter((p) => p.slug === expandedSlug)
+    : filtered
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
@@ -176,19 +222,19 @@ function Blog() {
         </div>
       </div>
 
-      {/* Listado de posts */}
-      <div className="space-y-6">
-        {filtered.map((post) => {
+      {/* Listado de posts: máx 4 cards de alto y scroll interno SOLO cuando no hay post abierto */}
+      <div id="post-list" className={`relative space-y-6 pr-2 ${expandedSlug ? "" : "overflow-y-auto max-h-[35rem]"}`}>
+        {visiblePosts.map((post) => {
           const isOpen = expandedSlug === post.slug
           const Comp = post.Component
           return (
-            <div key={post.slug} className="relative">
+            <div id={`card-${post.slug}`} key={post.slug} className="relative">
               <div
                 className={`rounded-2xl overflow-hidden transition-colors ${isDark ? "bg-primary" : "bg-secondary"}`}
               >
                 {/* Miniatura / Header */}
                 <div
-                  className={`w-full p-5 flex items-center gap-4 cursor-pointer`}
+                  className={`w-full p-5 min-h-[7rem] flex items-center gap-4 cursor-pointer`}
                   role="button"
                   tabIndex={0}
                   aria-expanded={isOpen}
@@ -230,20 +276,19 @@ function Blog() {
                     </p>
                   </div>
                   {/* Acciones a la derecha: caret + compartir */}
-                  <div className="ml-4 shrink-0 flex items-center gap-2">
+                  <div className=" shrink-0 flex items-center gap-2">
                     <button
                       type="button"
                       aria-label={language === 'es' ? 'Compartir enlace' : 'Share link'}
-                      className={`w-8 h-8 transition-colors flex items-center justify-center ${isDark ? 'text-white hover:text-feather' : 'text-black hover:text-feather'}`}
+                      className={`w-10 h-10 transition-colors flex items-center justify-center text-6xl ${isDark ? 'text-white hover:text-feather' : 'text-black hover:text-feather'}`}
                       onClick={(e) => { e.stopPropagation(); sharePost(post.slug, post.title) }}
                       title={language === 'es' ? 'Compartir' : 'Share'}
                     >
-                      <Icon icon="bxs:copy" className="text-xl" />
+                      <Icon icon="tabler:link"/>
                     </button>
                   </div>
                 </div>
 
-                {/* Contenido MDX expandido dentro del card, SIN scrollbar adentro */}
                 {isOpen && Comp && (
                   <div id={`post-${post.slug}`} className="min-w-0">
                     <CollapsibleProse isDark={isDark} postSlug={post.slug}>
@@ -253,17 +298,27 @@ function Blog() {
                   </div>
                 )}
               </div>
-              {/* Scrollbar totalmente fuera del card, a la derecha */}
+              {/* Scrollbar totalmente fuera del card, a la derecha (post mode con defaults) */}
               {isOpen && (
                 <Scrollbar targetId={`post-${post.slug}`} />
               )}
             </div>
           )
         })}
-        {!filtered.length && (
+        {!visiblePosts.length && (
           <p className="font-mono text-sm opacity-70">
             {language === "es" ? "Sin resultados" : "No results"}
           </p>
+        )}
+        {/* Scrollbar para la lista cuando hay más de 4 posts y ningún post abierto */}
+        {!expandedSlug && filtered.length > 4 && (
+          <Scrollbar
+            targetId="post-list"
+            container
+            rightOffsetPx={16}
+            topPadPx={366}
+            bottomPadPx={140}
+          />
         )}
       </div>
     </div>
