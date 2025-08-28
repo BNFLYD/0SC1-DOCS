@@ -10,6 +10,8 @@ export function Scrollbar({ targetId }) {
   const [trackHeightPx, setTrackHeightPx] = useState(() => Math.max(0, window.innerHeight - 96))
   const bottomOffsetPx = 48
   const [ready, setReady] = useState(false)
+  const initialTopRef = useRef(null)
+  const lockedRef = useRef(false)
 
   useEffect(() => {
     const offset = 96
@@ -44,83 +46,34 @@ export function Scrollbar({ targetId }) {
 
     const onScroll = () => updateThumb()
     const onResize = () => { updateThumb() }
+    // Initial compute + one extra frame for late layout
     updateThumb()
+    let raf1 = 0
+    raf1 = requestAnimationFrame(() => updateThumb())
+
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onResize)
     return () => {
+      cancelAnimationFrame(raf1)
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onResize)
     }
   }, [targetId])
 
-  // Compute fixed top aligned with the card header and track height to viewport bottom
+  // Fixed track with constant paddings (no card-based calculations or observers)
   useEffect(() => {
-    const computeTopAndHeight = () => {
-      try {
-        const el = document.getElementById(targetId)
-        let card = el
-        while (card && card !== document.body) {
-          if (card.classList && card.classList.contains('rounded-2xl')) break
-          card = card.parentElement
-        }
-        const node = card || el
-        if (!node) return false
-        // Two strategies to avoid race conditions: offset chain and rect.top
-        let pageTop = 0
-        let cur = node
-        while (cur) { pageTop += cur.offsetTop || 0; cur = cur.offsetParent }
-        const rect = node.getBoundingClientRect()
-        const rectTop = rect?.top ?? 0
-        const borderTop = (() => { try { return parseFloat(getComputedStyle(node).borderTopWidth || '0') || 0 } catch { return 0 } })()
-        const chainTop = pageTop - window.scrollY - borderTop
-        // Pick the sane positive value; if one is ~0 due to early layout, use the other
-        let top = Math.max(0, Math.round(Math.max(chainTop, rectTop - borderTop)))
-        // If still zero and rect gives 0 while card clearly in view height, wait for next frame
-        if (top === 0 && rectTop === 0) return false
-        const h = Math.max(0, window.innerHeight - top - bottomOffsetPx)
-        setFixedTop(top)
-        setTrackHeightPx(h)
-        setReady(true)
-        return true
-      } catch (_) {
-        // Don't mark ready on failure; retry later to avoid flash
-        return false
-      }
+    const topPad = 366 // fixed
+    const bottomPad = 56 // fixed
+    const apply = () => {
+      setFixedTop(topPad)
+      setTrackHeightPx(Math.max(0, window.innerHeight - topPad - bottomPad))
+      setReady(true)
     }
-    // Run after layout (twice) to survive late layout shifts on mount, retry until success
-    setReady(false)
-    let rafId1 = 0, rafId2 = 0
-    const tick = () => { if (!computeTopAndHeight()) rafId2 = requestAnimationFrame(tick) }
-    rafId1 = requestAnimationFrame(() => { if (!computeTopAndHeight()) rafId2 = requestAnimationFrame(tick) })
-    // Recompute once when window fully loaded (fonts/images)
-    const onWindowLoad = () => computeTopAndHeight()
-    window.addEventListener('load', onWindowLoad)
-    // Recompute when images inside the card load
-    const el = document.getElementById(targetId)
-    const node = el?.closest('.rounded-2xl') || el
-    const imgs = node ? node.querySelectorAll('img') : []
-    imgs && imgs.forEach(img => {
-      if (!img.complete) img.addEventListener('load', onWindowLoad, { once: true })
-    })
-    // Observe DOM mutations to detect when target/card becomes available
-    const mo = new MutationObserver(() => { if (!ready) computeTopAndHeight() })
-    mo.observe(document.body, { childList: true, subtree: true })
-    // Observe size/content mutations to recompute
-    let ro
-    if (node && 'ResizeObserver' in window) {
-      ro = new ResizeObserver(() => computeTopAndHeight())
-      ro.observe(node)
-    }
-    const onResize = () => computeTopAndHeight()
+    apply()
+    const onResize = () => apply()
     window.addEventListener('resize', onResize)
     return () => {
-      cancelAnimationFrame(rafId1)
-      cancelAnimationFrame(rafId2)
-      window.removeEventListener('load', onWindowLoad)
       window.removeEventListener('resize', onResize)
-      imgs && imgs.forEach(img => img.removeEventListener('load', onWindowLoad))
-      mo.disconnect()
-      if (ro) ro.disconnect()
     }
   }, [targetId])
 

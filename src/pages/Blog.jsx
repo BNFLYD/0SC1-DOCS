@@ -21,6 +21,8 @@ function Blog() {
   const location = useLocation()
   const navigate = useNavigate()
 
+  const isClearingRef = useRef(false)
+
   // Cargar todos los componentes MDX de /src/content/posts/*.mdx
   const mdxModules = useMemo(() => {
     return import.meta.glob("../content/posts/*.mdx", { eager: true })
@@ -72,9 +74,22 @@ function Blog() {
   const toggleExpanded = (slug) => {
     const isOpen = expandedSlug === slug
     const sp = new URLSearchParams(location.search)
-    if (isOpen) sp.delete('post'); else sp.set('post', slug)
-    navigate({ search: sp.toString() ? `?${sp.toString()}` : "" }, { replace: true })
-    setExpandedSlug(isOpen ? "" : slug)
+    if (isOpen) {
+      // CLEAR FIRST: skip any lifecycle saves during this close
+      isClearingRef.current = true
+      // Remove persisted fixedTop for this post so next open will recompute
+      try { sessionStorage.removeItem(`sbTop:post-${slug}`) } catch (_) { /* noop */ }
+      // Then update URL and state
+      sp.delete('post')
+      navigate({ search: sp.toString() ? `?${sp.toString()}` : "" }, { replace: true })
+      setExpandedSlug("")
+      // Release the guard on next tick
+      setTimeout(() => { isClearingRef.current = false }, 0)
+    } else {
+      sp.set('post', slug)
+      navigate({ search: sp.toString() ? `?${sp.toString()}` : "" }, { replace: true })
+      setExpandedSlug(slug)
+    }
   }
 
   const sharePost = async (slug, title) => {
@@ -231,7 +246,7 @@ function Blog() {
                 {/* Contenido MDX expandido dentro del card, SIN scrollbar adentro */}
                 {isOpen && Comp && (
                   <div id={`post-${post.slug}`} className="min-w-0">
-                    <CollapsibleProse isDark={isDark}>
+                    <CollapsibleProse isDark={isDark} postSlug={post.slug}>
                       <Comp />
                       <CodeCopyButton />
                     </CollapsibleProse>
@@ -257,12 +272,13 @@ function Blog() {
 
 export default Blog
 
-function CollapsibleProse({ isDark, children }) {
+function CollapsibleProse({ isDark, postSlug, children }) {
+  const STORAGE_UI_KEY = postSlug ? `blogProse:${postSlug}` : null
   useEffect(() => {
     // Initialize collapsible nested lists for all prose containers on mount/update
     const containers = document.querySelectorAll('[data-prose-collapsible]')
     containers.forEach((root) => {
-      initCollapsibles(root)
+      initCollapsibles(root, STORAGE_UI_KEY)
       // Ensure images inside prose are lazy-loaded by default
       const imgs = root.querySelectorAll('img')
       imgs.forEach((img) => {
@@ -270,6 +286,8 @@ function CollapsibleProse({ isDark, children }) {
         if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async')
       })
     })
+    // Signal readiness so Blog can finalize scroll restoration precisely
+    try { window.dispatchEvent(new CustomEvent('prose:ready', { detail: { slug: postSlug } })) } catch (_) { /* noop */ }
   })
 
   // Delegated click-to-zoom for native markdown images (exclude MdxImage)
@@ -344,11 +362,24 @@ function CollapsibleProse({ isDark, children }) {
 
 // Scrollbar moved to ../components/UI/Scrollbar
 
-function initCollapsibles(root) {
+function initCollapsibles(root, storageKey) {
   if (!root || root.__collapsibleInit) return
   root.__collapsibleInit = true
 
   const items = Array.from(root.querySelectorAll('li'))
+  // Load saved open set
+  let openSet = new Set()
+  if (storageKey) {
+    try {
+      const raw = sessionStorage.getItem(storageKey)
+      if (raw) openSet = new Set(JSON.parse(raw))
+    } catch (_) { /* noop */ }
+  }
+  // Persist only when Blog asks (prose:save), not on every click
+  const persist = () => {
+    if (!storageKey) return
+    try { sessionStorage.setItem(storageKey, JSON.stringify(Array.from(openSet))) } catch (_) { /* noop */ }
+  }
   items.forEach((li) => {
     // Only direct child list qualifies
     const childList = li.querySelector(':scope > ul, :scope > ol')
@@ -357,6 +388,10 @@ function initCollapsibles(root) {
     li.dataset.collapsibleInit = '1'
     // Ensure hover only affects the label text wrapper, not the entire LI
     li.classList.remove('group', 'relative')
+
+    // Assign a stable id for this LI within this post
+    if (!li.dataset.cid) li.dataset.cid = String(items.indexOf(li))
+    const cid = li.dataset.cid
 
     // Start collapsed with inline transition (height + opacity)
     childList.hidden = false
@@ -433,6 +468,15 @@ function initCollapsibles(root) {
     }
 
     let isOpen = false
+    // If saved as open, open immediately without animation
+    if (openSet.has(cid)) {
+      isOpen = true
+      childList.style.transition = 'none'
+      childList.style.height = 'auto'
+      childList.style.opacity = '1'
+      forceReflow()
+      childList.style.transition = TRANSITION
+    }
 
     const btn = document.createElement('button')
     btn.type = 'button'
@@ -449,8 +493,10 @@ function initCollapsibles(root) {
       isOpen = !isOpen
       if (isOpen) {
         expand()
+        openSet.add(cid)
       } else {
         collapse()
+        openSet.delete(cid)
       }
       btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false')
       btn.textContent = isOpen ? '▾' : '▸'
@@ -498,11 +544,32 @@ function initCollapsibles(root) {
       isOpen = !isOpen
       if (isOpen) {
         expand()
+        openSet.add(cid)
       } else {
         collapse()
+        openSet.delete(cid)
       }
       btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false')
       btn.textContent = isOpen ? '▾' : '▸'
     })
+
+    // Listen once per root for a consolidated save request
+    if (!root.__collapsibleSaveBind) {
+      root.__collapsibleSaveBind = true
+      const onSave = (e) => {
+        if (!e.detail || !e.detail.slug) { persist(); return }
+        // Only persist if this root belongs to the same post (best-effort: storageKey includes slug)
+        if (storageKey && storageKey.endsWith(e.detail.slug)) persist()
+      }
+      window.addEventListener('prose:save', onSave)
+      // Clean up when the root is removed
+      const observer = new MutationObserver(() => {
+        if (!document.contains(root)) {
+          window.removeEventListener('prose:save', onSave)
+          observer.disconnect()
+        }
+      })
+      observer.observe(document.body, { childList: true, subtree: true })
+    }
   })
 }

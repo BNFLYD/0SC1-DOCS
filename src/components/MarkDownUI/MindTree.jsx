@@ -465,7 +465,7 @@ export default function MindTree({ children, className = "", dark = true, height
   const ConnectorsSvg = ({ rootRef, nodesByDepth, colorClass = '', connectorStartRatio, connectorMinDx, lastExpandedDepth }) => {
     const [state, setState] = React.useState({ w: 0, h: 0, paths: [] })
     const rafId = React.useRef(0)
-    const pathRefs = React.useRef([])
+    const pathRefs = React.useRef({})
 
     const build = React.useCallback(() => {
       const rootEl = rootRef.current
@@ -566,7 +566,7 @@ export default function MindTree({ children, className = "", dark = true, height
             const dx = Math.max(minDx, (x2 - x1) * ratio)
             dPath = `M ${x1},${y1} C ${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`
           }
-          paths.push({ d: dPath, depth: d })
+          paths.push({ d: dPath, depth: d, key: `${parentId}->${childId}` })
         }
       }
       // Usar dimensiones del contenido completo para que el SVG no recorte
@@ -575,7 +575,7 @@ export default function MindTree({ children, className = "", dark = true, height
 
     // Animación de trazo: dibujar desde el caret hacia el bullet en ~200ms
     React.useEffect(() => {
-      pathRefs.current.forEach((el) => {
+      Object.values(pathRefs.current).forEach((el) => {
         if (!el) return
         // Animar solo si corresponde al nivel recién expandido
         const d = Number(el.dataset.depth)
@@ -667,8 +667,11 @@ export default function MindTree({ children, className = "", dark = true, height
       >
         {state.paths.map((p, i) => (
           <path
-            key={i}
-            ref={(el) => (pathRefs.current[i] = el)}
+            key={p.key || i}
+            ref={(el) => {
+              const k = p.key || String(i)
+              if (el) pathRefs.current[k] = el; else delete pathRefs.current[k]
+            }}
             d={p.d}
             fill="none"
             stroke="currentColor"
