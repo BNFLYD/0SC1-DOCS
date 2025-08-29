@@ -466,6 +466,7 @@ export default function MindTree({ children, className = "", dark = true, height
     const [state, setState] = React.useState({ w: 0, h: 0, paths: [] })
     const rafId = React.useRef(0)
     const pathRefs = React.useRef({})
+    const animGuardRef = React.useRef(new WeakMap())
 
     const build = React.useCallback(() => {
       const rootEl = rootRef.current
@@ -575,17 +576,26 @@ export default function MindTree({ children, className = "", dark = true, height
 
     // Animación de trazo: dibujar desde el caret hacia el bullet en ~200ms
     React.useEffect(() => {
+      const cycleKey = `${lastExpandedDepth}|${state.paths.length}`
       Object.values(pathRefs.current).forEach((el) => {
         if (!el) return
         // Animar solo si corresponde al nivel recién expandido
         const d = Number(el.dataset.depth)
         if (!Number.isFinite(d) || d !== lastExpandedDepth) return
-        // Preparar estilo para animación
-        el.style.transition = 'stroke-dashoffset 500ms ease-out, opacity 500ms ease-out'
+        // Guardar/consultar si ya inicializamos esta animación para este elemento en este ciclo
+        if (animGuardRef.current.get(el) === cycleKey) return
+        animGuardRef.current.set(el, cycleKey)
+        // Paso 1: quitar transiciones y fijar estado inicial oculto
+        el.style.transition = 'none'
         el.style.strokeDasharray = '1'
         el.style.strokeDashoffset = '1'
         el.style.opacity = '0.001'
+        // Forzar reflow para que el navegador "registre" el estado inicial
+        // eslint-disable-next-line no-unused-expressions
+        el.getBoundingClientRect()
+        // Paso 2: en el próximo frame, aplicar transición y estado final
         requestAnimationFrame(() => {
+          el.style.transition = 'stroke-dashoffset 500ms ease-out, opacity 500ms ease-out'
           el.style.strokeDashoffset = '0'
           el.style.opacity = '1'
         })
@@ -679,6 +689,8 @@ export default function MindTree({ children, className = "", dark = true, height
             strokeLinecap="round"
             pathLength={1}
             data-depth={p.depth}
+            // Inicialmente oculto solo para los paths del nivel recién expandido; evita el flash antes de animar
+            style={p.depth === lastExpandedDepth ? { strokeDasharray: '1', strokeDashoffset: '1', opacity: 0.001 } : undefined}
           />
         ))}
       </svg>

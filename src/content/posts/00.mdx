@@ -1,24 +1,57 @@
+{/* Componentes */}
+import Lang from '../../components/MarkDownUI/Lang.jsx'
 import MdxImage from '../../components/MarkDownUI/MdxImage.jsx'
 import MdxContent from '../../components/MarkDownUI/MdxContent.jsx'
 import YouTubeEmbed from '../../components/MarkDownUI/YouTubeEmbed.jsx'
 import Icon from '../../components/MarkDownUI/Icon.jsx'
 import MindTree from '../../components/MarkDownUI/MindTree.jsx'
+import Counter from '../../components/Dynamic/Counter.jsx'
+
+{/* Archivos */}
 import sekaide from '../images/00/sekaide.jpg'
 import gomez from '../images/00/gomez.jpg'
 import ciudad from '../images/00/ciudad.jpg'
 import potrerillos from '../images/00/potrerillos.jpg'
 import leñas from '../images/00/leñas.jpg'
 import hornero from '../images/00/hornero.svg'
+import signature from '../images/00/signature.svg'
+import sistema from '../images/00/sistema.jpg'
 import vapor from '../../assets/vaporwave.gif'
+import yo from '../../assets/yo.jpg'
 
-export const meta = {
-  title: "Demo",
-  subtitle: "Osea es una prueba",
-  date: "2025-08-20",
-  tags: ["prueba", "mdx", "react"],
-  icon: "game-icons:steampunk-goggles"
-  }
 
+export const metaByLang = {
+  es: {
+    title: 'Demo',
+    subtitle: 'Osea es una prueba',
+    date: '2025-08-20',
+    tags: ['prueba', 'mdx', 'react'],
+    icon: 'game-icons:steampunk-goggles',
+  },
+  en: {
+    title: 'Demo',
+    subtitle: 'This is a test',
+    date: '2025-08-20',
+    tags: ['demo', 'mdx', 'react'],
+    icon: 'game-icons:steampunk-goggles',
+  },
+  de: {
+    title: 'Demo',
+    subtitle: 'Das ist ein Test',
+    date: '2025-08-20',
+    tags: ['demo', 'mdx', 'react'],
+    icon: 'game-icons:steampunk-goggles',
+  },
+  ja: {
+    title: 'デモ',
+    subtitle: 'これはテストです',
+    date: '2025-08-20',
+    tags: ['デモ', 'mdx', 'react'],
+    icon: 'game-icons:steampunk-goggles',
+  },
+}
+
+<Lang show="es">
 # Esto es un archivo mdx
 
 ## Esto es un subtitulo
@@ -30,10 +63,10 @@ export const meta = {
 Esto es un parrafo: Waos,  impresionante! Casi que parece que es un formato de texto plano que podemos usar para hacer notas o cosas asi (pd: aguante Logseq).
 
 **Esto es una lista:**
-- aca podes poner items de lista (obviamente)
-- bastante util para roadmaps
-- guias
-- la lista del super (no se porque harias publico eso, pero bueno si queres podes)
+- Aca podes poner items de lista (obviamente)
+- Bastante util para roadmaps
+- Guias
+- Indices
 - etc
 <></>
 - **Esto es otra lista** (si tocas el triangulito explota)
@@ -44,7 +77,7 @@ Esto es un parrafo: Waos,  impresionante! Casi que parece que es un formato de t
         Osea podes hacer listas anidadas y poner lo que queras dentro de ellas literalmente, mas listas, imagenes, codigo, memes, una tesis completa sobre como centrar un div y luego esconderlo todo bajo la alfombra para que nadie sospeche del semejante acto de desprecio por la humanidad que acabas de escribir. O lo que sea (siempre y cuando sea texto plano, osea es un formato de texto plano no una pantalla magica, no soy Willy Wonka, la concha de tu madre).
 
 
-Tambien podes hacer cuadros de codigo identado simplemente usando ```  (se llaman backticks) poniendo tu codigo y cerrando con mas backticks, osea esa es la sintaxis, en realidad se ve asi:
+Tambien podes hacer cuadros de codigo identado simplemente usando backticks (son estos ```), poniendo tu codigo y cerrando con mas backticks, osea esa es la sintaxis, en realidad se ve asi:
 
 ```js title="ejemplo.js"
 // Este codigo se identa segun el lenguaje en este caso JS
@@ -93,7 +126,8 @@ Tambien podes hacer lineas de comandos
 ```bash title=""
 npm run dev #comando de ejemplo
 ```
-Super util para documentacion y tutoriales, tambien podes poner comandos dentro del texto por si queres evitar poner cuadros de codigo cuando solo queres dar indicaciones de comandos rapidas como ```pwd ``` o ```cd  C:\random_dir```
+Super util para documentacion o tutoriales, tambien podes poner comandos dentro del texto por si queres evitar poner cuadros de codigo cuando solo queres dar indicaciones de comandos rapidas como ```pwd ``` o ```cd  C:\random_dir```
+Ademas al ser un archivo mdx, podes tener soporte multi lenguaje o usar todos los componentes de react que quieras
 <br />
 # Como en cualquier blog generico, podes poner imagenes
 
@@ -112,7 +146,7 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
 >
   <>
     ## Como esta imagen de la Sekaide
-    Por cierto también se puede escribir al lado de la imagen para aprovechar el espacio. <br />
+    Por cierto también se puede escribir al lado de la imagen para aprovechar el espacio.
     Lo cual es muy util para que la experiencia de lectura sea mas dinámica y visualmente agradable. <br />
     Obviamente se puede poner codigo:
     ```js
@@ -140,7 +174,7 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
     ## Ademas podemos definir de que lado va la imagen
     **Tambien**
     - Podemos darle una descripcion a cada imagen
-    - Podemos crear carruseles de imagenes
+    - Y crear carruseles de imagenes
 
     Que? no me crees? <br />
     Acercate a la imagen de la derecha y fijate que pasa
@@ -154,10 +188,11 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
       alt="Hornero"
       side="center"
       className="my-2 invert-[88%] dark:invert-[12%]"
-      width={"100%"}
+      width={"90%"}
       aspectRatio="5:2"
+      locked
     />
-
+    - A cierto, me olvide de decirte que el contenido puede cambiar junto con la imagen, ya sabes, para mantener el contenido dinámico y evitar la monotonía.
   </>
   <>
     ## Y podes poner gifs
@@ -172,159 +207,1319 @@ Lo que hace que podamos retener la atencion del lector y crear puntos de referen
       aspectRatio="5:2"
     />
 
-    - Y le podes asignar un aspect ratio y un tamaño personalizado, al igual que al resto de las imagenes
+    - Tambien le podes asignar un aspect ratio y un tamaño personalizado, al igual que al resto de las imagenes
   </>
   <>
     ## Y... bueno tampoco hay mucho mas
-    Osea nomas es un componente que define el tamaño la posicion y el aspect ratio de la imagen
+    Osea necesitaba una excusa para poner un carrusel de con cuatro imagenes de mi ciudad, asi que bueno dormiste.<br />
+    Yo lo veo como un ganar ganar, porque yo retengo tu atencion diciendo estupideces o cosas irrelevantes y vos ves fotos bonitas.
+    <br />
+    Bueno basta de paisajes bonitos y dibujitos svg, ahora voy a sobre explicar algo mas util pero sustancialmente mas aburrido.
 
   </>
 </MdxImage>
 
+<br />
+<br />
+<br />
 
-## Ejemplo: contenido en columnas
+# Otra forma de organizar el contenido que tambien es util y necesaria
+## Sobre todo para explicar temas complejos y con multiples niveles de profundidad
+
+### Son los mapas mentales
+
+<MindTree
+height={"30%"}
+  >
+  - **Esto es un mapa mental**
+    - Usa una gerarquia horizontal
+      - Separando cada idea como un nivel
+      - Y a su vez cada nivel puede tener subniveles
+        - Estos subniveles pueden tener subniveles
+        - Y asi sucesivamente
+        - Podemos ver el flujo de los conceptos
+        - Y mostrar sus vinculos con otros conceptos
+        - Llendo desde lo general hasta lo especifico
+          - Separando lo que vendria a ser un texto largo y tedioso, en ideas atomicas
+
+             Ademas de permitirnos explicar con detenimiento cada una de ellas
+
+      - Permitiendonos conectar conceptos entre si
+      - Como una lista anidada pero mas practica
+        - Al igual que una lista anidada no solo podemos poner texto plano
+          - Tambien podemos anidar componentes para dar apoyos visuales o explicaciones mas detalladas
+            - Como esta imagen bien fachera
+
+              <MdxImage
+                src={sistema}
+                alt="Sistema"
+                side="center"
+                width={"100%"}
+                aspectRatio="2:1"
+                content="cover"
+                className="my-0"
+              />
+              Es una imagen del sistema solar construida al final de la mision de la sonda Cassini
+
+            - O este contador
+
+              <Counter />
+
+            - Estos son ejemplos, pero creo que se entiende la idea
+
+
+</MindTree>
+
+<br />
+<br />
+<br />
+
+# Hay veces que no van a hacer falta imagenes ni mapas mentales, pero si vamos a necesitar mantener una gerarquia horizontal para el contenido
+
+### Para esos casos, utilizamos las columnas
+<br />
+<br />
+<br />
 
 <MdxContent
   col={3}
-  width={["25%","50%","25%"]}
+  width={["30%","50%","20%"]}
   gap={20}
-  textAlign={["","justify",""]}
+  textAlign={["left","left","center"]}
   dividers={true}
   dividerClass="border-l border-feather pl-4"
 >
   <>
-    ## Título de columna 1
-    Texto 1
-    - Lista 1
-
-    <MindTree
-    height={"10%"}
-    >
-    - **0sc1-docs**
-      - nivel 2.
-        - subnivel 1 nivel 3
-        - subnivel 2 nivel 3
-          - Prototipo 1
-          - Prototipo 2
-        - subnivel 3 nivel 3
-        - subnivel 4 nivel 3
-          - Prototipo 1
-          - Prototipo 2
-    </MindTree>
+    ## Estas son columnas
+    Podes seccionar el espacio horizontal en columnas asignandoles un ancho especifico a cada una, asi como la alineacion del contenido. Por ejemplo aca tenemos 3 columnas, la primera con un ancho del 35% y su contenido a la izquierda, la segunda con un ancho del 40% y su contenido justificado y la tercera con un ancho del 25% y su contenido al centro. <br />
+    Como pueden ver, en esta columna solo estamos usando texto plano, pero nada nos impide usar componentes como en el resto del archivo, ya que es una de las bondades de mdx.
   </>
   <>
-    ## Título de columna 2
-
-    <MdxImage
-      src={sekaide}
-      alt="Sekaide"
-      side="center"
-      width={"40%"}
-      aspectRatio="1:1"
-      content="cover"
-      description="Sekaide"
-      className="my-2 rounded-full"
-    >
-
-    <>
-    ### *esto se puede reiterar infinitas veces*
-    bla bla bla
-    </>
-
-    </MdxImage>
-
-    Texto 2
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod.
-    - Lista que por alguna razon esta desfasada
-    - Lista madre anidada
-      - Lista madre anidada
-  </>
-  <>
-    ## Título de columna 3
-    Texto 3
-    - Lista 3
-  </>
-</MdxContent>
+    ## Esto es un video inventado
+    No va a funcionar porque no existe, solo es un ejemplo,  aunque algun dia hare el video y lo voy a poner aca.
 
     <YouTubeEmbed
-      url="https://www.youtube.com/watch?v=adadas"
-      title="Como crear tu propia distro linux usando IA"
+      url="https://www.youtube.com/watch?v=example"
+      title="Como crear tu propia distro linux"
       description="Y sobrevivir a la funa"
       autoplay={false}
       controls={true}
       side="center"
-      ratio="16:10"
+      ratio="16:8"
       width="100%"
       className="my-6"
       markers={[
       { label: "Intro 0:00", time: "0:00" },
       { label: "Rust es mejor que C++ 6:45", time: "6:45" },
-      { label: "Tuve que huir a Kiribati 15:10", time: "15:10" }
+      { label: "Hui a Kiribati 15:10", time: "15:10" }
       ]}
     >
       <MdxImage
         src={sekaide}
         alt="Sekaide"
         side="left"
-        width={"6%"}
+        width={"10%"}
         aspectRatio="1:1"
         content="cover"
         className="my-0 rounded-full text-my-8"
         >
         <>
         <br />
-        ## sekaide
+        ### Sekaide
         </>
       </MdxImage>
     </YouTubeEmbed>
-<Icon
-  items={[
-    { name: sekaide, image: true, size: '10%', objectFit: 'cover', url: 'https://github.com/tu-org' },
-    { name:'line-md:github-loop', size:'11%', url: 'https://github.com/tu-org' },
-  ]}
-  itemsDirection="row"
-  itemsContainerClass="items-center"
->
-</Icon>
+  </>
+  <>
+    <MdxImage
+      src={yo}
+      alt="yo"
+      side="center"
+      width={"90%"}
+      aspectRatio="1:1"
+      content="cover"
+      description="Flavio Morales"
+      className="mt-12 rounded-full"
+    >
+    <>
+     #### *Hola, soy el random que hizo esta pagina*
+    </>
+    </MdxImage>
+    <br />
+    Si quieren pueden seguirme aca:
+    <Icon
+      items={[
+        {name:'uil:instagram',size:'20%',url:'https://github.com/BNFLYD'},
+        {name:'ri:twitter-x-line',size:'20%',url:'https://twitter.com/BNFLYD'},
+      ]}
+      itemsDirection="row"
+      itemsContainerClass="items-center"
+      side="center"
+    />
+  </>
+</MdxContent>
 
-mapa mental
+<br />
+<br />
+<br />
+
+# Tambien me olvide de mencionar el componente de videos y el de iconos
+## Hagamos una explicacion rapida
+
+<br />
+## El componente de video
+
+<YouTubeEmbed
+url="https://www.youtube.com/shorts/NL7jb5kbOL8"
+title=""
+autoplay={false}
+controls={true}
+side="right"
+ratio="9:16"
+width="15%"
+uiScale={0.75}
+className="my-6"
+>
+ Funciona como el componente de imagen, solo que en vez de recibir una imagen, recibe una url, podemos definir un titulo, la descripcion y una serie de markers que sirven para indicar los minutos clave del video. <br />
+ Al igual que el componente de imagen, podemos definir el tamaño, el aspect ratio y la orientacion del contenido,asi le podemos dar un aspecto clasico como el video de mas arriba o darle la apariencia de un short adictivo y quema neuronas como el ejemplo de la derecha.<br />
+ No hace falta que reproduzcas el short solo deje el ejemplo para que vean que funciona, no me juzgues.
+</YouTubeEmbed>
+
+## El componente de iconos
+<br />
+Este componente es simplemente un contenedor que recibe un nombre de icono y una url, muestra un icono clickable  con un enlace a la url especificada. Podes usar los iconos de cualquier libreria de iconos que quieras, o los tuyos propios, solo tenes que usar el nombre de la libreria y el nombre del icono, ademas podes usar una imagen en vez de un icono. Y al igual que el componente de imagen, podes definir el tamaño y la orientacion del contenido.<br />
+Ademas podes poner varios iconos en fila como en el ejemplo de mas arriba o individualmente como en el ejemplo de abajo.
+  <Icon
+    name='line-md:github-loop'
+    size='20%'
+    url='https://github.com/BNFLYD/0SC1-DOCS'
+    side="left"
+  >
+    ### Y si te intereza algunos de los componentes del blog o la pagina en general
+    Aca tenes acceso al repositorio del proyecto, por si queres usar el codigo o hacer un clon descarado de la pagina, con un footer que diga tu nombre seguido de la mitica frase de "todos los derechos reservados". Adelante no te voy a juzgar, pero me voy a encargar de que sea lo ultimo que hagas. <br />
+    Na mentira, mucho quilombo, pero seria de mucha ayuda que le des una estrellita al proyecto si te gusto, asi mas gente lo copia y la originalidad del proyecto se pierde, o simplemente mas gente conoce la pagina, lo que pase despues. Toca al gatito en cualquier caso.
+  </Icon>
+
+<br />
+
+# Eso vendria a ser todo lo que usa este blog
+
+<MdxImage
+  src={signature}
+  alt="signature"
+  side="right"
+  width={"10%"}
+  content="cover"
+  className="invert-[88%] dark:invert-[12%]"
+  locked
+>
+<>
+ ### Hola de nuevo, soy el random que hizo esta pagina otra vez
+ Si ademas del codigo fuente, te intereza algo de lo que escribi, sos bienvenido/a a seguir el blog, probablemente publique en mis redes sociales cuando escriba un nuevo post, No prometo subir contenido recurrentemente porque procrastino mucho, asi que nada, muchas gracias por tu tiempo y nos vemos cuando tenga algo interesante para compartir. (voy a proceder a dejar mi firma sin razon aparente) Chau chau.
+</>
+</MdxImage>
+</Lang>
+
+<Lang show="en">
+# This is an MDX file
+
+## This is a subtitle
+
+### This is a smaller subtitle
+
+#### There are two more after this one, but honestly it makes no sense to go beyond here because they become indistinguishable from regular paragraphs
+
+This is a paragraph: Wow, impressive! It almost feels like a plain text format we can use for notes and similar stuff (PS: Logseq supremacy).
+
+**This is a list:**
+- You can put list items here (obviously)
+- Quite useful for roadmaps
+- Guides
+- Indexes
+- etc
+<></>
+- **This is another list** (if you click the tiny triangle it explodes)
+  - Okay, I lied, I didn't want to animate the explosion. This is a nested list inside the previous list
+    - And this is another nested list inside the nested list inside the other list
+      - I think you get the idea, right? Please say yes, I don't want to nest more lists.
+
+        In short, you can nest lists and put literally anything inside: more lists, images, code, memes, a full thesis on how to center a div and then hide it so nobody suspects the blatant disregard for humanity you just wrote. Or whatever (as long as it’s text/plain—this is a text format, not a magic screen; I’m not Willy Wonka).
+
+You can also create indented code blocks by using backticks (these ```), writing your code, and closing with more backticks. It looks like this:
+
+```js title="example.js"
+// This code is highlighted according to the language (JS in this case)
+
+export const PI = 3.14159
+const enabled = true
+let count = 0
+var legacy = null
+const notANumber = NaN
+
+const str = "Sample text"
+const regex = /foo(bar)?/gi
+
+function add(a, b) {
+  const obj = { key: "value", nested: { inner: 123 } }
+  return a + b
+}
+
+const result = add(1, 2)
+class Person {
+  constructor(name) { this.name = name }
+  greet() { return `Hi, ${this.name}` }
+}
+const user = new Person("Ado")
+
+function Card({ title, children }) {
+  return (
+    <section className="card">
+      <h2>{title}</h2>
+      <div>{children}</div>
+    </section>
+  )
+}
+
+const App = () => (
+  <Card title="Demo">
+    <button onClick={() => console.log(user.greet())}>Click</button>
+  </Card>
+)
+
+export default App
+```
+Do you like the syntax highlighter theme? I made it based on Sekaide’s color palette. Pretty masculine, if you ask me.
+
+You can also add command lines
+```bash title=""
+npm run dev # sample command
+```
+Super useful for documentation or tutorials. You can also drop inline commands when you don’t want a full code block and just need quick instructions like ```pwd``` or ```cd C:\random_dir```
+Since this is an MDX file, you can have multi-language support and use all the React components you want.
+<br />
+# Like any generic blog, you can add images
+
+That helps keep the reader’s attention, create visual reference points, and give graphic descriptions of whatever the author wants to portray.
+
+<br />
+
+<MdxImage
+  src={sekaide}
+  alt="Sekaide"
+  side="left"
+  width={"40%"}
+  className="my-2"
+  aspectRatio="1:1"
+  content="cover"
+>
+  <>
+    ## Like this picture of Sekaide
+    By the way, you can also write beside the image to make better use of space.
+    That’s very useful to make the reading experience more dynamic and visually pleasant. <br />
+    Of course you can also add code:
+    ```js
+    const miku = 01;
+    ```
+    - Regular lists
+    - Or nested lists
+      - Or anything else like above
+  </>
+</MdxImage>
+<br />
+<br />
+
+<MdxImage
+  src={[gomez,ciudad,potrerillos,leñas]}
+  description={["Gómez Building","Mendoza City","Potrerillos","Las Leñas"]}
+  alt="gallery"
+  side="right"
+  width={"40%"}
+  className="my-2"
+  aspectRatio="1:1"
+  content="cover"
+>
+  <>
+    ## We can also choose the side where the image goes
+    **Also**
+    - We can give each image its own description
+    - And create image carousels
+
+    What? You don’t believe me? <br />
+    Hover the image on the right and see what happens
+  </>
+  <>
+    ## You can also use SVG art
+    - Like this ovenbird that changes color depending on the theme
+
+    <MdxImage
+      src={hornero}
+      alt="Hornero"
+      side="center"
+      className="my-2 invert-[88%] dark:invert-[12%]"
+      width={"90%"}
+      aspectRatio="5:2"
+      locked
+    />
+    - Oh right, I forgot to mention that the content can change along with the image to keep things dynamic and avoid monotony.
+  </>
+  <>
+    ## And you can add GIFs
+    - Like this vaporwave background
+
+    <MdxImage
+      src={vapor}
+      alt="Vaporwave"
+      side="center"
+      className="my-2"
+      width={"80%"}
+      aspectRatio="5:2"
+    />
+
+    - You can also set a custom aspect ratio and size, just like with the rest of the images
+  </>
+  <>
+    ## And… well, that’s pretty much it
+    I needed an excuse to throw in a carousel with four photos of my city, so… you’re welcome.<br />
+    It’s a win-win if you ask me: I keep your attention with nonsense, and you get to see nice pictures.
+    <br />
+    Alright, enough with beautiful landscapes and cute SVGs; now I’ll over-explain something more useful but considerably more boring.
+
+  </>
+</MdxImage>
+
+<br />
+<br />
+<br />
+
+# Another useful way to structure content
+## Especially for complex topics with multiple levels of depth
+
+### Are mind maps
 
 <MindTree
 height={"30%"}
   >
-  - **0sc1-docs**
-    - nivel 2.
-      - subnivel 1 nivel 3
-      - subnivel 2 nivel 3
-        - Prototipo 1
-        - Prototipo 2
-        - das
-        - da
-        - dada
-          - Soy el nivel 5 que viene del nivel 4 subnivel 2
-          - Soy el nivel 5 que viene del nivel 4 subnivel 2
-          - Soy el nivel 5 que viene del nivel 4 subnivel 2
-      - subnivel 3 nivel 3
-      - subnivel 4 nivel 3
-        - hola
-        - soy un subnivel 2 en el nivel 4 que viene del nivel 3 subnivel 4
-          - soy el nivel 5 que viene del nivel 4 subnivel 4
-            - soy el nivel 6 que viene del nivel 5 subnivel 4
+  - **This is a mind map**
+    - It uses a horizontal hierarchy
+      - Each idea becomes a level
+      - And each level can have sub-levels
+        - Those sub-levels can have more sub-levels
+        - And so on
+        - You can see how concepts flow
+        - And show how they relate to other concepts
+        - Going from general to specific
+          - Breaking down what would otherwise be a long, tedious text into atomic ideas
+
+             Plus, it lets us explain each one in detail
+
+      - Helping us connect concepts to one another
+      - Like a nested list but more practical
+        - And just like a nested list, we’re not limited to plain text
+          - We can also embed components to add visual aids or detailed explanations
+            - Like this beautiful image
 
               <MdxImage
-                src={sekaide}
-                alt="Sekaide"
+                src={sistema}
+                alt="Solar system"
                 side="center"
-                width={"40%"}
+                width={"100%"}
                 aspectRatio="2:1"
                 content="cover"
-                className="my-0 rounded-full"
+                className="my-0"
               />
+              It’s a mosaic of the Solar System built at the end of the Cassini mission
 
-              - hola
-            - hola
+            - Or this counter
+
+              <Counter />
+
+            - They’re just examples but you get the idea
+
+
 </MindTree>
+
+<br />
+<br />
+<br />
+
+# Sometimes you don’t need images or mind maps, but you still need a horizontal hierarchy
+
+### For those cases, we use columns
+<br />
+<br />
+<br />
+
+<MdxContent
+  col={3}
+  width={["30%","50%","20%"]}
+  gap={20}
+  textAlign={["left","left","center"]}
+  dividers={true}
+  dividerClass="border-l border-feather pl-4"
+>
+  <>
+    ## These are columns
+    You can split the horizontal space into columns and assign each one a specific width and text alignment. In this example we have 3 columns: the first is 35% wide aligned to the left; the second 40% wide and justified; and the third 25% wide centered. <br />
+    As you can see, this column only uses plain text, but nothing prevents us from using components like everywhere else in this file—that’s one of MDX’s perks.
+  </>
+  <>
+    ## This is a made-up video
+    It won’t work because it doesn’t exist—just an example. I might make it one day and put it here.
+
+    <YouTubeEmbed
+      url="https://www.youtube.com/watch?v=example"
+      title="How to build your own Linux distro"
+      description="And survive the cancel mob"
+      autoplay={false}
+      controls={true}
+      side="center"
+      ratio="16:8"
+      width="100%"
+      className="my-6"
+      markers={[
+      { label: "Intro 0:00", time: "0:00" },
+      { label: "Rust is better than C++ 6:45", time: "6:45" },
+      { label: "I fled to Kiribati 15:10", time: "15:10" }
+      ]}
+    >
+      <MdxImage
+        src={sekaide}
+        alt="Sekaide"
+        side="left"
+        width={"10%"}
+        aspectRatio="1:1"
+        content="cover"
+        className="my-0 rounded-full text-my-8"
+        >
+        <>
+        <br />
+        ### Sekaide
+        </>
+      </MdxImage>
+    </YouTubeEmbed>
+  </>
+  <>
+    <MdxImage
+      src={yo}
+      alt="me"
+      side="center"
+      width={"90%"}
+      aspectRatio="1:1"
+      content="cover"
+      description="Flavio Morales"
+      className="mt-12 rounded-full"
+    >
+    <>
+     #### *Hi, I’m the random guy who made this page*
+    </>
+    </MdxImage>
+    <br />
+    If you want, you can follow me here:
+    <Icon
+      items={[
+        {name:'uil:instagram',size:'20%',url:'https://github.com/BNFLYD'},
+        {name:'ri:twitter-x-line',size:'20%',url:'https://twitter.com/BNFLYD'},
+      ]}
+      itemsDirection="row"
+      itemsContainerClass="items-center"
+      side="center"
+    />
+  </>
+</MdxContent>
+
+<br />
+<br />
+<br />
+
+# I also forgot to mention the video and icon components
+## Quick overview
+
+<br />
+## The video component
+
+<YouTubeEmbed
+url="https://www.youtube.com/shorts/NL7jb5kbOL8"
+title=""
+autoplay={false}
+controls={true}
+side="right"
+ratio="9:16"
+width="15%"
+uiScale={0.75}
+className="my-6"
+>
+ It works like the image component, but instead of receiving an image it receives a URL. You can set a title, description, and a list of markers for key moments. <br />
+ Just like the image component, you can set size, aspect ratio, and layout; so you can give it a classic video look like the one above, or make it look like an addictive brain-melting short like the example on the right. <br />
+ Please don’t actually watch the short; it’s just there to show it works. No judgment.
+</YouTubeEmbed>
+
+## The icon component
+<br />
+This component is simply a container that receives an icon name and a URL, and renders a clickable icon that links to that URL. You can use icons from any icon library (or your own). Just use the library name and the icon name, or even an image instead. As with the image component, you can control size and layout. <br />
+You can also show multiple icons in a row (as above) or individually (as below).
+  <Icon
+    name='line-md:github-loop'
+    size='20%'
+    url='https://github.com/BNFLYD/0SC1-DOCS'
+    side="left"
+  >
+    ### If you’re interested in any of the blog components—or the site in general
+    Here’s the project repository in case you want to reuse the code or shamelessly clone the site, slap your name in the footer with the classic “all rights reserved,” and call it a day. Go ahead, I won’t judge but I’ll make sure it’s the last thing you do. <br />
+    Just kidding. Too much hassle. But it would really help if you leave a star if you liked it so more people can copy it and the originality of the project gets diluted, or simply more people discover the page. Whatever happens after that, happens. Click the kitty either way.
+  </Icon>
+
+<br />
+
+# That’s basically everything this blog uses
+
+<MdxImage
+  src={signature}
+  alt="signature"
+  side="right"
+  width={"10%"}
+  content="cover"
+  className="invert-[88%] dark:invert-[12%]"
+  locked
+>
+<>
+ ### Hello again, I’m the random guy who made this page
+ If besides the source code you’re also interested in what I write, you’re welcome to follow the blog. I’ll probably post on my socials when I publish a new post. I can’t promise regular content because I procrastinate a lot, so… thank you for your time and see you when I have something interesting to share. (I’ll proceed to leave my signature for no apparent reason.) Bye.
+</>
+</MdxImage>
+</Lang>
+
+<Lang show="de">
+# Dies ist eine MDX-Datei
+
+## Dies ist ein Untertitel
+
+### Dies ist ein kleinerer Untertitel
+
+#### Es gibt danach noch zwei weitere, aber ehrlich gesagt ergibt es keinen Sinn, darüber hinauszugehen, weil sie sich kaum noch von normalen Absätzen unterscheiden
+
+Das ist ein Absatz: Wow, beeindruckend! Es fühlt sich fast an wie ein Plain-Text-Format, das wir für Notizen und ähnliches verwenden können (PS: Logseq over alles).
+
+**Das ist eine Liste:**
+- Hier kannst du Listeneinträge hinzufügen (obviously)
+- Ziemlich nützlich für Roadmaps
+- Anleitungen
+- Indizes
+- usw.
+<></>
+- **Das ist eine weitere Liste** (wenn du auf das kleine Dreieck klickst, explodiert es)
+  - Okay, ich habe gelogen, ich wollte die Explosion nicht animieren. Das hier ist eine verschachtelte Liste innerhalb der vorherigen Liste
+    - Und das hier ist noch eine verschachtelte Liste in der verschachtelten Liste in der anderen Liste
+      - Ich glaube, die Idee ist klar, oder? Bitte sag ja, ich will nicht noch mehr Listen verschachteln.
+
+        Kurz gesagt: Du kannst Listen verschachteln und buchstäblich alles hineintun – weitere Listen, Bilder, Code, Memes, eine komplette Doktorarbeit darüber, wie man ein div zentriert und es danach versteckt, damit niemand deinen eklatanten Mangel an Menschlichkeit bemerkt. Oder was auch immer (solange es Text/Plain ist – das ist ein Textformat, kein magischer Bildschirm; ich bin nicht Willy Wonka).
+
+Du kannst auch eingerückte Codeblöcke mit Backticks (diese ```) erstellen, deinen Code hineinschreiben und mit weiteren Backticks schließen. So sieht das aus:
+
+```js title="beispiel.js"
+// Dieser Code wird je nach Sprache gehighlighted (hier JS)
+
+export const PI = 3.14159
+const enabled = true
+let count = 0
+var legacy = null
+const notANumber = NaN
+
+const str = "Beispieltext"
+const regex = /foo(bar)?/gi
+
+function add(a, b) {
+  const obj = { key: "value", nested: { inner: 123 } }
+  return a + b
+}
+
+const result = add(1, 2)
+class Person {
+  constructor(name) { this.name = name }
+  greet() { return `Hi, ${this.name}` }
+}
+const user = new Person("Ado")
+
+function Card({ title, children }) {
+  return (
+    <section className="card">
+      <h2>{title}</h2>
+      <div>{children}</div>
+    </section>
+  )
+}
+
+const App = () => (
+  <Card title="Demo">
+    <button onClick={() => console.log(user.greet())}>Click</button>
+  </Card>
+)
+
+export default App
+```
+Gefällt dir das Theme für die Syntaxhervorhebung? Ich habe es auf Basis der Sekaide-Farbpalette gebaut. Ziemlich maskulin, wenn du mich fragst.
+
+Du kannst auch Befehlszeilen hinzufügen
+```bash title=""
+npm run dev # Beispielbefehl
+```
+Super nützlich für Dokus oder Tutorials. Du kannst auch Inline‑Befehle verwenden, wenn du keinen ganzen Codeblock willst und nur schnelle Anweisungen brauchst, wie ```pwd``` oder ```cd C:\random_dir```
+Da dies eine MDX-Datei ist, hast du Mehrsprachigkeit und kannst alle React‑Komponenten verwenden, die du willst.
+<br />
+# Wie in jedem generischen Blog kannst du Bilder einfügen
+
+Das hilft, die Aufmerksamkeit der Leser zu halten, visuelle Bezugspunkte zu schaffen und grafische Beschreibungen dessen zu geben, was die Autorin/der Autor zeigen möchte.
+
+<br />
+
+<MdxImage
+  src={sekaide}
+  alt="Sekaide"
+  side="left"
+  width={"40%"}
+  className="my-2"
+  aspectRatio="1:1"
+  content="cover"
+>
+  <>
+    ## Wie dieses Bild von Sekaide
+    Übrigens kannst du auch neben dem Bild schreiben, um den Platz besser zu nutzen.
+    Das ist sehr hilfreich, um das Leseerlebnis dynamischer und optisch angenehmer zu machen. <br />
+    Natürlich kannst du auch Code einfügen:
+    ```js
+    const miku = 01;
+    ```
+    - Normale Listen
+    - Oder verschachtelte Listen
+      - Oder irgendwas anderes wie oben
+  </>
+</MdxImage>
+<br />
+<br />
+
+<MdxImage
+  src={[gomez,ciudad,potrerillos,leñas]}
+  description={["Gómez‑Gebäude","Stadt Mendoza","Potrerillos","Las Leñas"]}
+  alt="Galerie"
+  side="right"
+  width={"40%"}
+  className="my-2"
+  aspectRatio="1:1"
+  content="cover"
+>
+  <>
+    ## Wir können auch die Seite wählen, auf der das Bild erscheint
+    **Außerdem**
+    - Können wir jedem Bild eine eigene Beschreibung geben
+    - Und Bild‑Karussells erstellen
+
+    Was? Du glaubst mir nicht? <br />
+    Fahre mit der Maus über das Bild rechts und schau, was passiert
+  </>
+  <>
+    ## Du kannst auch SVG‑Art verwenden
+    - Wie diesen Hornero, der je nach Theme die Farbe wechselt
+
+    <MdxImage
+      src={hornero}
+      alt="Hornero"
+      side="center"
+      className="my-2 invert-[88%] dark:invert-[12%]"
+      width={"90%"}
+      aspectRatio="5:2"
+      locked
+    />
+    - Ach ja, der Inhalt kann sich zusammen mit dem Bild ändern, um Dinge dynamisch zu halten und Monotonie zu vermeiden.
+  </>
+  <>
+    ## Und du kannst GIFs einfügen
+    - Zum Beispiel diesen Vaporwave‑Hintergrund
+
+    <MdxImage
+      src={vapor}
+      alt="Vaporwave"
+      side="center"
+      className="my-2"
+      width={"80%"}
+      aspectRatio="5:2"
+    />
+
+    - Du kannst auch ein eigenes Seitenverhältnis und eine Größe festlegen – genau wie bei den anderen Bildern
+  </>
+  <>
+    ## Und… nun, das war’s im Grunde
+    Ich brauchte eine Ausrede, um ein Karussell mit vier Fotos meiner Stadt einzubauen, also… gern geschehen. <br />
+    Win‑win, würde ich sagen: Ich halte deine Aufmerksamkeit mit Blödsinn, und du siehst schöne Bilder.
+    <br />
+    Okay, genug von schönen Landschaften und süßen SVGs; jetzt erkläre ich etwas Nützlicheres, aber erheblich Langweiligeres viel zu ausführlich.
+
+  </>
+</MdxImage>
+
+<br />
+<br />
+<br />
+
+# Eine weitere nützliche Art, Inhalte zu strukturieren
+## Besonders für komplexe Themen mit mehreren Ebenen an Tiefe
+
+### Sind Mindmaps
+
+<MindTree
+height={"30%"}
+  >
+  - **Das ist eine Mindmap**
+    - Sie nutzt eine horizontale Hierarchie
+      - Jede Idee wird zu einer Ebene
+      - Und jede Ebene kann Unterebenen haben
+        - Diese Unterebenen können weitere Unterebenen haben
+        - Und so weiter
+        - Man kann den Fluss der Konzepte sehen
+        - Und ihre Verbindungen zu anderen Konzepten darstellen
+        - Vom Allgemeinen zum Spezifischen gehen
+          - Und so einen sonst langen, mühsamen Text in atomare Ideen zerlegen
+
+             Außerdem können wir jede davon ausführlich erklären
+
+      - Hilft uns, Konzepte miteinander zu verknüpfen
+      - Wie eine verschachtelte Liste, aber praktischer
+        - Und genauso sind wir nicht auf Plain Text beschränkt
+          - Wir können auch Komponenten einbetten, um visuelle Hilfen oder ausführliche Erklärungen hinzuzufügen
+            - Wie dieses schöne Bild
+
+              <MdxImage
+                src={sistema}
+                alt="Sonnensystem"
+                side="center"
+                width={"100%"}
+                aspectRatio="2:1"
+                content="cover"
+                className="my-0"
+              />
+              Es ist ein Mosaik des Sonnensystems, erstellt am Ende der Cassini‑Mission
+
+            - Oder dieser Zähler
+
+              <Counter />
+
+            - Das sind nur Beispiele, aber die Idee ist klar
+
+
+</MindTree>
+
+<br />
+<br />
+<br />
+
+# Manchmal braucht man weder Bilder noch Mindmaps, aber trotzdem eine horizontale Hierarchie
+
+### Für solche Fälle verwenden wir Spalten
+<br />
+<br />
+<br />
+
+<MdxContent
+  col={3}
+  width={["30%","50%","20%"]}
+  gap={20}
+  textAlign={["left","left","center"]}
+  dividers={true}
+  dividerClass="border-l border-feather pl-4"
+>
+  <>
+    ## Das sind Spalten
+    Du kannst den horizontalen Raum in Spalten aufteilen und jeder eine bestimmte Breite und Textausrichtung geben. In diesem Beispiel haben wir 3 Spalten: die erste ist 35% breit und linksbündig; die zweite 40% breit und im Blocksatz; die dritte 25% breit und zentriert. <br />
+    Wie du siehst, verwenden wir hier nur Plain Text, aber nichts hindert uns daran, Komponenten zu nutzen – das ist einer der Vorteile von MDX.
+  </>
+  <>
+    ## Das ist ein ausgedachtes Video
+    Es wird nicht funktionieren, weil es nicht existiert – nur ein Beispiel. Vielleicht mache ich es eines Tages und packe es hier rein.
+
+    <YouTubeEmbed
+      url="https://www.youtube.com/watch?v=example"
+      title="Wie du deine eigene Linux‑Distribution baust"
+      description="Und die Cancel‑Meute überlebst"
+      autoplay={false}
+      controls={true}
+      side="center"
+      ratio="16:8"
+      width="100%"
+      className="my-6"
+      markers={[
+      { label: "Intro 0:00", time: "0:00" },
+      { label: "Rust ist besser als C++ 6:45", time: "6:45" },
+      { label: "Ich floh nach Kiribati 15:10", time: "15:10" }
+      ]}
+    >
+      <MdxImage
+        src={sekaide}
+        alt="Sekaide"
+        side="left"
+        width={"10%"}
+        aspectRatio="1:1"
+        content="cover"
+        className="my-0 rounded-full text-my-8"
+        >
+        <>
+        <br />
+        ### Sekaide
+        </>
+      </MdxImage>
+    </YouTubeEmbed>
+  </>
+  <>
+    <MdxImage
+      src={yo}
+      alt="ich"
+      side="center"
+      width={"90%"}
+      aspectRatio="1:1"
+      content="cover"
+      description="Flavio Morales"
+      className="mt-12 rounded-full"
+    >
+    <>
+     #### *Hi, ich bin der Random, der diese Seite gebaut hat*
+    </>
+    </MdxImage>
+    <br />
+    Wenn du magst, kannst du mir hier folgen:
+    <Icon
+      items={[
+        {name:'uil:instagram',size:'20%',url:'https://github.com/BNFLYD'},
+        {name:'ri:twitter-x-line',size:'20%',url:'https://twitter.com/BNFLYD'},
+      ]}
+      itemsDirection="row"
+      itemsContainerClass="items-center"
+      side="center"
+    />
+  </>
+</MdxContent>
+
+<br />
+<br />
+<br />
+
+# Ich habe außerdem die Video‑ und Icon‑Komponenten vergessen
+## Kurzer Überblick
+
+<br />
+## Die Video‑Komponente
+
+<YouTubeEmbed
+url="https://www.youtube.com/shorts/NL7jb5kbOL8"
+title=""
+autoplay={false}
+controls={true}
+side="right"
+ratio="9:16"
+width="15%"
+uiScale={0.75}
+className="my-6"
+>
+ Es funktioniert wie die Bild‑Komponente, nur dass sie statt eines Bildes eine URL erhält. Du kannst einen Titel, eine Beschreibung und eine Liste von Markern für Schlüsselmomente angeben. <br />
+ Genau wie bei der Bild‑Komponente kannst du Größe, Seitenverhältnis und Layout steuern – also entweder den klassischen Video‑Look wie oben wählen oder ihm das Aussehen eines süchtig machenden, gehirnschmelzenden Shorts geben, wie im Beispiel rechts. <br />
+ Bitte schau dir den Short nicht wirklich an; er ist nur da, um zu zeigen, dass es funktioniert. Kein Urteil.
+</YouTubeEmbed>
+
+## Die Icon‑Komponente
+<br />
+Diese Komponente ist einfach ein Container, der einen Icon‑Namen und eine URL erhält und ein klickbares Icon rendert, das auf diese URL verlinkt. Du kannst Icons aus jeder Icon‑Bibliothek (oder deine eigenen) verwenden. Nutze einfach den Bibliotheksnamen und den Icon‑Namen – oder auch ein Bild. Wie bei der Bild‑Komponente kannst du Größe und Layout steuern. <br />
+Du kannst mehrere Icons in einer Reihe anzeigen (wie oben) oder einzeln (wie unten).
+  <Icon
+    name='line-md:github-loop'
+    size='20%'
+    url='https://github.com/BNFLYD/0SC1-DOCS'
+    side="left"
+  >
+    ### Wenn dich irgendeine der Blog‑Komponenten – oder die Seite allgemein – interessiert
+    Hier ist das Projekt‑Repository, falls du den Code wiederverwenden oder die Seite schamlos klonen willst, deinen Namen in den Footer klatschen und die klassische Floskel „Alle Rechte vorbehalten“ druntersetzen. Nur zu, ich verurteile dich nicht – aber ich sorge dafür, dass es das Letzte ist, was du tust. <br />
+    Spaß. Zu viel Aufwand. Es würde aber sehr helfen, wenn du dem Projekt einen Stern gibst, wenn es dir gefallen hat – damit es mehr Leute kopieren und die Originalität verwässert wird, oder einfach mehr Leute die Seite finden. Was danach passiert, passiert. Klick in jedem Fall auf das Kätzchen.
+  </Icon>
+
+<br />
+
+# Das ist im Grunde alles, was dieser Blog nutzt
+
+<MdxImage
+  src={signature}
+  alt="signature"
+  side="right"
+  width={"10%"}
+  content="cover"
+  className="invert-[88%] dark:invert-[12%]"
+  locked
+>
+<>
+ ### Hallo nochmal, ich bin wieder der Random, der diese Seite gebaut hat
+ Wenn dich neben dem Quellcode auch das interessiert, was ich schreibe, bist du herzlich eingeladen, dem Blog zu folgen. Wahrscheinlich poste ich auf meinen Socials, wenn ich etwas Neues veröffentliche. Regelmäßigen Content kann ich nicht versprechen, ich prokrastiniere viel – also danke für deine Zeit und wir sehen uns, wenn ich wieder etwas Interessantes zu teilen habe. (Ich hinterlasse jetzt grundlos meine Signatur.) Ciao.
+</>
+</MdxImage>
+</Lang>
+
+<Lang show="ja">
+# これは MDX ファイルです
+
+## これはサブタイトルです
+
+### これはもっと小さいサブタイトルです
+
+#### この先にもう二つありますが、正直ここより下は段落と見分けがつかないので、使う意味はあまりありません
+
+これは段落です。わお、すごい！ メモやノートに使えるプレーンテキストのフォーマットみたいですね（追伸：Logseq 最強）。
+
+**これはリストです：**
+- ここにリスト項目を置けます（当然）
+- ロードマップに便利
+- ガイド
+- 目次
+- などなど
+<></>
+- **これは別のリストです**（小さな三角をクリックすると爆発します）
+  - うそです。爆発アニメを作るのは面倒でした。これはさっきのリストの中にある入れ子リストです
+    - そしてこれは、その入れ子リストの中にある、さらに入れ子のリストです
+      - もう分かりましたよね？ そうだと言ってください。これ以上リストを入れ子にしたくありません。
+
+        要するに、リストを入れ子にできて、その中に何でも入れられます。さらにリスト、画像、コード、ミーム、div を中央に配置してから隠す方法に関する完全な論文まで、人類への冒涜を書き殴ってもOK。あるいは他の何かでも（テキスト/プレーンである限り。これはテキストフォーマットであって魔法の画面ではありません。私はウィリー・ウォンカではない）。
+
+また、バッククォート（``` これ）でコードブロックを作れます。コードを書いて、さらにバッククォートで閉じます。見た目はこんな感じです：
+
+```js title="example.js"
+// このコードは言語（ここでは JS）に応じてハイライトされます
+
+export const PI = 3.14159
+const enabled = true
+let count = 0
+var legacy = null
+const notANumber = NaN
+
+const str = "サンプルテキスト"
+const regex = /foo(bar)?/gi
+
+function add(a, b) {
+  const obj = { key: "value", nested: { inner: 123 } }
+  return a + b
+}
+
+const result = add(1, 2)
+class Person {
+  constructor(name) { this.name = name }
+  greet() { return `Hi, ${this.name}` }
+}
+const user = new Person("Ado")
+
+function Card({ title, children }) {
+  return (
+    <section className="card">
+      <h2>{title}</h2>
+      <div>{children}</div>
+    </section>
+  )
+}
+
+const App = () => (
+  <Card title="Demo">
+    <button onClick={() => console.log(user.greet())}>Click</button>
+  </Card>
+)
+
+export default App
+```
+シンタックスハイライトのテーマ、どうですか？ Sekaide のカラーパレットを元に作りました。個人的にはかなり男前。
+
+コマンドラインも書けます。
+```bash title=""
+npm run dev # サンプルコマンド
+```
+ドキュメントやチュートリアルに超便利。```pwd``` や ```cd C:\random_dir``` のように、ちょっとした指示だけならインラインでも十分です。
+MDX なので多言語対応ができ、好きなだけ React コンポーネントを使えます。
+<br />
+# 一般的なブログと同じように、画像を入れられます
+
+読者の注意を引き、視覚的な基準点を作り、作者が伝えたいことをグラフィカルに説明するのに役立ちます。
+
+<br />
+
+<MdxImage
+  src={sekaide}
+  alt="Sekaide"
+  side="left"
+  width={"40%"}
+  className="my-2"
+  aspectRatio="1:1"
+  content="cover"
+>
+  <>
+    ## この Sekaide の写真のように
+    ちなみに、画像の横にテキストを書くこともできるので、スペースを有効活用できます。
+    これにより、読み心地がよりダイナミックで視覚的に心地よくなります。<br />
+    もちろんコードも書けます：
+    ```js
+    const miku = 01;
+    ```
+    - 通常のリスト
+    - あるいは入れ子リスト
+      - さっきのように何でも OK
+  </>
+</MdxImage>
+<br />
+<br />
+
+<MdxImage
+  src={[gomez,ciudad,potrerillos,leñas]}
+  description={["ゴメス・ビル","メンドーサ市","ポトレリーヨス","ラス・レーニャス"]}
+  alt="ギャラリー"
+  side="right"
+  width={"40%"}
+  className="my-2"
+  aspectRatio="1:1"
+  content="cover"
+>
+  <>
+    ## 画像を置く側も選べます
+    **さらに**
+    - 各画像に説明を付けられます
+    - 画像カルーセルも作れます
+
+    え？ 信じない？ <br />
+    右の画像にホバーして、何が起こるか見てみて
+  </>
+  <>
+    ## SVG アートも使えます
+    - テーマに応じて色が変わるこのホルネロのように
+
+    <MdxImage
+      src={hornero}
+      alt="Hornero"
+      side="center"
+      className="my-2 invert-[88%] dark:invert-[12%]"
+      width={"90%"}
+      aspectRatio="5:2"
+      locked
+    />
+    - そうそう、単調さを避けるため、画像に合わせてコンテンツも切り替えられます。
+  </>
+  <>
+    ## それから、GIF も置けます
+    - この Vaporwave 背景のように
+
+    <MdxImage
+      src={vapor}
+      alt="Vaporwave"
+      side="center"
+      className="my-2"
+      width={"80%"}
+      aspectRatio="5:2"
+    />
+
+    - 他の画像と同様、アスペクト比やサイズも自由に設定できます
+  </>
+  <>
+    ## そして… まあ、だいたいこんな感じです
+    自分の街の写真を4枚並べたカルーセルを入れる口実が欲しかっただけです。どういたしまして。<br />
+    ある意味 Win‑Win です。私が適当な話であなたの注意を引き、あなたは綺麗な写真を見られる。
+    <br />
+    さて、綺麗な風景や可愛い SVG はこのくらいにして、もっと実用的だけどかなり退屈なことを、これでもかというほど説明します。
+
+  </>
+</MdxImage>
+
+<br />
+<br />
+<br />
+
+# コンテンツを整理する別の有用な方法
+## とくに、階層が深い複雑なトピックに
+
+### それがマインドマップです
+
+<MindTree
+height={"30%"}
+  >
+  - **これはマインドマップです**
+    - 水平の階層構造を使います
+      - 各アイデアが 1 つのレイヤーになります
+      - そして各レイヤーはサブレイヤーを持てます
+        - そのサブレイヤーもさらにサブレイヤーを持てます
+        - 以下同様
+        - コンセプトの流れが見えます
+        - 他のコンセプトとの関係も示せます
+        - 一般から具体へと進み
+          - 長くて退屈になりがちな文章を、原子的なアイデアに分解できます
+
+             それぞれを丁寧に説明することもできます
+
+      - コンセプト同士を結び付けるのに役立ちます
+      - 入れ子リストに似ていますが、もっと実用的です
+        - そして入れ子リストと同じく、プレーンテキストに限りません
+          - 視覚的な補助や詳しい説明を加えるため、コンポーネントも埋め込めます
+            - この綺麗な画像のように
+
+              <MdxImage
+                src={sistema}
+                alt="太陽系"
+                side="center"
+                width={"100%"}
+                aspectRatio="2:1"
+                content="cover"
+                className="my-0"
+              />
+              これはカッシーニ計画の終盤に作られた、太陽系のモザイク画像です
+
+            - あるいは、このカウンター
+
+              <Counter />
+
+            - ただの例ですが、言いたいことは伝わるはず
+
+
+</MindTree>
+
+<br />
+<br />
+<br />
+
+# 画像やマインドマップが不要でも、水平の階層は必要なときがあります
+
+### そんな時はカラム（段組み）を使います
+<br />
+<br />
+<br />
+
+<MdxContent
+  col={3}
+  width={["30%","50%","20%"]}
+  gap={20}
+  textAlign={["left","left","center"]}
+  dividers={true}
+  dividerClass="border-l border-feather pl-4"
+>
+  <>
+    ## これがカラムです
+    横幅をカラムに分割し、それぞれに幅とテキスト揃えを設定できます。ここでは 3 カラムです： 1 列目は 35% で左寄せ、2 列目は 40% で両端揃え、3 列目は 25% で中央揃え。<br />
+    ご覧の通り、このカラムではプレーンテキストのみを使っていますが、ファイル内の他の場所と同じようにコンポーネントも使えます。これが MDX の長所です。
+  </>
+  <>
+    ## これは作り話の動画です
+    実在しないので再生できません。単なる例です。いつか本当に作ってここに置くかも。
+
+    <YouTubeEmbed
+      url="https://www.youtube.com/watch?v=example"
+      title="自作 Linux ディストロの作り方"
+      description="そして炎上を生き延びる方法"
+      autoplay={false}
+      controls={true}
+      side="center"
+      ratio="16:8"
+      width="100%"
+      className="my-6"
+      markers={[
+      { label: "イントロ 0:00", time: "0:00" },
+      { label: "Rust は C++ より上 6:45", time: "6:45" },
+      { label: "キリバスに逃亡 15:10", time: "15:10" }
+      ]}
+    >
+      <MdxImage
+        src={sekaide}
+        alt="Sekaide"
+        side="left"
+        width={"10%"}
+        aspectRatio="1:1"
+        content="cover"
+        className="my-0 rounded-full text-my-8"
+        >
+        <>
+        <br />
+        ### Sekaide
+        </>
+      </MdxImage>
+    </YouTubeEmbed>
+  </>
+  <>
+    <MdxImage
+      src={yo}
+      alt="わたし"
+      side="center"
+      width={"90%"}
+      aspectRatio="1:1"
+      content="cover"
+      description="Flavio Morales"
+      className="mt-12 rounded-full"
+    >
+    <>
+     #### *やあ、このページを作ったランダムな人です*
+    </>
+    </MdxImage>
+    <br />
+    よかったら、ここからフォローしてください：
+    <Icon
+      items={[
+        {name:'uil:instagram',size:'20%',url:'https://github.com/BNFLYD'},
+        {name:'ri:twitter-x-line',size:'20%',url:'https://twitter.com/BNFLYD'},
+      ]}
+      itemsDirection="row"
+      itemsContainerClass="items-center"
+      side="center"
+    />
+  </>
+</MdxContent>
+
+<br />
+<br />
+<br />
+
+# それから、動画コンポーネントとアイコンコンポーネントについても言い忘れていました
+## さくっと概要を
+
+<br />
+## 動画コンポーネント
+
+<YouTubeEmbed
+url="https://www.youtube.com/shorts/NL7jb5kbOL8"
+title=""
+autoplay={false}
+controls={true}
+side="right"
+ratio="9:16"
+width="15%"
+uiScale={0.75}
+className="my-6"
+>
+ 画像コンポーネントと同じ使い方ですが、画像の代わりに URL を受け取ります。タイトル、説明、重要なタイミング用のマーカー一覧を設定できます。<br />
+ 画像コンポーネントと同様に、サイズ・アスペクト比・レイアウトを制御できます。上のようなクラシックな見た目にもできるし、右の例のような中毒性のある脳を溶かすショートっぽい見た目にもできます。<br />
+ 実際にショートを見なくて大丈夫です。動作確認用の例にすぎません。ジャッジはしません。
+</YouTubeEmbed>
+
+## アイコンコンポーネント
+<br />
+このコンポーネントは、アイコン名と URL を受け取り、その URL へリンクするクリック可能なアイコンを表示するだけのコンテナです。任意のアイコンライブラリ（や自作アイコン）を使えます。ライブラリ名とアイコン名、あるいは画像を指定してください。画像コンポーネントと同じく、サイズとレイアウトを制御できます。<br />
+上のように横並びでも、下のように単体でも表示できます。
+  <Icon
+    name='line-md:github-loop'
+    size='20%'
+    url='https://github.com/BNFLYD/0SC1-DOCS'
+    side="left"
+  >
+    ### ブログのコンポーネントや、このサイト全般に興味があるなら
+    こちらがプロジェクトのリポジトリです。コードを再利用しても、このサイトを容赦なくクローンしても構いません。フッターに自分の名前と、お決まりの「All rights reserved」を付けてね。遠慮なく。責めはしません——それが君の最後の行為にならない限り。<br />
+    冗談です。面倒くさすぎるだけ。気に入ってくれたならスターを付けてもらえると嬉しいです。そうすれば、もっと多くの人がコピーしてオリジナリティは薄まるかもしれませんし、単にこのサイトを知る人が増えるかもしれません。後は野となれ山となれ。どっちにしても子猫をクリックして。
+  </Icon>
+
+<br />
+
+# このブログで使っているのは、だいたい以上です
+
+<MdxImage
+  src={signature}
+  alt="signature"
+  side="right"
+  width={"10%"}
+  content="cover"
+  className="invert-[88%] dark:invert-[12%]"
+  locked
+>
+<>
+ ### こんにちは、またこのページを作ったランダムな人です
+ ソースコードだけでなく文章にも興味があるなら、ぜひブログをフォローしてください。新しい記事を書いたら、おそらく SNS にも投稿します。怠け者なので定期更新は約束できませんが……時間を割いてくれてありがとう。何か面白いものができたら、またお会いしましょう。（特に理由もなく、ここにサインを残しておきます。）それでは。
+</>
+</MdxImage>
+</Lang>

@@ -24,6 +24,8 @@ export default function YouTubeEmbed({
   className = "",
   // soporte de contenido adicional (MDX children) como en imágenes
   children,
+  // Escalar UI del player (controles) cuando el embed es muy pequeño. 1 = sin cambios
+  uiScale = 1,
 }) {
   const normalizeRatio = (val) => {
     if (!val) return undefined;
@@ -49,8 +51,10 @@ export default function YouTubeEmbed({
       // https://www.youtube.com/watch?v=VIDEO_ID
       if (u.hostname.includes("youtube.com")) {
         if (u.searchParams.get("v")) return u.searchParams.get("v");
-        // youtu.be share links inside path sometimes appear on youtube.com/embed
+        // Paths like /shorts/VIDEO_ID or /embed/VIDEO_ID
         const parts = u.pathname.split("/").filter(Boolean);
+        const shortsIdx = parts.indexOf("shorts");
+        if (shortsIdx !== -1 && parts[shortsIdx + 1]) return parts[shortsIdx + 1];
         const embedIdx = parts.indexOf("embed");
         if (embedIdx !== -1 && parts[embedIdx + 1]) return parts[embedIdx + 1];
       }
@@ -158,7 +162,7 @@ export default function YouTubeEmbed({
     <>
       <div className="relative overflow-hidden rounded-2xl" style={frameStyle}>
         <iframe
-          className={`${cover ? "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 min-w-full min-h-full" : "w-full h-full"}`}
+          className={`${cover ? "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" : "w-full h-full"}`}
           src={src}
           title={title}
           loading="lazy"
@@ -167,6 +171,26 @@ export default function YouTubeEmbed({
           referrerPolicy="strict-origin-when-cross-origin"
           ref={iframeRef}
           allowFullScreen
+          style={(() => {
+            // Cuando cover=true, antes usábamos min-w/min-h para cubrir.
+            // Para escalar la UI, compensamos expandiendo el iframe y aplicando transform.
+            if (!cover) return undefined;
+            const s = Number(uiScale);
+            if (!s || s === 1) return { minWidth: '100%', minHeight: '100%' };
+            const pct = (100 / s);
+            return {
+              // Hacemos el iframe más grande y lo escalamos para que cubra sin dejar bordes
+              width: `${pct}%`,
+              height: `${pct}%`,
+              minWidth: `${pct}%`,
+              minHeight: `${pct}%`,
+              transform: `translate(-50%, -50%) scale(${s})`,
+              transformOrigin: 'center',
+              left: '50%',
+              top: '50%',
+              position: 'absolute',
+            };
+          })()}
         />
       </div>
       {showTitle && typeof title === 'string' && title.trim() !== '' ? (

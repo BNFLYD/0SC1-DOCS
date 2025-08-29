@@ -25,6 +25,8 @@ export default function MdxImage({
   columnsMd,
   columnsLg,
   columnGap = 4, // tailwind gap-x unidad (e.g. 4 -> gap-x-4)
+  // Bloquear interacciones con la imagen (no menú, no arrastrar, no selección, sin overlay)
+  locked = false,
 }) {
   // Helper: crea un overlay de imagen a pantalla completa y lo cierra con click o Esc
   const showOverlay = (src, alt = '') => {
@@ -139,7 +141,11 @@ export default function MdxImage({
           fetchpriority={fetchpriority}
           decoding={decoding}
           data-mdximage="1"
-          onClick={() => showOverlay(currentSrc, alt)}
+          onClick={() => { if (!locked) showOverlay(currentSrc, alt) }}
+          onContextMenu={locked ? (e) => e.preventDefault() : undefined}
+          onDragStart={locked ? (e) => e.preventDefault() : undefined}
+          onMouseDown={locked ? (e) => e.preventDefault() : undefined}
+          draggable={locked ? false : undefined}
           className={`mdx-fade-in ${(() => {
             // Si el usuario ya pasó alguna clase rounded*, no aplicar el default
             const hasRounded = typeof className === 'string' && /(^|\s)rounded(?:-[a-z0-9-]+)?(\s|$)/i.test(className)
@@ -150,7 +156,9 @@ export default function MdxImage({
             width: '100%',
             height: normalizedAspect ? '100%' : undefined,
             objectFit: content,
-            cursor: 'zoom-in',
+            cursor: locked ? 'default' : 'zoom-in',
+            userSelect: locked ? 'none' : undefined,
+            WebkitUserDrag: locked ? 'none' : undefined,
             // Forzar el radio si el usuario pasó rounded-full/rounded-none
             borderRadius: (() => {
               if (typeof className === 'string') {

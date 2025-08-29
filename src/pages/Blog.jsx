@@ -16,6 +16,30 @@ function parseLocalDate(iso) {
   }
 }
 
+// Map app language to proper locale
+const localeFor = (lang) => ({
+  es: 'es-AR',
+  en: 'en-US',
+  de: 'de-DE',
+  ja: 'ja-JP',
+} [lang] || lang || 'en-US')
+
+const formatDateLong = (dateObj, lang) => {
+  try {
+    // Special handling for Japanese spacing: "Y M D"
+    if (lang === 'ja') {
+      const y = new Intl.DateTimeFormat('ja-JP', { year: 'numeric' }).format(dateObj) // includes 年
+      const m = new Intl.DateTimeFormat('ja-JP', { month: 'numeric' }).format(dateObj)
+      const d = new Intl.DateTimeFormat('ja-JP', { day: 'numeric' }).format(dateObj)
+      return `${y} ${m} ${d}`
+    }
+    const loc = localeFor(lang)
+    return new Intl.DateTimeFormat(loc, { dateStyle: 'long' }).format(dateObj)
+  } catch (_) {
+    return dateObj.toLocaleDateString()
+  }
+}
+
 function Blog() {
   const { language, isDark, t } = useOutletContext()
   const location = useLocation()
@@ -35,14 +59,16 @@ function Blog() {
         const file = path.split("/").pop() || ""
         const slug = file.replace(/\.mdx$/, "")
         const meta = (mod && "meta" in mod ? mod.meta : undefined) || {}
+        const metaByLang = (mod && "metaByLang" in mod ? mod.metaByLang : undefined) || undefined
+        const sel = (metaByLang && language && metaByLang[language]) ? metaByLang[language] : meta
         const Comp = mod?.default
-        const title = meta.title || slug
-        const date = meta.date || "2025-08-16"
-        const tags = Array.isArray(meta.tags) ? meta.tags : []
-        const excerpt = typeof meta.excerpt === "string" ? meta.excerpt : ""
-        const cover = typeof meta.cover === "string" ? meta.cover : ""
-        const subtitle = typeof meta.subtitle === "string" ? meta.subtitle : ""
-        const icon = typeof meta.icon === "string" ? meta.icon : ""
+        const title = sel?.title || slug
+        const date = sel?.date || "2025-08-16"
+        const tags = Array.isArray(sel?.tags) ? sel.tags : []
+        const excerpt = typeof sel?.excerpt === "string" ? sel.excerpt : ""
+        const cover = typeof sel?.cover === "string" ? sel.cover : ""
+        const subtitle = typeof sel?.subtitle === "string" ? sel.subtitle : ""
+        const icon = typeof sel?.icon === "string" ? sel.icon : ""
         return {
           slug,
           title,
@@ -57,7 +83,7 @@ function Blog() {
         }
       })
       .filter((p) => Boolean(p.Component))
-  }, [mdxModules])
+  }, [mdxModules, language])
 
   // Estado de UI: búsqueda, tag activo y post expandido
   const [query, setQuery] = useState("")
@@ -267,16 +293,12 @@ function Blog() {
                       {post.excerpt}
                     </p>
                     <p className="font-mono text-xs mt-1">
-                      {post._date.toLocaleDateString(language === "es" ? "es-AR" : "en-US", {
-                        year: "numeric",
-                        month: "short",
-                        day: "2-digit",
-                      })}
+                      {formatDateLong(post._date, language)}
                       {post.tags?.length ? ` · ${post.tags.join(", ")}` : ""}
                     </p>
                   </div>
                   {/* Acciones a la derecha: caret + compartir */}
-                  <div className=" shrink-0 flex items-center gap-2">
+                  <div className="ml-4 shrink-0 flex items-center gap-2">
                     <button
                       type="button"
                       aria-label={language === 'es' ? 'Compartir enlace' : 'Share link'}
