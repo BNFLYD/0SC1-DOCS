@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth'
 import emailjs from '@emailjs/browser'
 import { Icon } from '@iconify/react'
 
-export default function ContactForm({ isDark, onCardOpenChange }) {
+export default function ContactForm({ isDark, onCardOpenChange, t }) {
   const { loginWithRedirect, loginWithPopup, getIdTokenClaims, getAccessTokenSilently, logout } = useAuth()
 
   const [formData, setFormData] = useState({ name: '', message: '' })
@@ -32,8 +32,8 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
     const params = {
       // El template espera: Subject: {{subject}}, To Email: {{email}}, Content: {{message}}
       email: toEmail,
-      subject: 'Recibimos tu mensaje',
-      message: `Hola ${toName || 'amig@'}, ¡gracias por escribir! Ya recibimos tu mensaje y lo responderemos a la brevedad. Se notificó a Flavio Morales.`,
+      subject: (t?.aboutPage?.muttForm?.auth?.title || 'Autenticación'),
+      message: `Hola ${toName || 'amig@'}, ${(t?.aboutPage?.muttForm?.status?.success || '¡Mensaje enviado con éxito desde {{email}}!')}`,
     }
     try {
       await emailjs.send(svc, tpl, params, pub)
@@ -148,13 +148,13 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
           const trimmedMsg = (formData.message || '').trim()
           if (!trimmedName) {
             setInvalidField('name')
-            setInvalidMsg('Rellene este campo')
+            setInvalidMsg(t?.aboutPage?.muttForm?.status?.required || 'Rellene este campo')
             try { e.currentTarget.querySelector('input[name="name"]').focus() } catch {}
             return
           }
           if (!trimmedMsg) {
             setInvalidField('message')
-            setInvalidMsg('Rellene este campo')
+            setInvalidMsg(t?.aboutPage?.muttForm?.status?.required || 'Rellene este campo')
             try { e.currentTarget.querySelector('textarea[name="message"]').focus() } catch {}
             return
           }
@@ -205,7 +205,7 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
 
               const freshEmail = await getFreshEmailWithRetry()
               if (!freshEmail) {
-                setAuthError('No se pudo obtener el email autenticado tras la redirección. Intenta de nuevo.')
+                setAuthError(t?.aboutPage?.muttForm?.auth?.cannotGetEmailAfterRedirect || 'No se pudo obtener el email autenticado tras la redirección. Intenta de nuevo.')
                 setAuthCardStatus('error')
                 authInFlight.current = false
                 return
@@ -288,7 +288,7 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
               }
             }
             if (!freshEmail) {
-              setAuthError('No se pudo obtener el email autenticado. Intenta de nuevo.')
+              setAuthError(t?.aboutPage?.muttForm?.auth?.cannotGetEmail || 'No se pudo obtener el email autenticado. Intenta de nuevo.')
               setAuthCardStatus('error')
               return
             }
@@ -326,24 +326,24 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
             await resetAuthState() // Reset state first
 
             if (error?.error === 'popup_closed' || error?.code === 'popup_closed') {
-              setAuthError('Autenticación cancelada. Vuelve a intentar.')
+              setAuthError(t?.aboutPage?.muttForm?.auth?.popupClosed || 'Autenticación cancelada. Vuelve a intentar.')
               setAuthCardStatus('error')
               return
             }
             // Popup bloqueado por el navegador
             if (error?.error === 'popup_blocked' || error?.code === 'popup_blocked') {
-              setAuthError('El navegador bloqueó el popup. Habilita pop-ups para este sitio o usa la redirección.')
+              setAuthError(t?.aboutPage?.muttForm?.auth?.popupBlocked || 'El navegador bloqueó el popup. Habilita pop-ups para este sitio o usa la redirección.')
               setAuthCardStatus('error')
               return
             }
-            setAuthError(error?.message || 'No se pudo abrir el popup de autenticación.')
+            setAuthError(error?.message || (t?.aboutPage?.muttForm?.auth?.cannotGetEmail || 'No se pudo abrir el popup de autenticación.'))
             setAuthCardStatus('error')
           }
         }}
       noValidate>
         <div className="relative">
           <label htmlFor="name" className="block text-sm font-bold mb-2">
-            Nombre
+            {t?.aboutPage?.muttForm?.labels?.name || 'Nombre'}
           </label>
           <div className="relative">
             <input
@@ -359,7 +359,7 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
                 if (invalidField === 'name' && e.target.value.trim()) setInvalidMsg('')
               }}
               className={`w-full p-2 rounded-lg ${isDark ? 'bg-void' : 'bg-cloud'} font-mono ${invalidField === 'name' ? 'pr-36' : ''}`}
-              placeholder="Tu nombre"
+              placeholder={t?.aboutPage?.muttForm?.placeholders?.name || 'Tu nombre'}
               required
               aria-invalid={invalidField === 'name'}
               aria-describedby={invalidField === 'name' ? 'error-name' : undefined}
@@ -374,7 +374,7 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
         </div>
         <div className="relative">
           <label htmlFor="message" className="block text-sm font-bold mb-2">
-            Mensaje
+            {t?.aboutPage?.muttForm?.labels?.message || 'Mensaje'}
           </label>
           <div className="relative">
             <textarea
@@ -390,7 +390,7 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
                 if (invalidField === 'message' && e.target.value.trim()) setInvalidMsg('')
               }}
               className={`w-full p-2 rounded-lg ${isDark ? 'bg-void' : 'bg-cloud'} font-mono ${invalidField === 'message' ? 'pr-36' : ''}`}
-              placeholder="Escribe tu mensaje aquí..."
+              placeholder={t?.aboutPage?.muttForm?.placeholders?.message || 'Escribe tu mensaje aquí...'}
               required
               aria-invalid={invalidField === 'message'}
               aria-describedby={invalidField === 'message' ? 'error-message' : undefined}
@@ -420,13 +420,13 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
               e.currentTarget.style.setProperty('--oy', `${oy}%`)
             }}
           >
-            <span className="relative z-10 text-md">{sending ? 'Enviando...' : 'Enviar ↗'}</span>
+            <span className="relative z-10 text-md">{sending ? (t?.aboutPage?.muttForm?.sending || 'Enviando...') : (t?.aboutPage?.muttForm?.submit || 'Enviar ↗')}</span>
           </button>
           {sendStatus === 'success' && (
-            <p className="text-feather text-sm">¡Mensaje enviado con éxito desde {lastSentEmail}!</p>
+            <p className="text-feather text-sm">{(t?.aboutPage?.muttForm?.status?.success || '¡Mensaje enviado con éxito desde {{email}}!').replace('{{email}}', lastSentEmail || '')}</p>
           )}
           {sendStatus === 'error' && (
-            <p className="text-red-500 text-sm">Error al enviar el mensaje. Por favor, intenta de nuevo.</p>
+            <p className="text-red-500 text-sm">{t?.aboutPage?.muttForm?.status?.error || 'Error al enviar el mensaje. Por favor, intenta de nuevo.'}</p>
           )}
         </div>
       </form>
@@ -438,7 +438,7 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
           >
             <button
               type="button"
-              aria-label="Cerrar"
+              aria-label={t?.aboutPage?.muttForm?.auth?.closeAria || 'Cerrar'}
               className={`absolute top-2 right-2 h-8 w-8 flex items-center justify-center rounded-lg text-3xl leading-none ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/10'}`}
               onClick={async () => {
                 await resetAuthState()
@@ -447,12 +447,12 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
             >
               ×
             </button>
-            <h4 className="absolute top-2 left-4 font-mono font-bold text-lg">Autenticación</h4>
+            <h4 className="absolute top-2 left-4 font-mono font-bold text-lg">{t?.aboutPage?.muttForm?.auth?.title || 'Autenticación'}</h4>
             <br/>
             {authCardStatus === 'authenticating' && (
               <div className="flex flex-col items-center gap-3">
                 <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-500 opacity-75"></div>
-                <p className="pt-16 font-mono text-sm opacity-80">Autenticando... completa el popup para continuar.</p>
+                <p className="pt-16 font-mono text-sm opacity-80">{t?.aboutPage?.muttForm?.auth?.authenticating || 'Autenticando... completa el popup para continuar.'}</p>
               </div>
             )}
             {authCardStatus === 'error' && (
@@ -470,7 +470,7 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
                   if (form) form.requestSubmit()
                 }}
               >
-                Reintentar
+                {t?.aboutPage?.muttForm?.auth?.retry || 'Reintentar'}
               </button>
               <button
                 type="button"
@@ -495,12 +495,12 @@ export default function ContactForm({ isDark, onCardOpenChange }) {
                     })
                   } catch (e) {
                     await resetAuthState()
-                    setAuthError('Error al redireccionar. Intenta de nuevo.')
+                    setAuthError(t?.aboutPage?.muttForm?.auth?.redirectError || 'Error al redireccionar. Intenta de nuevo.')
                     setAuthCardStatus('error')
                   }
                 }}
               >
-                Usar redirección
+                {t?.aboutPage?.muttForm?.auth?.useRedirect || 'Usar redirección'}
               </button>
             </div>
           </div>

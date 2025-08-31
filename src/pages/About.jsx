@@ -45,7 +45,7 @@ const InViewImage = ({ src, alt, isTransitioning, currentImageIndex, w, h, decod
 
 const About = () => {
   const context = useOutletContext() || {}
-  const { isDark, theme, isMuttActive, setIsMuttActive } = context
+  const { isDark, theme, isMuttActive, setIsMuttActive, t } = context
   const safeSetIsMuttActive = typeof setIsMuttActive === 'function' ? setIsMuttActive : () => {}
   const { isLoading } = useAuth()
   const [showWhoamiContent, setShowWhoamiContent] = useState(false)
@@ -148,6 +148,30 @@ const About = () => {
   }, [isScrolling, setIsScrolling]);
 
   const images = [profile, osci, hornero]
+
+  // Helper: get toast key from skill display name
+  const getToastKey = useCallback((name) => {
+    const map = {
+      'Javascript': 'javascript',
+      'JavaScript': 'javascript',
+      'Python': 'python',
+      'Rust': 'rust',
+      'Docker': 'docker',
+      'Node': 'node',
+      'Fast API': 'fastapi',
+      'Tauri': 'tauri',
+      'PostgreSQL': 'postgresql',
+      'React': 'react',
+      'Svelte': 'svelte',
+      'Tailwind': 'tailwind',
+      'Next': 'next',
+      'IA SDK': 'ia_sdk',
+      'n8n': 'n8n',
+      'Model Context Protocols': 'mcp',
+      'Vibe Coding': 'vibe_coding'
+    }
+    return map[name] || null
+  }, [])
 
   // Preload del sprite (se usa como background-image, no aplica atributos de <img>)
   useEffect(() => {
@@ -296,7 +320,7 @@ const About = () => {
               <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
                 <TerminalText
                   key={headerText}
-                  text={headerText}
+                  text={t?.aboutPage?.header?.[headerText] || headerText}
                   onComplete={() => {
                     setShowWhoamiContent(true)
                     if (headerText === "mutt") {
@@ -315,26 +339,18 @@ const About = () => {
                     {/* Formulario de contacto extraído a componente */}
                     <ContactForm
                       isDark={isDark}
+                      t={t}
                       onCardOpenChange={setAuthCardOpenFromChild}
                     />
                   </div>
                 ) : (
                   <>
-                    <h2 className="text-xl font-mono font-bold mb-4 tracking-wide">Flavio Gabriel Morales</h2>
+                    <h2 className="text-xl font-mono font-bold mb-4 tracking-wide">{t?.aboutPage?.profile?.name || 'Flavio Gabriel Morales'}</h2>
                     <div className="space-y-3 font-mono text-lg leading-relaxed">
-                      <p>Desarrollador Full Stack apasionado por crear soluciones tecnológicas innovadoras y eficientes.</p>
-                      <p>
-                        Me especializo en el desarrollo web moderno, con experiencia en arquitecturas escalables y tecnologías
-                        de vanguardia.
-                      </p>
-                      <p>
-                        Disfruto trabajando tanto en el frontend como en el backend, siempre buscando escribir código limpio y
-                        mantenible.
-                      </p>
-                      <p>
-                        Cuando no estoy programando, me gusta explorar nuevas tecnologías, contribuir a proyectos open source
-                        y compartir conocimiento con la comunidad.
-                      </p>
+                      <p>{t?.aboutPage?.profile?.bio?.[0] || 'Desarrollador Full Stack apasionado por crear soluciones tecnológicas innovadoras y eficientes.'}</p>
+                      <p>{t?.aboutPage?.profile?.bio?.[1] || 'Me especializo en el desarrollo web moderno, con experiencia en arquitecturas escalables y tecnologías de vanguardia.'}</p>
+                      <p>{t?.aboutPage?.profile?.bio?.[2] || 'Disfruto trabajando tanto en el frontend como en el backend, siempre buscando escribir código limpio y mantenible.'}</p>
+                      <p>{t?.aboutPage?.profile?.bio?.[3] || 'Cuando no estoy programando, me gusta explorar nuevas tecnologías, contribuir a proyectos open source y compartir conocimiento con la comunidad.'}</p>
                     </div>
                   </>
                 )}
@@ -388,7 +404,7 @@ const About = () => {
               <div
                 className={`w-48 rounded-xl`}
               >
-                <h3 className="text-xl font-mono font-bold mb-4 tracking-wide text-center">Contacto</h3>
+                <h3 className="text-xl font-mono font-bold mb-4 tracking-wide text-center">{t?.aboutPage?.contact?.title || 'Contacto'}</h3>
                 <div className="flex justify-center gap-2 font-mono text-sm">
                   {/* Reducido gap-4 a gap-2 */}
                   <a
@@ -397,7 +413,7 @@ const About = () => {
                       handleMailClick();
                     }}
                     className={`relative p-3 rounded-lg transition-all duration-200 flex flex-col items-center justify-center group`}
-                    aria-label="Enviar correo electrónico"
+                    aria-label={(t?.aboutPage?.contact?.email || 'Email')}
                   >
                     <Icon
                       icon="streamline-logos:protonmail-logo-2-block"
@@ -409,13 +425,13 @@ const About = () => {
                       className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"
                         }`}
                     >
-                      Email
+                      {t?.aboutPage?.contact?.email || 'Email'}
                     </span>
                   </a>
                   <a
                     href="https://www.linkedin.com/in/flavio-gabriel-morales-939371184/"
                     className={`relative p-3 rounded-lg transition-all duration-300 flex flex-col items-center justify-center group`}
-                    aria-label="Ver perfil de LinkedIn"
+                    aria-label={(t?.aboutPage?.contact?.linkedin || 'LinkedIn')}
                   >
                     <Icon
                       icon="brandico:linkedin-rect"
@@ -427,13 +443,13 @@ const About = () => {
                       className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
                         }`}
                     >
-                      LinkedIn
+                      {t?.aboutPage?.contact?.linkedin || 'LinkedIn'}
                     </span>
                   </a>
                   <a
                     href="https://github.com/FlavioG01"
                     className={`relative p-3 rounded-lg transition-all duration-300 flex flex-col items-center justify-center group `}
-                    aria-label="Ver perfil de GitHub"
+                    aria-label={(t?.aboutPage?.contact?.github || 'GitHub')}
                   >
                     <Icon
                       icon="jam:github"
@@ -445,7 +461,7 @@ const About = () => {
                       className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
                         }`}
                     >
-                      GitHub
+                      {t?.aboutPage?.contact?.github || 'GitHub'}
                     </span>
                   </a>
                 </div>
@@ -463,7 +479,7 @@ const About = () => {
           >
             <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
               <TerminalText
-                text="htop skills"
+                text={t?.aboutPage?.skills?.title || 'htop skills'}
                 inView={sections.skills.isVisible}
                 onComplete={() => updateSection('skills', { showContent: true })}
               />
@@ -477,7 +493,16 @@ const About = () => {
                     className={`text-xl font-mono font-bold tracking-wide pb-2 border-b ${isDark ? "border-white/20" : "border-black/20"
                       }`}
                   >
-                    {category.title}
+                    {(() => {
+                      const c = t?.aboutPage?.skills?.categories
+                      switch (category.title) {
+                        case 'Habilidades': return c?.general || category.title
+                        case 'Backend': return c?.backend || category.title
+                        case 'Frontend': return c?.frontend || category.title
+                        case 'Inteligencia Artificial': return c?.ai || category.title
+                        default: return category.title
+                      }
+                    })()}
                   </h3>
 
                   {/* Grid de habilidades */}
@@ -496,7 +521,12 @@ const About = () => {
                           shouldAnimate={sections.skills.showContent}
                           isDark={isDark}
                         />
-                        <Toast text={skill.toast} icon={skill.icon} visible={hoveredSkill === skill.name} isDark={isDark} />
+                        <Toast
+                          text={(t?.aboutPage?.skills?.toasts?.[getToastKey(skill.name)] || skill.toast)}
+                          icon={skill.icon}
+                          visible={hoveredSkill === skill.name}
+                          isDark={isDark}
+                        />
                       </div>
                     ))}
                   </div>
@@ -515,7 +545,7 @@ const About = () => {
           >
             <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
               <TerminalText
-                text="bat experience.md"
+                text={t?.aboutPage?.experience?.title || 'bat experience.md'}
                 inView={sections.experience.isVisible}
                 onComplete={() => updateSection('experience', { showContent: true })}
               />
@@ -525,15 +555,8 @@ const About = () => {
               <div className={`p-6 rounded-xl border-2 ${isDark ? "border-primary/10 bg-primary" : "border-secondary/10 bg-secondary"
                 }`}>
                 <div className="space-y-4 font-mono text-lg">
-                  <p>
-                    Con más de 5 años de experiencia en desarrollo web, he participado
-                    en diversos proyectos que han enriquecido mi perfil profesional.
-                  </p>
-                  <p>
-                    Mi trayectoria incluye el desarrollo de aplicaciones web escalables,
-                    implementación de arquitecturas robustas y optimización de rendimiento
-                    en proyectos de alto impacto.
-                  </p>
+                  <p>{t?.aboutPage?.experience?.paragraphs?.[0] || 'Con más de 5 años de experiencia en desarrollo web, he participado en diversos proyectos que han enriquecido mi perfil profesional.'}</p>
+                  <p>{t?.aboutPage?.experience?.paragraphs?.[1] || 'Mi trayectoria incluye el desarrollo de aplicaciones web escalables, implementación de arquitecturas robustas y optimización de rendimiento en proyectos de alto impacto.'}</p>
                 </div>
               </div>
             </div>

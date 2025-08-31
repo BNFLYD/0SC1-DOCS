@@ -54,6 +54,22 @@ function Blog() {
 
   // Construir lista desde los propios archivos MDX (sin JSON)
   const normalized = useMemo(() => {
+    const buildHaystack = (baseMeta, metaByLang) => {
+      const buf = []
+      const push = (obj) => {
+        if (!obj) return
+        if (obj.title) buf.push(String(obj.title))
+        if (obj.subtitle) buf.push(String(obj.subtitle))
+        if (obj.excerpt) buf.push(String(obj.excerpt))
+        if (Array.isArray(obj.tags)) buf.push(obj.tags.join(' '))
+      }
+      push(baseMeta)
+      if (metaByLang && typeof metaByLang === 'object') {
+        Object.values(metaByLang).forEach(push)
+      }
+      return buf.join(' ').toLowerCase()
+    }
+
     return Object.entries(mdxModules)
       .map(([path, mod]) => {
         const file = path.split("/").pop() || ""
@@ -69,6 +85,7 @@ function Blog() {
         const cover = typeof sel?.cover === "string" ? sel.cover : ""
         const subtitle = typeof sel?.subtitle === "string" ? sel.subtitle : ""
         const icon = typeof sel?.icon === "string" ? sel.icon : ""
+        const haystack = buildHaystack(meta, metaByLang)
         return {
           slug,
           title,
@@ -80,6 +97,7 @@ function Blog() {
           icon,
           Component: Comp,
           _date: parseLocalDate(date),
+          haystack,
         }
       })
       .filter((p) => Boolean(p.Component))
@@ -89,6 +107,7 @@ function Blog() {
   const [query, setQuery] = useState("")
   const [activeTag, setActiveTag] = useState("")
   const [expandedSlug, setExpandedSlug] = useState("")
+  const [copiedSlug, setCopiedSlug] = useState("")
 
   // Sync expanded post with URL (?post=slug)
   useEffect(() => {
@@ -97,12 +116,52 @@ function Blog() {
     setExpandedSlug(s)
   }, [location.search])
 
+  // Load initial query and tag from URL on mount and whenever URL changes externally
+  useEffect(() => {
+    const sp = new URLSearchParams(location.search)
+    const q = sp.get('q') || ""
+    const tag = sp.get('tag') || ""
+    // Avoid loops: only update state if different
+    if (q !== query) setQuery(q)
+    if (tag !== activeTag) setActiveTag(tag)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search])
+
+  // Reflect query and tag into URL (preserve ?post)
+  useEffect(() => {
+    const sp = new URLSearchParams(location.search)
+    const curQ = sp.get('q') || ""
+    const curTag = sp.get('tag') || ""
+    let changed = false
+    if (query !== curQ) { changed = true; if (query) sp.set('q', query); else sp.delete('q') }
+    if (activeTag !== curTag) { changed = true; if (activeTag) sp.set('tag', activeTag); else sp.delete('tag') }
+    if (changed) {
+      navigate({ search: sp.toString() ? `?${sp.toString()}` : "" }, { replace: true })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, activeTag])
+
+  // Allow closing expanded post with Escape
+  useEffect(() => {
+    if (!expandedSlug) return
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        toggleExpanded(expandedSlug)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [expandedSlug])
+
   const toggleExpanded = (slug) => {
     const isOpen = expandedSlug === slug
     const sp = new URLSearchParams(location.search)
     if (isOpen) {
       // CLEAR FIRST: skip any lifecycle saves during this close
       isClearingRef.current = true
+      // Persist collapsible state for this post before closing
+      try { window.dispatchEvent(new CustomEvent('prose:save', { detail: { slug } })) } catch (_) { /* noop */ }
       // Remove persisted fixedTop for this post so next open will recompute
       try { sessionStorage.removeItem(`sbTop:post-${slug}`) } catch (_) { /* noop */ }
       // Then update URL and state
@@ -168,6 +227,8 @@ function Blog() {
         await navigator.share({ title, url: shareUrl })
       } else if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(shareUrl)
+        setCopiedSlug(slug)
+        setTimeout(() => setCopiedSlug(""), 1500)
       }
     } catch (_) { /* noop */ }
   }
@@ -184,10 +245,8 @@ function Blog() {
     const q = query.trim().toLowerCase()
     const matchesQuery = (p) => {
       if (!q) return true
-      const haystack = [p.title, p.excerpt, ...(p.tags || [])]
-        .join(" ")
-        .toLowerCase()
-      return haystack.includes(q)
+      // Search across all languages using precomputed haystack
+      return (p.haystack || "").includes(q)
     }
     const matchesTag = (p) => (activeTag ? p.tags?.includes(activeTag) : true)
 
@@ -205,10 +264,19 @@ function Blog() {
     <div className="max-w-7xl mx-auto px-6 py-12">
       {/* Controles: búsqueda y filtros */}
       <div className="mb-8 flex flex-col gap-4 space-y-4 pt-24">
+        {/** Simple inline i18n for labels (fallback if no t-keys) */}
+        {(() => {
+          return null
+        })()}
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={language === "es" ? "Buscar por título, resumen o tag..." : "Search by title, excerpt or tag..."}
+          placeholder={{
+            es: "Buscar por título, resumen o tag...",
+            en: "Search by title, excerpt or tag...",
+            de: "Suche nach Titel, Zusammenfassung oder Tag...",
+            ja: "タイトル・要約・タグで検索...",
+          }[language] || "Search by title, excerpt or tag..."}
           className={`w-full px-8 py-3 rounded-xl outline-none font-mono text-md ${isDark
             ? "bg-primary text-white placeholder-white/40"
             : "bg-secondary text-black placeholder-black/40"
@@ -227,7 +295,12 @@ function Blog() {
               }`}
             onClick={() => setActiveTag("")}
           >
-            {language === "es" ? "Todos" : "All"}
+            {{
+              es: "Todos",
+              en: "All",
+              de: "Alle",
+              ja: "すべて",
+            }[language] || "All"}
           </button>
           {allTags.map((tag) => (
             <button
@@ -304,7 +377,7 @@ function Blog() {
                       aria-label={language === 'es' ? 'Compartir enlace' : 'Share link'}
                       className={`w-10 h-10 transition-colors flex items-center justify-center text-6xl ${isDark ? 'text-white hover:text-feather' : 'text-black hover:text-feather'}`}
                       onClick={(e) => { e.stopPropagation(); sharePost(post.slug, post.title) }}
-                      title={language === 'es' ? 'Compartir' : 'Share'}
+                      title={copiedSlug === post.slug ? (language === 'es' ? 'Copiado' : 'Copied') : (language === 'es' ? 'Compartir' : 'Share')}
                     >
                       <Icon icon="tabler:link"/>
                     </button>
@@ -329,7 +402,12 @@ function Blog() {
         })}
         {!visiblePosts.length && (
           <p className="font-mono text-sm opacity-70">
-            {language === "es" ? "Sin resultados" : "No results"}
+            {{
+              es: "Sin resultados",
+              en: "No results",
+              de: "Keine Ergebnisse",
+              ja: "該当なし",
+            }[language] || "No results"}
           </p>
         )}
         {/* Scrollbar para la lista cuando hay más de 4 posts y ningún post abierto */}
@@ -342,6 +420,10 @@ function Blog() {
             bottomPadPx={140}
           />
         )}
+      </div>
+      {/* aria-live for copy feedback */}
+      <div aria-live="polite" className="sr-only">
+        {copiedSlug ? (language === 'es' ? 'Enlace copiado' : 'Link copied') : ''}
       </div>
     </div>
   )
