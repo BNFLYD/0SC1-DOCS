@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-const MesmerizeChannel = () => {
+const MesmerizerChannel = () => {
 
   const canvasRef = useRef(null)
 
@@ -73,4 +73,4 @@ const MesmerizeChannel = () => {
 }
 
 
-export default MesmerizeChannel
+export default MesmerizerChannel

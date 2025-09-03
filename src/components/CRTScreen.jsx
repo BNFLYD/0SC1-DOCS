@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react"
 import WhoamiChannel from "../components/Channels/WhoamiChannel"
 import ProjectsChannel from "../components/Channels/ProjectsChannel"
 import BlogChannel from "../components/Channels/BlogChannel"
-import MesmerizerChannel from "../components/Channels/MesmerizerChannel"
+import PlayChannel from "../components/Channels/PlayChannel"
 import HireChannel from "../components/Channels/HireChannel"
 
 const CRTScreen = ({ activeChannel, isDistorting, language, isDark, t }) => {
@@ -99,7 +99,7 @@ const CRTScreen = ({ activeChannel, isDistorting, language, isDark, t }) => {
               {activeChannel === "projects" && <ProjectsChannel theme={isDark ? "dark" : "light"} language={language} isDark={isDark} t={t} />}
               {activeChannel === "blog" && <BlogChannel theme={isDark ? "dark" : "light"} language={language} isDark={isDark} />}
               {activeChannel === "hire" && <HireChannel theme={isDark ? "dark" : "light"} isDark={isDark} />}
-              {activeChannel === "play" && <MesmerizerChannel theme={isDark ? "dark" : "light"} />}
+              {activeChannel === "play" && <PlayChannel theme={isDark ? "dark" : "light"} />}
             </div>
           )}
 
