@@ -22,6 +22,7 @@ export default {
       fontFamily: {
         'sans': ['Poppins'],
         'mono': ['JetBrains Mono', 'monospace'],
+        'arcade': ['"Jersey 10"', 'monospace'],
       },
       borderRadius: {
         lg: 'var(--radius)',
