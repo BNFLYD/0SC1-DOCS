@@ -4,6 +4,7 @@ import scenebg from '../../assets/scenebg.png'
 import scene from '../../assets/scene.png'
 import zondaIcon from '../../assets/zonda.png'
 import palitoIcon from '../../assets/palito.png'
+import sauce from '../../assets/sauce.png'
 import menu from '../../assets/menu.gif'
 import zonda from '../../assets/zonda.gif'
 import palito from '../../assets/palito.gif'
@@ -1073,32 +1074,23 @@ const PlayChannel = ({ theme }) => {
           );
           }
 
-          // Obstáculo intermedio (árbol): dibujar tronco visual y copa alineada con hitbox
+          // Obstáculo intermedio (árbol): renderizar con asset `sauce` cubriendo tronco + copa
           if (o.type === 'middle') {
             const r = getObstacleRect(o)
             return (
               <div key={`${o.id}-container`}>
-                {/* Tronco (visual), desde el suelo hasta trunkH */}
-                <div
-                  className="absolute bg-[#1b1b1b] dark:bg-white/60"
-                  style={{
-                    left: `${o.x}%`,
-                    bottom: `${o.y}%`,
-                    width: `${o.w}%`,
-                    height: `${o.trunkH}%`,
-                    opacity: 0.6,
-                    zIndex: 5
-                  }}
-                />
-                {/* Copa (visual y colisionable), coincide con hitbox */}
-                <div
-                  className="absolute bg-[#1b1b1b] dark:bg-white/90"
+                {/* Árbol completo con asset */}
+                <img
+                  src={sauce}
+                  alt="Árbol"
+                  className="absolute select-none pointer-events-none object-contain"
                   style={{
                     left: `${r.left}%`,
-                    bottom: `${r.bottom}%`,
+                    bottom: `${r.bottom - o.trunkH}%`,
                     width: `${r.width}%`,
-                    height: `${r.height}%`,
-                    zIndex: 6
+                    height: `${r.height + o.trunkH}%`,
+                    zIndex: 6,
+                    filter: isDark ? 'invert(0)' : 'invert(1)'
                   }}
                 />
                 {/* Debug: mostrar hitbox de la copa */}
