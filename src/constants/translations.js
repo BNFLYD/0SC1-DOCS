@@ -142,6 +142,23 @@ export const translations = {
           cannotGetEmailAfterRedirect: "No se pudo obtener el email autenticado tras la redirección. Intenta de nuevo."
         }
       }
+    },
+    playChannel: {
+      menu: {
+        start: "Empezar",
+        loading: "Cargando…",
+        helper: "W/Click para empezar · S/Swipe abajo para agacharse"
+      },
+      gameover: {
+        title: "Game Over",
+        distance: "Distancia",
+        zondaCharges: "Cargas de Zonda",
+        sticks: "Palitos",
+        finalScore: "Puntuación Final",
+        newRecord: "¡Nuevo Récord!",
+        record: "Récord",
+        restart: "Reiniciar [R]"
+      }
     }
   },
   en: {

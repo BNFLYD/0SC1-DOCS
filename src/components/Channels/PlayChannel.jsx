@@ -12,6 +12,7 @@ import vuelo from '../../assets/normal.gif'
 import rasante from '../../assets/rasante.gif'
 import planear from '../../assets/planeando.gif'
 import choque from '../../assets/choque.gif'
+import { useGlobalState } from '../../hooks/useGlobalState'
 
 
 // Variable de depuración global para el componente
@@ -19,6 +20,7 @@ const DEBUG_MODE = true; // Activado para depuración
 
 const PlayChannel = ({ theme }) => {
   const isDark = theme === 'dark'
+  const { t } = useGlobalState()
   // Refs y estado principal
   const containerRef = useRef(null)
   const rafRef = useRef(0)
@@ -1272,13 +1274,13 @@ const PlayChannel = ({ theme }) => {
               }}
             />
             {/* helper text and start button */}
-            <div className="text-xs opacity-80 mt-1">W/Click para empezar · S/Swipe abajo para agacharse</div>
+            <div className="text-xs opacity-80 mt-1">{t?.playChannel?.menu?.helper || 'W/Click to start · S/Swipe down to crouch'}</div>
             <button
               onClick={() => { if (assetsReady) { resetGame(); setState('playing') } }}
               disabled={!assetsReady}
               className={`inline-flex items-center gap-2 px-3 py-1 rounded border border-void/30 dark:border-secondary text-xl hover:bg-primary hover:text-secondary dark:hover:bg-cloud dark:hover:text-void ${!assetsReady ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              {assetsReady ? 'Empezar' : 'Cargando…'}
+              {assetsReady ? (t?.playChannel?.menu?.start || 'Start') : (t?.playChannel?.menu?.loading || 'Loading…')}
             </button>
           </div>
         )}
@@ -1291,7 +1293,7 @@ const PlayChannel = ({ theme }) => {
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                 <div className="mx-auto w-full max-w-[min(900px,95%)] px-8 py-3 rounded-xl backdrop-blur-sm bg-cloud/80 dark:bg-void/80">
                   <div className="font-arcade text-center text-primary dark:text-secondary ">
-                    <div className="text-3xl">Game Over</div>
+                    <div className="text-3xl">{t?.playChannel?.gameover?.title || 'Game Over'}</div>
                   </div>
                 </div>
               </div>
@@ -1302,22 +1304,22 @@ const PlayChannel = ({ theme }) => {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="font-arcade text-center">
                   <div className="text-lg md:text-2xl mb-2" style={{ visibility: recapStep >= 1 ? 'visible' : 'hidden' }}>
-                    Distancia x {finalScore}
+                    {(t?.playChannel?.gameover?.distance || 'Distance')} x {finalScore}
                   </div>
                   <div className="text-lg md:text-2xl mb-2" style={{ visibility: recapStep >= 2 ? 'visible' : 'hidden' }}>
-                    Cargas de Zonda x {finalZonda}
+                    {(t?.playChannel?.gameover?.zondaCharges || 'Zonda charges')} x {finalZonda}
                   </div>
                   <div className="text-lg md:text-2xl mb-2" style={{ visibility: recapStep >= 3 ? 'visible' : 'hidden' }}>
-                    Palitos x {finalSticks}
+                    {(t?.playChannel?.gameover?.sticks || 'Sticks')} x {finalSticks}
                   </div>
                   <div className="text-lg md:text-2xl mb-3" style={{ visibility: recapStep >= 4 ? 'visible' : 'hidden' }}>
-                    Puntuacion Final {recapTotal}
+                    {(t?.playChannel?.gameover?.finalScore || 'Final score')} {recapTotal}
                   </div>
                   {recapStep >= 4 && recapAnimDone && (
                     <div className="text-lg md:text-2xl mb-3 font-semibold">
-                      {isNewRecord ? 'Nuevo Record!' : (
+                      {isNewRecord ? (t?.playChannel?.gameover?.newRecord || 'New Record!') : (
                         <>
-                          Record {highScore}
+                          {(t?.playChannel?.gameover?.record || 'Record')} {highScore}
                         </>
                       )}
                     </div>
@@ -1332,7 +1334,7 @@ const PlayChannel = ({ theme }) => {
                         <polyline points="1 4 1 10 7 10" />
                         <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
                       </svg>
-                      Reiniciar [R]
+                      {t?.playChannel?.gameover?.restart || 'Restart [R]'}
                     </button>
                   )}
                 </div>
