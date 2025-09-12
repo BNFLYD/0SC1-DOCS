@@ -99,7 +99,7 @@ const CRTScreen = ({ activeChannel, isDistorting, language, isDark, t }) => {
               {activeChannel === "projects" && <ProjectsChannel theme={isDark ? "dark" : "light"} language={language} isDark={isDark} t={t} />}
               {activeChannel === "blog" && <BlogChannel theme={isDark ? "dark" : "light"} language={language} isDark={isDark} />}
               {activeChannel === "hire" && <HireChannel theme={isDark ? "dark" : "light"} isDark={isDark} />}
-              {activeChannel === "play" && <PlayChannel theme={isDark ? "dark" : "light"} />}
+              {activeChannel === "play" && <PlayChannel theme={isDark ? "dark" : "light"} language={language} isDark={isDark} t={t} />}
             </div>
           )}
 

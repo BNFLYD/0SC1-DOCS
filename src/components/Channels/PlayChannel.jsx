@@ -12,15 +12,28 @@ import vuelo from '../../assets/normal.gif'
 import rasante from '../../assets/rasante.gif'
 import planear from '../../assets/planeando.gif'
 import choque from '../../assets/choque.gif'
-import { useGlobalState } from '../../hooks/useGlobalState'
 
 
 // Variable de depuración global para el componente
 const DEBUG_MODE = true; // Activado para depuración
 
-const PlayChannel = ({ theme }) => {
-  const isDark = theme === 'dark'
-  const { t } = useGlobalState()
+const PlayChannel = ({ theme, language, isDark: isDarkProp, t: tProp }) => {
+  const isDark = (typeof isDarkProp === 'boolean') ? isDarkProp : (theme === 'dark')
+  const t = tProp
+  // TEMP DIAGNOSTIC: verify playChannel keys at runtime
+  useEffect(() => {
+    try {
+      // Log only once per language change
+      // eslint-disable-next-line no-console
+      console.log('[PlayChannel i18n]', {
+        language,
+        hasPlay: !!t?.playChannel,
+        menuStart: t?.playChannel?.menu?.start,
+        goTitle: t?.playChannel?.gameover?.title,
+        goDistance: t?.playChannel?.gameover?.distance,
+      })
+    } catch {}
+  }, [language, t])
   // Refs y estado principal
   const containerRef = useRef(null)
   const rafRef = useRef(0)
@@ -1226,7 +1239,6 @@ const PlayChannel = ({ theme }) => {
         )}
 
         </>)}
-
         {/* Overlays de estado */}
         {/* Inicio */}
         {state === 'menu' && (
@@ -1251,7 +1263,7 @@ const PlayChannel = ({ theme }) => {
               >
                 <pre
                   ref={menuAsciiRef}
-                  className="whitespace-pre leading-none font-mono select-none"
+                  className="whitespace-pre leading-none font-ascii select-none"
                   style={{ fontSize: '12px', lineHeight: '12px', margin: 0 }}
                 >
                   {asciiTitle}
@@ -1274,13 +1286,13 @@ const PlayChannel = ({ theme }) => {
               }}
             />
             {/* helper text and start button */}
-            <div className="text-xs opacity-80 mt-1">{t?.playChannel?.menu?.helper || 'W/Click to start · S/Swipe down to crouch'}</div>
+            <div className="text-xs opacity-80 mt-1">{t?.playChannel?.menu?.helper}</div>
             <button
               onClick={() => { if (assetsReady) { resetGame(); setState('playing') } }}
               disabled={!assetsReady}
               className={`inline-flex items-center gap-2 px-3 py-1 rounded border border-void/30 dark:border-secondary text-xl hover:bg-primary hover:text-secondary dark:hover:bg-cloud dark:hover:text-void ${!assetsReady ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              {assetsReady ? (t?.playChannel?.menu?.start || 'Start') : (t?.playChannel?.menu?.loading || 'Loading…')}
+              {assetsReady ? t?.playChannel?.menu?.start : t?.playChannel?.menu?.loading}
             </button>
           </div>
         )}
@@ -1293,7 +1305,7 @@ const PlayChannel = ({ theme }) => {
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                 <div className="mx-auto w-full max-w-[min(900px,95%)] px-8 py-3 rounded-xl backdrop-blur-sm bg-cloud/80 dark:bg-void/80">
                   <div className="font-arcade text-center text-primary dark:text-secondary ">
-                    <div className="text-3xl">{t?.playChannel?.gameover?.title || 'Game Over'}</div>
+                    <div className="text-3xl">{t?.playChannel?.gameover?.title}</div>
                   </div>
                 </div>
               </div>
@@ -1304,22 +1316,22 @@ const PlayChannel = ({ theme }) => {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="font-arcade text-center">
                   <div className="text-lg md:text-2xl mb-2" style={{ visibility: recapStep >= 1 ? 'visible' : 'hidden' }}>
-                    {(t?.playChannel?.gameover?.distance || 'Distance')} x {finalScore}
+                    {t?.playChannel?.gameover?.distance} x {finalScore}
                   </div>
                   <div className="text-lg md:text-2xl mb-2" style={{ visibility: recapStep >= 2 ? 'visible' : 'hidden' }}>
-                    {(t?.playChannel?.gameover?.zondaCharges || 'Zonda charges')} x {finalZonda}
+                    {t?.playChannel?.gameover?.zondaCharges} x {finalZonda}
                   </div>
                   <div className="text-lg md:text-2xl mb-2" style={{ visibility: recapStep >= 3 ? 'visible' : 'hidden' }}>
-                    {(t?.playChannel?.gameover?.sticks || 'Sticks')} x {finalSticks}
+                    {t?.playChannel?.gameover?.sticks} x {finalSticks}
                   </div>
                   <div className="text-lg md:text-2xl mb-3" style={{ visibility: recapStep >= 4 ? 'visible' : 'hidden' }}>
-                    {(t?.playChannel?.gameover?.finalScore || 'Final score')} {recapTotal}
+                    {t?.playChannel?.gameover?.finalScore} {recapTotal}
                   </div>
                   {recapStep >= 4 && recapAnimDone && (
                     <div className="text-lg md:text-2xl mb-3 font-semibold">
-                      {isNewRecord ? (t?.playChannel?.gameover?.newRecord || 'New Record!') : (
+                      {isNewRecord ? t?.playChannel?.gameover?.newRecord : (
                         <>
-                          {(t?.playChannel?.gameover?.record || 'Record')} {highScore}
+                          {t?.playChannel?.gameover?.record} {highScore}
                         </>
                       )}
                     </div>
@@ -1334,7 +1346,7 @@ const PlayChannel = ({ theme }) => {
                         <polyline points="1 4 1 10 7 10" />
                         <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
                       </svg>
-                      {t?.playChannel?.gameover?.restart || 'Restart [R]'}
+                      {t?.playChannel?.gameover?.restart}
                     </button>
                   )}
                 </div>

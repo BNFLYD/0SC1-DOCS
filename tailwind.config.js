@@ -20,9 +20,11 @@ export default {
         '3xl': ['30px', { lineHeight: '40px' }],
       },
       fontFamily: {
-        'sans': ['Poppins'],
-        'mono': ['JetBrains Mono', 'monospace'],
-        'arcade': ['"Jersey 10"', 'monospace'],
+        'sans': ['DotGothic16'],
+        'mono': ['JetBrains Mono', '"M PLUS 2"'],
+        'arcade': ['"Jersey 10"', 'DotGothic16'],
+        'ascii': ['monospace'],
+        'mark': ['Kode Mono', '"Dela Gothic One"'],
       },
       borderRadius: {
         lg: 'var(--radius)',

@@ -291,6 +291,23 @@ export const translations = {
           cannotGetEmailAfterRedirect: "Couldn't obtain the authenticated email after redirect. Try again."
         }
       }
+    },
+    playChannel: {
+      menu: {
+        start: "Start",
+        loading: "Loading…",
+        helper: "W/Click to start · S/Swipe down to crouch"
+      },
+      gameover: {
+        title: "Game Over",
+        distance: "Distance",
+        zondaCharges: "Zonda charges",
+        sticks: "Sticks",
+        finalScore: "Final score",
+        newRecord: "New Record!",
+        record: "Record",
+        restart: "Restart [R]"
+      }
     }
   },
   de: {
@@ -410,6 +427,23 @@ export const translations = {
           redirectError: "Fehler bei der Weiterleitung. Bitte erneut versuchen.",
           cannotGetEmail: "Authentifizierte E‑Mail konnte nicht abgerufen werden.",
           cannotGetEmailAfterRedirect: "E‑Mail nach Weiterleitung konnte nicht abgerufen werden."
+        }
+      },
+      playChannel: {
+        menu: {
+          start: "Starten",
+          loading: "Laden…",
+          helper: "W/Klick zum Starten · S/Swipe nach unten zum Ducken"
+        },
+        gameover: {
+          title: "Game Over",
+          distance: "Distanz",
+          zondaCharges: "Zonda‑Ladungen",
+          sticks: "Stöcke",
+          finalScore: "Endpunktzahl",
+          newRecord: "Neuer Rekord!",
+          record: "Rekord",
+          restart: "Neu starten [R]"
         }
       }
     }
@@ -532,6 +566,23 @@ export const translations = {
           cannotGetEmail: "認証済みメールを取得できませんでした。",
           cannotGetEmailAfterRedirect: "リダイレクト後にメールを取得できませんでした。"
         }
+      }
+    },
+    playChannel: {
+      menu: {
+        start: "スタート",
+        loading: "読み込み中…",
+        helper: "W/クリックで開始 · S/下スワイプでしゃがむ"
+      },
+      gameover: {
+        title: "ゲームオーバー",
+        distance: "距離",
+        zondaCharges: "ゾンダの充電数",
+        sticks: "スティック数",
+        finalScore: "最終スコア",
+        newRecord: "新記録！",
+        record: "記録",
+        restart: "リスタート [R]"
       }
     }
   }
