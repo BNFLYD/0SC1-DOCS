@@ -20,11 +20,13 @@ export default {
         '3xl': ['30px', { lineHeight: '40px' }],
       },
       fontFamily: {
-        'sans': ['DotGothic16'],
-        'mono': ['JetBrains Mono', '"M PLUS 2"'],
-        'arcade': ['"Jersey 10"', 'DotGothic16'],
+        'serif': ['"Squada One"', '"Mochiy Pop One"'],
+        'sans': ['"Rajdhani"', '"M PLUS 2"'],
+        'mono': ['"JetBrains Mono"', '"M PLUS 1 Code"'],
+        'arcade': ['"Silkscreen"', '"DotGothic16"'],
+        'specs': ['"Share Tech Mono"', '"Workbench"'],
         'ascii': ['monospace'],
-        'mark': ['Kode Mono', '"Dela Gothic One"'],
+        'mark': ['"Dela Gothic One"', '"Wavefont"'],
       },
       borderRadius: {
         lg: 'var(--radius)',

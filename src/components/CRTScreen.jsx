@@ -127,7 +127,7 @@ const CRTScreen = ({ activeChannel, isDistorting, language, isDark, t }) => {
         </div>
 
         {/* Etiqueta del monitor */}
-        <div className={`absolute bottom-4 right-4 text-xs font-mono ${isDark ? "text-white" : "text-black"}`}>
+        <div className={`absolute bottom-4 right-4 text-sm font-specs ${isDark ? "text-secondary" : "text-primary"}`}>
           0SC1
         </div>
       </div>

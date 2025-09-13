@@ -24,8 +24,8 @@ const BlogChannel = ({ language, isDark }) => {
   }, [])
 
   return (
-    <div className={`flex flex-col p-8 gap-2 ${textColor}`}>
-      <div className="text-xl font-bold">
+    <div className={`font-specs flex flex-col p-8 gap-2 ${textColor}`}>
+      <div className="text-2xl font-semibold">
         <TerminalText
           text="bat blog/README.md"
           inView={true}
@@ -35,7 +35,7 @@ const BlogChannel = ({ language, isDark }) => {
       </div>
       <div className={`flex w-full transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
         {/* Contenido de texto (60% del ancho) */}
-        <div className="text-lg font-mono font-semibold w-[60%] pr-4 space-y-2">
+        <div className="text-xl w-[60%] pr-4 space-y-2">
           <p>{t.title}</p>
           <ul className="list-disc list-inside ml-2 space-y-4">
             {t.items.map((item, index) => (
@@ -56,19 +56,20 @@ const BlogChannel = ({ language, isDark }) => {
       </div>
       <Link
         to="/blog"
-        className={`relative isolate overflow-hidden mt-4 px-3 py-1 border rounded-md text-xs font-bold self-start
-          transition-colors duration-300
-          before:content-[''] before:absolute before:inset-0 before:rounded-full before:z-0
-          before:scale-0 hover:before:scale-150 before:transition-transform before:duration-300 before:ease-out before:origin-[var(--ox)_var(--oy)]
-          transition-opacity duration-500 ${showContent ? 'opacity-100' : 'opacity-0'}
-          ${isDark ? "border-white/60 text-white hover:text-black before:bg-white" : "border-black/60 text-black hover:text-white before:bg-black"}`}
-        onMouseMove={(e) => {
-          const rect = e.currentTarget.getBoundingClientRect()
-          const ox = ((e.clientX - rect.left) / rect.width) * 100;
-          const oy = ((e.clientY - rect.top) / rect.height) * 100;
-          e.currentTarget.style.setProperty('--ox', `${ox}%`);
-          e.currentTarget.style.setProperty('--oy', `${oy}%`);
-        }}
+        className={`
+          relative inline-flex items-center justify-center
+          mt-2 px-3 border rounded-sm text-base self-start
+          overflow-hidden
+          transition-[background-size,color,opacity] duration-300 ease-out
+          ${showContent ? 'opacity-100' : 'opacity-0'}
+          ${isDark
+            ? "border-cloud/60 text-white hover:text-primary [--fill:theme(colors.cloud)]"
+            : "border-primary/60 text-black hover:text-secondary [--fill:theme(colors.primary)]"
+          }
+          bg-[radial-gradient(circle_at_center,var(--fill)_0%,var(--fill)_100%)]
+          bg-no-repeat bg-center [background-size:0%_0%]
+          hover:[background-size:140%_140%]
+        `}
       >
         <span className="relative z-10">{t.action} ↗</span>
       </Link>

@@ -3,6 +3,7 @@ import { useAuth } from "../hooks/useAuth"
 import { Icon } from "@iconify/react"
 import { useInView } from 'react-intersection-observer'
 import TerminalText from "../components/UI/TerminalText"
+import ProjectCards from "../components/UI/ProjectCards"
 import ContactForm from "../components/ContactForm"
 import AmplitudeIndicator from "../components/UI/AmplitudeIndicator"
 import StaticEffect from "../components/UI/StaticEffect"
@@ -94,7 +95,8 @@ const About = () => {
   // Estado unificado para las secciones
   const [sections, setSections] = useState({
     skills: { isVisible: false, canScroll: true, showContent: false },
-    experience: { isVisible: false, canScroll: true, showContent: false }
+    experience: { isVisible: false, canScroll: true, showContent: false },
+    projects: { isVisible: false, canScroll: true, showContent: false },
   })
   // Ref para tener el estado de secciones siempre actualizado en callbacks
   const sectionsRef = useRef(sections)
@@ -105,9 +107,11 @@ const About = () => {
   // Referencias unificadas
   const skillsRef = useRef(null)
   const experienceRef = useRef(null)
+  const projectsRef = useRef(null)
   const sectionRefs = useMemo(() => ({
     skills: skillsRef,
-    experience: experienceRef
+    experience: experienceRef,
+    projects: projectsRef,
   }), [])
 
   // Función para scroll suave personalizado
@@ -148,6 +152,25 @@ const About = () => {
   }, [isScrolling, setIsScrolling]);
 
   const images = [profile, osci, hornero]
+
+  // Project cards content
+  const projectItems = useMemo(() => ([
+    {
+      title: "Metodológicas",
+      description: "Buenas prácticas, disciplina y gobierno de datos.",
+      icon: "ph:target-duotone",
+    },
+    {
+      title: "Funcionales",
+      description: "Diseño funcional alineado al negocio.",
+      icon: "ph:rocket-launch-duotone",
+    },
+    {
+      title: "Tecnológicas",
+      description: "Arquitecturas, toolchain y performance.",
+      icon: "ph:cpu-duotone",
+    },
+  ]), [])
 
   // Helper: get toast key from skill display name
   const getToastKey = useCallback((name) => {
@@ -317,7 +340,7 @@ const About = () => {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-16 pt-32">
             {/* Información personal */}
             <div className="flex-1 text-left">
-              <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
+              <h1 className="text-4xl md:text-5xl font-specs font-semibold mb-6 tracking-wider">
                 <TerminalText
                   key={headerText}
                   text={t?.aboutPage?.header?.[headerText] || headerText}
@@ -345,8 +368,8 @@ const About = () => {
                   </div>
                 ) : (
                   <>
-                    <h2 className="text-xl font-mono font-bold mb-4 tracking-wide">{t?.aboutPage?.profile?.name || 'Flavio Gabriel Morales'}</h2>
-                    <div className="space-y-3 font-mono text-lg leading-relaxed">
+                    <h2 className="text-2xl font-sans font-semibold mb-4 tracking-wide">{t?.aboutPage?.profile?.name || 'Flavio Gabriel Morales'}</h2>
+                    <div className="space-y-3 font-sans text-xl leading-relaxed">
                       <p>{t?.aboutPage?.profile?.bio?.[0] || 'Desarrollador Full Stack apasionado por crear soluciones tecnológicas innovadoras y eficientes.'}</p>
                       <p>{t?.aboutPage?.profile?.bio?.[1] || 'Me especializo en el desarrollo web moderno, con experiencia en arquitecturas escalables y tecnologías de vanguardia.'}</p>
                       <p>{t?.aboutPage?.profile?.bio?.[2] || 'Disfruto trabajando tanto en el frontend como en el backend, siempre buscando escribir código limpio y mantenible.'}</p>
@@ -404,9 +427,8 @@ const About = () => {
               <div
                 className={`w-48 rounded-xl`}
               >
-                <h3 className="text-xl font-mono font-bold mb-4 tracking-wide text-center">{t?.aboutPage?.contact?.title || 'Contacto'}</h3>
-                <div className="flex justify-center gap-2 font-mono text-sm">
-                  {/* Reducido gap-4 a gap-2 */}
+                <h3 className="text-xl font-sans font-semibold mb-4 tracking-wide text-center">{t?.aboutPage?.contact?.title || 'Contacto'}</h3>
+                <div className="flex justify-center gap-2 font-sans text-sm">
                   <a
                     onClick={(e) => {
                       e.preventDefault();
@@ -422,7 +444,7 @@ const About = () => {
                       className={`mb-2 mx-auto transition-colors duration-200 ${isDark ? 'text-white' : 'text-black'}`}
                     />
                     <span
-                      className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"
+                      className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-sm font-sans whitespace-nowrap ${isDark ? "hover:bg-white/10" : "hover:bg-black/10"
                         }`}
                     >
                       {t?.aboutPage?.contact?.email || 'Email'}
@@ -440,7 +462,7 @@ const About = () => {
                       className={`mb-2 mx-auto transition-colors duration-200 ${isDark ? 'text-white' : 'text-black'}`}
                     />
                     <span
-                      className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
+                      className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-sm font-sans whitespace-nowrap ${isDark ? "text-white" : "text-black"
                         }`}
                     >
                       {t?.aboutPage?.contact?.linkedin || 'LinkedIn'}
@@ -458,7 +480,7 @@ const About = () => {
                       className={`mb-2 mx-auto transition-colors duration-200  ${isDark ? 'text-white ' : 'text-black'}`}
                     />
                     <span
-                      className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
+                      className={`absolute bottom-[-0.5rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-sm font-sans whitespace-nowrap ${isDark ? "text-white" : "text-black"
                         }`}
                     >
                       {t?.aboutPage?.contact?.github || 'GitHub'}
@@ -477,7 +499,7 @@ const About = () => {
             className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${sections.skills.isVisible ? "opacity-100" : "opacity-0"
               }`}
           >
-            <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
+            <h1 className="text-4xl md:text-5xl font-specs font-semibold mb-6 tracking-wider">
               <TerminalText
                 text={t?.aboutPage?.skills?.title || 'htop skills'}
                 inView={sections.skills.isVisible}
@@ -490,7 +512,7 @@ const About = () => {
                 <div key={category.title} className="space-y-2">
                   {/* Título de la categoría */}
                   <h3
-                    className={`text-xl font-mono font-bold tracking-wide pb-2 border-b ${isDark ? "border-white/20" : "border-black/20"
+                    className={`text-xl md:text-2xl font-specs font-semibold tracking-wide pb-2 border-b ${isDark ? "border-white/20" : "border-black/20"
                       }`}
                   >
                     {(() => {
@@ -543,7 +565,7 @@ const About = () => {
             className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${sections.experience.isVisible ? "opacity-100" : "opacity-0"
               }`}
           >
-            <h1 className="text-4xl md:text-5xl font-mono font-bold mb-6 tracking-wider">
+            <h1 className="text-4xl md:text-5xl font-specs font-semibold mb-6 tracking-wider">
               <TerminalText
                 text={t?.aboutPage?.experience?.title || 'bat experience.md'}
                 inView={sections.experience.isVisible}
@@ -554,11 +576,36 @@ const About = () => {
             <div className={`transition-opacity duration-500 ${sections.experience.showContent ? "opacity-100" : "opacity-0"}`}>
               <div className={`p-6 rounded-xl border-2 ${isDark ? "border-primary/10 bg-primary" : "border-secondary/10 bg-secondary"
                 }`}>
-                <div className="space-y-4 font-mono text-lg">
+                <div className="space-y-4 font-sans text-xl">
                   <p>{t?.aboutPage?.experience?.paragraphs?.[0] || 'Con más de 5 años de experiencia en desarrollo web, he participado en diversos proyectos que han enriquecido mi perfil profesional.'}</p>
                   <p>{t?.aboutPage?.experience?.paragraphs?.[1] || 'Mi trayectoria incluye el desarrollo de aplicaciones web escalables, implementación de arquitecturas robustas y optimización de rendimiento en proyectos de alto impacto.'}</p>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Sección de proyectos */}
+        <section>
+          <div
+            ref={sectionRefs.projects}
+            className={`space-y-8 py-12 transition-opacity duration-1000 ease-out ${sections.projects.isVisible ? "opacity-100" : "opacity-0"
+              }`}
+          >
+            <h1 className="text-4xl md:text-5xl font-specs font-semibold mb-6 tracking-wider">
+              <TerminalText
+                text={t?.channelContent?.projects?.title || 'ls projects/'}
+                inView={sections.projects.isVisible}
+                onComplete={() => updateSection('projects', { showContent: true })}
+              />
+            </h1>
+
+            <div className={`transition-opacity duration-500 ${sections.projects.showContent ? "opacity-100" : "opacity-0"}`}>
+              <ProjectCards
+                items={projectItems}
+                isDark={isDark}
+                columns={{ base: 1, md: 2, lg: 3 }}
+              />
             </div>
           </div>
         </section>

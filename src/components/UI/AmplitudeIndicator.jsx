@@ -49,7 +49,7 @@ AmplitudeIndicator.propTypes = {
 
         {/* Solo etiqueta */}
         <div className="text-center">
-          <div className={`text-xs font-mono font-bold ${isDark ? "text-white" : "text-black"}`}>{skill}</div>
+          <div className={`text-sm font-specs ${isDark ? "text-white" : "text-black"}`}>{skill}</div>
         </div>
       </div>
     )
@@ -59,8 +59,8 @@ AmplitudeIndicator.propTypes = {
       <div className="space-y-2">
         {/* Nombre y porcentaje */}
         <div className="flex justify-between items-center">
-          <span className="font-mono font-bold text-sm tracking-wide">{skill}</span>
-          <span className="font-mono text-xs">{currentValue}%</span>
+          <span className="font-specs text-md tracking-wide">{skill}</span>
+          <span className="font-specs text-md">{currentValue}%</span>
         </div>
 
         {/* Barra de progreso horizontal */}

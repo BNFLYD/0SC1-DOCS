@@ -26,7 +26,7 @@ const SkillKnob = ({ skill, percentage, shouldAnimate = true, isDark }) => {
   }, [percentage, shouldAnimate, rotation])
 
   return (
-    <div className="flex flex-col items-center space-y-2">
+    <div className="flex flex-col items-center space-y-1">
       {/* Knob/Perilla simplificada */}
       <div className="relative w-10 h-10">
         {/* Base del knob */}
@@ -57,7 +57,7 @@ const SkillKnob = ({ skill, percentage, shouldAnimate = true, isDark }) => {
 
       {/* Solo etiqueta */}
       <div className="text-center">
-        <div className={`text-xs font-mono font-bold ${isDark ? "text-white" : "text-black"}`}>{skill}</div>
+        <div className={`text-sm font-specs ${isDark ? "text-white" : "text-black"}`}>{skill}</div>
       </div>
     </div>
   )

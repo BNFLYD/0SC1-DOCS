@@ -16,7 +16,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
   }
 
   return (
-    <nav className={`fixed top-0 left-0 w-full px-6 py-4 transition-colors duration-300 z-50 ${isDark ? "bg-primary text-white" : "bg-secondary text-black"
+    <nav className={`fixed top-0 left-0 w-full px-6 py-4 transition-colors duration-300 z-50 ${isDark ? "bg-primary text-white" : "bg-secondary text-void"
       }`}>
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo y nombre */}
@@ -32,7 +32,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
                 className={`w-8 h-8 ${isDark ? "filter invert-[100%] hue-rotate-180" : "filter invert-[0%] hue-rotate-0"}`}
               />
             </div>
-            <h1 className="relative inline-block group text-xl font-mono font-semibold tracking-wider">
+            <h1 className="relative inline-block group text-2xl font-specs tracking-wider">
               0SC1-DOCS
               <span className="underline -bottom-0"></span>
             </h1>
@@ -44,7 +44,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
 
           <Link
             to="/about"
-            className={`font-sans font-bold text-sm uppercase tracking-wider relative group ${isDark ? "text-white" : "text-black"
+            className={`font-mono text-lg uppercase tracking-wider relative group ${isDark ? "text-white" : "text-black"
               }`}
           >
             {t.about}
@@ -52,7 +52,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
           </Link>
           <Link
             to="/blog"
-            className={`font-sans font-bold text-sm uppercase tracking-wider relative group ${isDark ? "text-white" : "text-black"
+            className={`font-mono text-lg uppercase tracking-wider relative group ${isDark ? "text-white" : "text-black"
               }`}
           >
             {t.blog}
@@ -66,27 +66,34 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
           <div className="relative">
             <button
               onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-              className={`w-8 h-8 flex items-center justify-center transition-opacity ${isDark ? "text-white" : "text-black"
-                }`}
+              className={`w-auto h-auto flex items-center justify-center transition-opacity ${isDark ? "text-white" : "text-black"}`}
               aria-label={t.languageSelector}
             >
-              <Icon
-                icon={languages.find(lang => lang.code === currentLanguage)?.icon}
-                width="20"
-                height="20"
-              />
+
+              <div className="w-auto h-auto flex items-center justify-center">
+                <p className="relative inline-block group text-md font-specs tracking-wider">
+                  {languages.find(lang => lang.code === currentLanguage)?.language}
+                  <span className="underline -bottom-0"></span>
+                </p>
+                <Icon
+                  className="ml-2"
+                  icon={languages.find(lang => lang.code === currentLanguage)?.icon}
+                  width="20"
+                  height="20"
+                />
+              </div>
             </button>
 
             {isLanguageMenuOpen && (
               <div
-                className={`absolute right-0 top-full mt-5 w-32 rounded-lg shadow-lg z-50  ${isDark ? "bg-primary text-white" : "bg-secondary text-black"
+                className={`absolute -left-2 top-full mt-7 w-36 rounded-lg z-50 ${isDark ? "bg-primary text-white" : "bg-secondary text-void"
                   }`}
               >
                 {languages.map(language => (
                   <button
                     key={language.code}
                     onClick={() => handleLanguageSelect(language.code)}
-                    className="w-full px-3 py-2 text-left text-sm font-mono relative group"
+                    className="w-full px-3 py-1 text-left text-sm font-mono relative group"
                   >
                     <div className="flex items-center space-x-2">
                       <Icon
@@ -94,7 +101,7 @@ const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t
                         width="20"
                         height="20"
                       />
-                      <span className={`relative ${currentLanguage === language.code ? "font-bold" : ""}`}>
+                      <span className={`relative ${currentLanguage === language.code ? `font-semibold ${isDark ? "text-secondary" : "text-primary"}` : ""}`}>
                         {t[
                           language.code === "es" ? "spanish" :
                             language.code === "en" ? "english" :

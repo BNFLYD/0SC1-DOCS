@@ -42,7 +42,7 @@ const Toast = ({ text, icon, visible, isDark }) => {
               />
             </div>
           )}
-          <span className={`text-sm pb-3 font-mono font-semibold block transition-all duration-300 transform
+          <span className={`text-lg pb-3 font-sans block transition-all duration-300 transform
             ${showText ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
             {text}
           </span>

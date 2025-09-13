@@ -144,8 +144,8 @@ const HireChannel = ({ isDark }) => {
   }, [getAccessTokenSilently, getIdTokenClaims])
 
   return (
-    <div className={`flex flex-col p-8 gap-2 relative ${textColor}`}>
-      <div className="text-xl font-bold">
+    <div className={`font-specs flex flex-col p-8 gap-2 relative ${textColor}`}>
+      <div className="text-2xl font-semibold">
         <TerminalText
           text="sendmail"
           inView={true}
@@ -249,7 +249,7 @@ const HireChannel = ({ isDark }) => {
             }
           }}
           noValidate
-          className={`font-mono w-full max-w-2xl
+          className={`font-xs w-full max-w-2xl
             ${isDark ? 'bg-transparent text-white' : 'bg-transparent text-black'}`}
         >
 
@@ -277,7 +277,7 @@ const HireChannel = ({ isDark }) => {
                   required
                 />
                 {invalidField === 'name' && (
-                  <div className={`absolute -bottom-6 left-0 font-mono text-xs border px-2 py-1 rounded-md ${isDark ? 'bg-primary text-white border-white/30' : 'bg-white text-black border-black/30'}`}>
+                  <div className={`absolute -bottom-6 left-0 text-xs border px-2 py-1 rounded-md ${isDark ? 'bg-primary text-white border-white/30' : 'bg-white text-black border-black/30'}`}>
                     {invalidMsg}
                   </div>
                 )}
@@ -298,7 +298,7 @@ const HireChannel = ({ isDark }) => {
               required
             />
             {invalidField === 'message' && (
-              <div className={`absolute -bottom-6 left-0 font-mono text-xs border px-2 py-1 rounded-md ${isDark ? 'bg-primary text-white border-white/30' : 'bg-white text-black border-black/30'}`}>
+              <div className={`absolute -bottom-6 left-0  text-xs border px-2 py-1 rounded-md ${isDark ? 'bg-primary text-white border-white/30' : 'bg-white text-black border-black/30'}`}>
                 {invalidMsg}
               </div>
             )}
@@ -308,18 +308,20 @@ const HireChannel = ({ isDark }) => {
               <button
                 type="submit"
                 disabled={sending}
-                className={`relative isolate overflow-hidden px-3 py-1 border rounded-md text-xs font-bold
-                  transition-colors duration-300
-                  before:content-[''] before:absolute before:inset-0 before:rounded-full
-                  before:scale-0 hover:before:scale-150 before:transition-transform before:duration-300 before:ease-out before:origin-[var(--ox)_var(--oy)]
-                  ${isDark ? 'border-white/60 text-white hover:text-black before:bg-white' : 'border-black/60 text-black hover:text-white before:bg-black'}`}
-                onMouseMove={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect()
-                  const ox = ((e.clientX - rect.left) / rect.width) * 100
-                  const oy = ((e.clientY - rect.top) / rect.height) * 100
-                  e.currentTarget.style.setProperty('--ox', `${ox}%`)
-                  e.currentTarget.style.setProperty('--oy', `${oy}%`)
-                }}
+                className={`
+                  relative inline-flex items-center justify-center
+                  mt-2 px-3 border rounded-sm text-base self-start
+                  overflow-hidden
+                  transition-[background-size,color,opacity] duration-300 ease-out
+                  ${showContent ? 'opacity-100' : 'opacity-0'}
+                  ${isDark
+                    ? "border-cloud/60 text-white hover:text-primary [--fill:theme(colors.cloud)]"
+                    : "border-primary/60 text-black hover:text-secondary [--fill:theme(colors.primary)]"
+                  }
+                  bg-[radial-gradient(circle_at_center,var(--fill)_0%,var(--fill)_100%)]
+                  bg-no-repeat bg-center [background-size:0%_0%]
+                  hover:[background-size:140%_140%]
+                `}
               >
                 <span className="relative z-10 whitespace-nowrap">{sending ? 'enviando…' : 'enviar ↗'}</span>
               </button>
@@ -343,7 +345,7 @@ const HireChannel = ({ isDark }) => {
                     className={`mb-2 mx-auto transition-colors duration-200 ${isDark ? 'text-white' : 'text-black'}`}
                   />
                   <span
-                    className={`absolute bottom-[-0.1rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
+                    className={`absolute bottom-[-0.1rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs  whitespace-nowrap ${isDark ? "text-white" : "text-black"
                       }`}
                   >
                     LinkedIn
@@ -360,7 +362,7 @@ const HireChannel = ({ isDark }) => {
                     className={`mb-2 mx-auto transition-colors duration-200 ${isDark ? 'text-white' : 'text-black'}`}
                   />
                   <span
-                    className={`absolute bottom-[-0.1rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-mono whitespace-nowrap ${isDark ? "text-white" : "text-black"
+                    className={`absolute bottom-[-0.1rem] left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs  whitespace-nowrap ${isDark ? "text-white" : "text-black"
                       }`}
                   >
                     GitHub
@@ -377,7 +379,7 @@ const HireChannel = ({ isDark }) => {
           {/* Backdrop dentro del CRT */}
           <div className="absolute inset-0 bg-current/5" />
           {/* Card retro */}
-          <div className={`relative w-[90%] max-w-md p-4 border font-mono rounded-md ${isDark ? 'bg-primary text-white border-white/20' : 'bg-white text-black border-black/20'}`}>
+          <div className={`relative w-[90%] max-w-md p-4 border  rounded-md ${isDark ? 'bg-primary text-white border-white/20' : 'bg-white text-black border-black/20'}`}>
             <div className={`text-sm border-b ${isDark ? 'border-white/20' : 'border-black/20'} pb-2 mb-3 flex items-center justify-between`}>
               <span className="font-bold">[ autenticación ]</span>
               <button
