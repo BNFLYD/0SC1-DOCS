@@ -156,20 +156,20 @@ const About = () => {
   // Project cards content
   const projectItems = useMemo(() => ([
     {
-      title: "Metodológicas",
-      description: "Buenas prácticas, disciplina y gobierno de datos.",
-      icon: "ph:target-duotone",
-    },
-    {
-      title: "Funcionales",
+      title: "BlackSun",
       description: "Diseño funcional alineado al negocio.",
+      tecnologies: "Next.js, tailwindcss",
+      access: "https://github.com/0SC1/black-sun",
       icon: "ph:rocket-launch-duotone",
     },
     {
-      title: "Tecnológicas",
-      description: "Arquitecturas, toolchain y performance.",
-      icon: "ph:cpu-duotone",
+      title: "Hornero",
+      description: "Buenas prácticas, disciplina y gobierno de datos.",
+      tecnologies: "React, Tailwind",
+      access: "https://github.com/0SC1/hornero",
+      icon: "ph:target-duotone",
     },
+
   ]), [])
 
   // Helper: get toast key from skill display name
