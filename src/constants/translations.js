@@ -46,7 +46,7 @@ export const translations = {
         ]
       },
       projects: {
-        title: "Proyectos:",
+        title: "ls projects/",
         items: [
           "E-commerce Platform",
           "Task Management App",
@@ -196,7 +196,7 @@ export const translations = {
         ]
       },
       projects: {
-        title: "Projects:",
+        title: "ls projects/",
         items: [
           "E-commerce Platform",
           "Task Management App",
@@ -343,7 +343,7 @@ export const translations = {
         ]
       },
       projects: {
-        title: "Projekte:",
+        title: "ls projects/",
         items: [
           "E-commerce Platform",
           "Task Management App",
@@ -481,7 +481,7 @@ export const translations = {
         ]
       },
       projects: {
-        title: "プロジェクト：",
+        title: "ls projects/",
         items: [
           "ECサイトプラットフォーム",
           "タスク管理アプリ",

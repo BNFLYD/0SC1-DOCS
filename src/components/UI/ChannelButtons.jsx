@@ -17,14 +17,14 @@ const ChannelButtons = ({ activeChannel, onChannelChange, isDark, t }) => {
   }
 
   return (
-      <div className="w-full h-full p-3 flex items-center justify-center">
+      <div className="w-full h-full p-2 flex items-center justify-center">
         <div className="flex w-full justify-between px-8">
           {channels.map((channel) => (
             <div key={channel.id} className="flex flex-col items-center gap-1">
               <button
                 onClick={() => handleChannelClick(channel.id)}
                 aria-pressed={activeChannel === channel.id}
-                className={`relative isolate px-7 py-3 text-xs font-mono font-bold rounded border select-none
+                className={`relative isolate px-7 py-3 rounded border select-none
                   transition-all duration-200 ease-out
                   ${isDark ? 'bg-primary text-white border-white/40' : 'bg-secondary text-black border-black/30'}
                   shadow-[inset_0_1px_0_rgba(255,255,255,0.10),0_2px_6px_rgba(0,0,0,0.25)]
@@ -37,7 +37,7 @@ const ChannelButtons = ({ activeChannel, onChannelChange, isDark, t }) => {
               >
 
               </button>
-              <span className={`text-sm font-specs ${isDark ? "text-white" : "text-black"}`}>
+              <span className={`text-sm font-mono2 ${isDark ? "text-white" : "text-black"}`}>
                 {channel.label}
               </span>
             </div>

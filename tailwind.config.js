@@ -23,6 +23,7 @@ export default {
         'serif': ['"Squada One"', '"Mochiy Pop One"'],
         'sans': ['"Rajdhani"', '"M PLUS 2"'],
         'mono': ['"JetBrains Mono"', '"M PLUS 1 Code"'],
+        'mono2': ['"Share Tech Mono"', '"M PLUS 1 Code"'],
         'arcade': ['"Silkscreen"', '"DotGothic16"'],
         'specs': ['"Share Tech Mono"', '"Workbench"'],
         'ascii': ['monospace'],
