@@ -116,6 +116,8 @@ const About = () => {
 
   // Función para scroll suave personalizado
   const smoothScrollTo = useCallback((element) => {
+    // Guard: si ScrollHierarchy del botón está activo, no interferir
+    if (typeof window !== 'undefined' && window.__SCROLL_HIERARCHY__) return;
     if (isScrolling) return; // Evitar múltiples scrolls simultáneos
 
     setIsScrolling(true);
@@ -236,6 +238,8 @@ const About = () => {
               updateSection(sectionId, { isVisible: true });
 
               if (currentSection.canScroll && !isScrolling) {
+                // Guard: respetar la jerarquía del botón ScrollToTop
+                if (typeof window !== 'undefined' && window.__SCROLL_HIERARCHY__) return;
                 smoothScrollTo(entry.target);
                 updateSection(sectionId, { canScroll: false });
               }

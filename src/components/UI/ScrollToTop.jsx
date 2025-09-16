@@ -37,6 +37,13 @@ const ScrollToTop = ({ isDark }) => {
     }
   }, [scrollHierarchy])
 
+  // Opción B: además de apagar al llegar al top, si el botón deja de ser visible, desactivar jerarquía
+  useEffect(() => {
+    if (scrollHierarchy && !isVisible) {
+      setScrollHierarchy(false)
+    }
+  }, [scrollHierarchy, isVisible])
+
   // Función para desplazarse suavemente hacia arriba con jerarquía activada
   const scrollToTop = () => {
     setScrollHierarchy(true)
