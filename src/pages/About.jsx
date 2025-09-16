@@ -47,7 +47,7 @@ const InViewImage = ({ src, alt, isTransitioning, currentImageIndex, w, h, decod
 const About = () => {
   const context = useOutletContext() || {}
   const { isDark, theme, isMuttActive, setIsMuttActive, t } = context
-  const safeSetIsMuttActive = typeof setIsMuttActive === 'function' ? setIsMuttActive : () => {}
+  const safeSetIsMuttActive = typeof setIsMuttActive === 'function' ? setIsMuttActive : () => { }
   const { isLoading } = useAuth()
   const [showWhoamiContent, setShowWhoamiContent] = useState(false)
   const [headerText, setHeaderText] = useState(isMuttActive ? "mutt" : "whoami")
@@ -66,7 +66,7 @@ const About = () => {
     let pending = false
     try {
       pending = sessionStorage.getItem('contact:pending') === '1'
-    } catch {}
+    } catch { }
     if (pending) {
       setHeaderText('mutt')
       safeSetIsMuttActive(true)
@@ -337,8 +337,6 @@ const About = () => {
       )}
       {/* Contenido principal (siempre montado) */}
       <main className="max-w-7xl mx-auto space-y-52">
-        {" "}
-        {/* Añadido px-6 para padding lateral */}
         {/* Sección de perfil */}
         <section>
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-16 pt-32">
@@ -403,7 +401,7 @@ const About = () => {
                 <div className="relative w-full h-full flex items-center justify-center">
                   {currentImageIndex === 1 ? (
                     <div
-                      className={`animate-sprite bg-no-repeat w-full h-full ${isDark ? "filter invert-[0%] hue-rotate-0" : "filter invert-[100%] hue-rotate-180"}`}
+                      className={`animate-sprite bg-no-repeat w-full h-full ${isDark ? "filter invert-[0%]" : "filter invert-[100%]"}`}
                       style={{
                         backgroundImage: `url(${images[1]})`,
                         backgroundSize: '100% 6400%'
@@ -422,7 +420,7 @@ const About = () => {
                   <StaticEffect
                     theme={theme}
                     intensity={150}
-                    flashProbability={0.2}
+                    flashProbability={0.4}
                   />
                 )}
               </div>
@@ -494,6 +492,9 @@ const About = () => {
               </div>
             </div>
           </div>
+          <div className={`flex justify-center pt-3 object-contain animate-float transition-opacity duration-500 ${showWhoamiContent ? 'opacity-100' : 'opacity-0'}`}>
+            <Icon icon="gravity-ui:chevron-down-wide" width="40" height="40" className={`${isDark ? 'text-cloud' : 'text-primary'}`} />
+          </div>
         </section>
 
         {/* Sección de habilidades */}
@@ -560,6 +561,9 @@ const About = () => {
               ))}
             </div>
           </div>
+          <div className={`flex justify-center pt-3 object-contain animate-float transition-opacity duration-500 ${sections.skills.showContent ? 'opacity-100' : 'opacity-0'}`}>
+                <Icon icon="gravity-ui:chevron-down-wide" width="40" height="40" className={`${isDark ? 'text-cloud' : 'text-primary'}`} />
+              </div>
         </section>
 
         {/* Sección de experiencia */}
@@ -586,6 +590,9 @@ const About = () => {
                 </div>
               </div>
             </div>
+            <div className={`flex justify-center pt-3 object-contain animate-float transition-opacity duration-500 ${sections.experience.showContent ? 'opacity-100' : 'opacity-0'}`}>
+                <Icon icon="gravity-ui:chevron-down-wide" width="40" height="40" className={`${isDark ? 'text-cloud' : 'text-primary'}`} />
+              </div>
           </div>
         </section>
 

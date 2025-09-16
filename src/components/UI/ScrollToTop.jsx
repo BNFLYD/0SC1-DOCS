@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ArrowUp } from 'lucide-react'
+import { Icon } from '@iconify/react'
 
 const ScrollToTop = ({ isDark }) => {
   const [isVisible, setIsVisible] = useState(false)
@@ -69,11 +69,11 @@ const ScrollToTop = ({ isDark }) => {
       onClick={scrollToTop}
       className={`fixed bottom-12 right-12 p-6 rounded-3xl transition-all duration-300 transform
         ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}
-        ${isDark ? 'bg-primary hover:bg-primary/80' : 'bg-secondary hover:bg-secondary/80'}
+        ${isDark ? 'bg-primary text-cloud' : 'bg-secondary text-primary'}
         focus:outline-none shadow-lg z-50`}
       aria-label="Scroll to top"
     >
-      <ArrowUp className="w-6 h-6" />
+      <Icon icon="gravity-ui:chevron-up-wide" className="w-6 h-6" />
     </button>
   )
 }
