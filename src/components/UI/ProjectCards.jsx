@@ -164,11 +164,18 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
                 ) : (
                   <div
                     ref={el => (iconRefs.current[idx] = el)}
-                    className="h-20 w-28 rounded-md bg-current/10 shrink-0 overflow-hidden flex items-center justify-center"
+                    className="rounded-md bg-current/10 shrink-0 overflow-hidden flex items-center justify-center"
                     style={{ transform: offsets[idx] ? `translateX(${offsets[idx]}px)` : 'translateX(0px)', transition: sliding.has(idx) ? 'transform 280ms ease-out' : 'none' }}
                   >
                     {item.icon ? (
-                      <Icon icon={item.icon} className={`text-6xl md:text-8xl opacity-80 ${isDark ? "text-white" : "text-black"}`} />
+                      <Icon
+                        icon={item.icon}
+                        className={`text-7xl md:text-9xl hover:feather ${
+                          item.icon?.startsWith('custom:')
+                            ? (isDark ? 'filter invert-[12%]' : 'filter invert-[88%]')
+                            : (isDark ? 'text-cloud' : 'text-primary')
+                        }`}
+                      />
                     ) : (
                       <span className="text-xs font-specs opacity-70">PRJ</span>
                     )}
@@ -223,11 +230,18 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
                 {isReversed ? (
                   <div
                     ref={el => (iconRefs.current[idx] = el)}
-                    className="h-20 w-28 rounded-md bg-current/10 shrink-0 overflow-hidden flex items-center justify-center"
+                    className="rounded-md shrink-0 overflow-hidden flex items-center justify-center"
                     style={{ transform: offsets[idx] ? `translateX(${offsets[idx]}px)` : 'translateX(0px)', transition: sliding.has(idx) ? 'transform 280ms ease-out' : 'none' }}
                   >
                     {item.icon ? (
-                      <Icon icon={item.icon} className={`text-6xl md:text-8xl opacity-80 ${isDark ? "text-white" : "text-black"}`} />
+                      <Icon
+                        icon={item.icon}
+                        className={`text-7xl md:text-9xl ${
+                          item.icon?.startsWith('custom:')
+                            ? (isDark ? 'filter invert-[12%]' : 'filter invert-[88%]')
+                            : (isDark ? 'text-cloud' : 'text-primary')
+                        }`}
+                      />
                     ) : (
                       <span className="text-xs font-specs opacity-70">PRJ</span>
                     )}

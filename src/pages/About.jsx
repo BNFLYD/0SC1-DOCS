@@ -11,6 +11,7 @@ import Toast from "../components/UI/Toast"
 import profile from "../assets/yo.jpg"
 import hornero from "../assets/hornero.svg"
 import osci from "../assets/sprite.svg";
+import registerCustomIcons from "../assets/icons/registerCustomIcons"
 import { useOutletContext } from "react-router-dom"
 
 // Componente para la imagen con intersection observer
@@ -79,6 +80,11 @@ const About = () => {
       safeSetIsMuttActive(false)
     }
   }, [safeSetIsMuttActive])
+
+  // Registrar iconos personalizados (centralizado en assets)
+  useEffect(() => {
+    registerCustomIcons()
+  }, [])
 
   // Función para manejar el cambio de texto y mostrar/ocultar el formulario
   const handleMailClick = () => {
@@ -162,14 +168,14 @@ const About = () => {
       description: "Diseño funcional alineado al negocio.",
       tecnologies: "Next.js, tailwindcss",
       access: "https://github.com/0SC1/black-sun",
-      icon: "ph:rocket-launch-duotone",
+      icon: "custom:blacksun",
     },
     {
       title: "Hornero",
       description: "Buenas prácticas, disciplina y gobierno de datos.",
       tecnologies: "React, Tailwind",
       access: "https://github.com/0SC1/hornero",
-      icon: "ph:target-duotone",
+      icon: "custom:hornero",
     },
 
   ]), [])
@@ -336,7 +342,7 @@ const About = () => {
         </div>
       )}
       {/* Contenido principal (siempre montado) */}
-      <main className="max-w-7xl mx-auto space-y-52">
+      <main className="max-w-7xl mx-auto space-y-32">
         {/* Sección de perfil */}
         <section>
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-16 pt-32">
