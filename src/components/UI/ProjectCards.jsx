@@ -157,7 +157,7 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
           >
             <div ref={el => (rowRefs.current[idx] = el)} className={`rounded-2xl overflow-hidden transition-colors ${isDark ? "bg-primary text-white" : "bg-secondary text-black"}`}>
               {/* Header/content row as 3-column grid to center title optically */}
-              <div className="w-full py-6 px-5 grid items-center gap-4 grid-cols-[auto_1fr_auto]">
+              <div className="w-full h-36 px-5 grid items-center gap-4 grid-cols-[auto_1fr_auto]">
                 {/* Left slot: icon or spacer depending on side */}
                 {isReversed ? (
                   <div className="h-20 w-28 shrink-0" aria-hidden></div>
@@ -175,21 +175,21 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
                   </div>
                 )}
 
-                {/* Center slot: centered title when closed, details when open (full width to truly center inline content) */}
-                <div className="flex min-w-0 w-full flex-col items-center justify-center text-center space-y-2">
+                {/* Center slot: centered title when closed; left-aligned details when open */}
+                <div className={`flex min-w-0 w-full flex-col justify-center ${isFlipped ? 'items-start text-left' : 'items-center text-center'}`}>
                   {!isFlipped ? (
                     <h3 className={`font-specs text-4xl md:text-5xl font-semibold leading-tight truncate transition-opacity duration-200 ${(!isFlipped && !fading.has(idx)) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                       {item.title}
                     </h3>
                   ) : (
-                    <div className="max-w-prose w-full transition-opacity duration-200 opacity-100">
+                    <div className="w-full transition-opacity duration-200 opacity-100">
                       {item.description && (
-                        <p className="mb-0 mt-3font-sans text-lg md:text-xl opacity-90">
+                        <p className="m-0 mt-2 font-sans text-lg md:text-xl opacity-90">
                           {item.description}
                         </p>
                       )}
                       {item.tecnologies && (
-                        <p className="mb-0 mt-3 font-sans text-lg md:text-xl opacity-80">
+                        <p className="mb-1 mt-1 font-sans text-lg md:text-xl opacity-80">
                           <span className="font-semibold">Tecnologías:</span> {item.tecnologies}
                         </p>
                       )}
@@ -199,7 +199,7 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
                           target="_blank"
                           rel="noopener noreferrer"
                           role="button"
-                          className={`relative isolate overflow-hidden block w-fit mx-auto px-3 py-2 rounded-lg text-sm font-bold mt-0
+                          className={`relative isolate overflow-hidden block w-fit self-start px-3 py-2 rounded-lg text-sm font-bold mt-0
                             transition-colors duration-300 font-sans
                             before:content-[''] before:absolute before:inset-0 before:rounded-full before:z-0
                             before:scale-0 hover:before:scale-150 before:transition-transform before:duration-300 before:ease-out before:origin-[var(--ox)_var(--oy)]
