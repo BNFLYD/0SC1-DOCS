@@ -3,7 +3,7 @@ import { Icon } from '@iconify/react'
 import { Sun, Moon, Menu } from "lucide-react"
 import { Link } from "react-router-dom"
 import { languages } from "../../constants/languages"
-import icon from "../../assets/iconb.svg"
+import icon from "../../assets/icon.svg"
 
 const Navbar = ({ currentLanguage = "es", onLanguageChange, isDark, setIsDark, t }) => {
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false)

@@ -10,32 +10,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&display=swap" rel="stylesheet">
   <!-- Squada One -->
   <link href="https://fonts.googleapis.com/css2?family=Squada+One&display=swap" rel="stylesheet">
-
   <!-- Textos -->
   <!-- Rajdhani -->
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- M PLUS 2 -->
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+2:wght@100..900&display=swap" rel="stylesheet">
-
   <!-- Codigo -->
   <!-- JetBrains Mono -->
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
     rel="stylesheet">
   <!-- M PLUS 1 Code -->
   <link href="https://fonts.googleapis.com/css2?family=M+PLUS+1+Code:wght@100..700&display=swap" rel="stylesheet">
-
   <!-- Resaltado -->
   <!-- Dela Gothic One -->
   <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap" rel="stylesheet">
   <!-- Wavefont -->
   <link href="https://fonts.googleapis.com/css2?family=Wavefont:wght@4..1000&display=swap" rel="stylesheet">
-
   <!-- Specs -->
   <!-- Workbench -->
   <link href="https://fonts.googleapis.com/css2?family=Workbench&display=swap" rel="stylesheet">
   <!-- Share Tech Mono -->
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
-
   <!-- Arcade -->
   <!-- DotGothic16 -->
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
@@ -52,8 +47,69 @@
   <!-- WDXL Lubrifont JP N -->
   <link href="https://fonts.googleapis.com/css2?family=WDXL+Lubrifont+JP+N&display=swap" rel="stylesheet">
 
-  <!-- icono -->
-  <link rel="icon" href="/src/assets/iconb.svg" sizes="32x32" type="image/svg+xml">
+  <!-- iconos según tema -->
+  <link id="favicon" rel="icon" href="/src/assets/icon.svg" sizes="32x32" type="image/svg+xml">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    function updateFavicon() {
+      const favicon = document.getElementById('favicon');
+      const size = 32; // Tamaño estándar para favicons
+
+      fetch('/src/assets/icon.svg')
+        .then(response => response.text())
+        .then(svgContent => {
+          // Crear un blob del SVG
+          const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+          const url = URL.createObjectURL(svgBlob);
+
+          const img = new Image();
+          img.src = url;
+
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Fondo transparente
+            ctx.clearRect(0, 0, size, size);
+
+            // Dibujamos la imagen original manteniendo la proporción
+            const scale = Math.min(size / img.width, size / img.height);
+            const x = (size - img.width * scale) / 2;
+            const y = (size - img.height * scale) / 2;
+
+            ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+              // Invertimos los colores para el tema oscuro
+              const imageData = ctx.getImageData(0, 0, size, size);
+              const data = imageData.data;
+
+              for (let i = 0; i < data.length; i += 4) {
+                // Solo invertimos si el pixel no es transparente
+                if (data[i + 3] > 0) {
+                  data[i] = 255 - data[i];         // Rojo
+                  data[i + 1] = 255 - data[i + 1]; // Verde
+                  data[i + 2] = 255 - data[i + 2]; // Azul
+                }
+              }
+
+              ctx.putImageData(imageData, 0, 0);
+            }
+
+            favicon.href = canvas.toDataURL('image/png');
+            URL.revokeObjectURL(url); // Limpiamos el blob URL
+          };
+        });
+    }
+
+    // Actualizar el favicon inicialmente
+    updateFavicon();
+
+    // Escuchar cambios en el tema del sistema
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>0SC1 docs</title>
   <script src="https://cdn.jsdelivr.net/npm/figlet@1.6.0/figlet.min.js"></script>

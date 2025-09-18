@@ -160,7 +160,7 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
               <div className="w-full h-36 px-5 grid items-center gap-4 grid-cols-[auto_1fr_auto]">
                 {/* Left slot: icon or spacer depending on side */}
                 {isReversed ? (
-                  <div className="h-20 w-28 shrink-0" aria-hidden></div>
+                  <div className="h-32 w-32 shrink-0" aria-hidden></div>
                 ) : (
                   <div
                     ref={el => (iconRefs.current[idx] = el)}
