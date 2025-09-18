@@ -166,14 +166,14 @@ const About = () => {
     {
       title: "BlackSun",
       description: "Diseño funcional alineado al negocio.",
-      tecnologies: "Next.js, tailwindcss",
+      tecnologies: "Next.js, Tailwind.css",
       access: "https://github.com/0SC1/black-sun",
       icon: "custom:blacksun",
     },
     {
       title: "Hornero",
       description: "Buenas prácticas, disciplina y gobierno de datos.",
-      tecnologies: "React, Tailwind",
+      tecnologies: "React.js, Tailwind.css",
       access: "https://github.com/0SC1/hornero",
       icon: "custom:hornero",
     },

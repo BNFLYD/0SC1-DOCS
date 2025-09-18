@@ -2,27 +2,6 @@ import PropTypes from "prop-types"
 import { useState, useRef } from "react"
 import { Icon } from "@iconify/react"
 
-/*
-  ProjectCards
-  - Responsive grid of cards for showcasing project areas or offerings.
-  - Designed to match the radial hover fill pattern you used in channels.
-
-  Props:
-  - items: Array<{ title: string, description?: string, icon?: string, href?: string }>
-  - isDark?: boolean
-  - columns?: { base?: number, md?: number, lg?: number }
-  - className?: string (extra classes for the grid container)
-
-  Usage:
-    <ProjectCards
-      isDark={isDark}
-      items={[
-        { title: 'Metodológicas', description: 'Buenas prácticas, disciplina y gobierno de datos', icon: 'ph:target-duotone', href: '#' },
-        { title: 'Funcionales', description: 'Diseño funcional alineado al negocio', icon: 'ph:rocket-launch-duotone', href: '#' },
-      ]}
-    />
-*/
-
 const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) => {
   // columns is intentionally ignored to follow the stacked style used in Blog posts
   // Track flipped cards (by index)
@@ -43,8 +22,11 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
   const stopFade = (i) => setFading(prev => { const n = new Set(prev); n.delete(i); return n })
   // No slide/wobble: we removed icon translation animation entirely
 
-  const FADE_MS = 80
-  const SLIDE_MS = 280
+  const FADE_MS = 10
+  const SLIDE_MS = 350
+  // Separate fade durations for open (fade-in) and close (fade-out)
+  const OPEN_FADE_MS = 100
+  const CLOSE_FADE_MS = 100
 
   const computeTravel = (idx) => {
     const row = rowRefs.current[idx]
@@ -56,14 +38,14 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
   }
 
   const openCard = (idx) => {
-    const baseReversed = (idx % 2) === 1
+    const baseReversed = true
     setAnimating(true)
     // Start fading title and slide immediately for a snappier feel
     startFade(idx)
     const travel = computeTravel(idx)
     try {
       if (travel != null) {
-        const dir = baseReversed ? -1 : 1
+        const dir = -1
         setOffsets(prev => ({ ...prev, [idx]: dir * travel }))
         setSliding(prev => new Set(prev).add(idx))
         setTimeout(() => {
@@ -73,36 +55,42 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
           setOffsets(prev => ({ ...prev, [idx]: 0 }))
           setActiveIndex(idx)
           setAnimating(false)
+          stopFade(idx)
         }, SLIDE_MS)
       } else {
         setFlipped(prev => { const n = new Set(prev); n.add(idx); return n })
         setActiveIndex(idx)
         setAnimating(false)
+        stopFade(idx)
       }
     } catch (_) {
       setFlipped(prev => { const n = new Set(prev); n.add(idx); return n })
       setActiveIndex(idx)
       setAnimating(false)
+      stopFade(idx)
     }
   }
 
   const closeCard = (idx, cb) => {
-    const baseReversed = (idx % 2) === 1
+    const baseReversed = true
     // Start fading and sliding back immediately
     startFade(idx)
     const travel = computeTravel(idx)
     try {
       if (travel != null) {
-        const dir = baseReversed ? 1 : -1
-        setOffsets(prev => ({ ...prev, [idx]: dir * travel }))
+        const dir = 1
+        // Fade content first, then start the slide after CLOSE_FADE_MS
         setSliding(prev => new Set(prev).add(idx))
         setTimeout(() => {
-          setSliding(prev => { const n = new Set(prev); n.delete(idx); return n })
-          setOffsets(prev => ({ ...prev, [idx]: 0 }))
-          setFlipped(prev => { const n = new Set(prev); n.delete(idx); return n })
-          setTimeout(() => stopFade(idx), FADE_MS)
-          if (typeof cb === 'function') cb()
-        }, SLIDE_MS)
+          setOffsets(prev => ({ ...prev, [idx]: dir * travel }))
+          setTimeout(() => {
+            setSliding(prev => { const n = new Set(prev); n.delete(idx); return n })
+            setOffsets(prev => ({ ...prev, [idx]: 0 }))
+            setFlipped(prev => { const n = new Set(prev); n.delete(idx); return n })
+            setTimeout(() => stopFade(idx), OPEN_FADE_MS)
+            if (typeof cb === 'function') cb()
+          }, SLIDE_MS)
+        }, CLOSE_FADE_MS)
       } else {
         setFlipped(prev => { const n = new Set(prev); n.delete(idx); return n })
         setTimeout(() => stopFade(idx), FADE_MS)
@@ -127,11 +115,10 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
       })
       return
     }
-    // If another is active, close it first, then open current
+    // If another is active, close it first, then open current (parallel handoff, no delay)
     if (activeIndex !== null && activeIndex !== i) {
       setAnimating(true)
       const prev = activeIndex
-      // Run both animations in parallel for instant feel
       closeCard(prev, () => { setActiveIndex(null) })
       openCard(i)
       return
@@ -143,10 +130,9 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
   return (
     <div className={["relative space-y-6", className].join(" ")}>
       {items.map((item, idx) => {
-        const baseReversed = (idx % 2) === 1
+        const baseReversed = true
         const isFlipped = flipped.has(idx)
-        // If flipped, invert the base layout and hide text (no slide)
-        const isReversed = isFlipped ? !baseReversed : baseReversed
+        const isReversed = baseReversed !== isFlipped
         return (
           <button
             key={idx}
@@ -170,11 +156,10 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
                     {item.icon ? (
                       <Icon
                         icon={item.icon}
-                        className={`text-7xl md:text-9xl hover:feather ${
-                          item.icon?.startsWith('custom:')
+                        className={`text-7xl md:text-9xl ${item.icon?.startsWith('custom:')
                             ? (isDark ? 'filter invert-[12%]' : 'filter invert-[88%]')
-                            : (isDark ? 'text-cloud' : 'text-primary')
-                        }`}
+                            : (isDark ? 'text-feather' : 'text-primary')
+                          }`}
                       />
                     ) : (
                       <span className="text-xs font-specs opacity-70">PRJ</span>
@@ -185,11 +170,14 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
                 {/* Center slot: centered title when closed; left-aligned details when open */}
                 <div className={`flex min-w-0 w-full flex-col justify-center ${isFlipped ? 'items-start text-left' : 'items-center text-center'}`}>
                   {!isFlipped ? (
-                    <h3 className={`font-specs text-4xl md:text-5xl font-semibold leading-tight truncate transition-opacity duration-200 ${(!isFlipped && !fading.has(idx)) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                    <h3 className={`font-specs text-4xl md:text-5xl leading-tight truncate transition-opacity duration-200 ${(!isFlipped && !fading.has(idx)) ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
                       {item.title}
                     </h3>
                   ) : (
-                    <div className="w-full transition-opacity duration-200 opacity-100">
+                    <div
+                      className={`w-full transition-opacity ${fading.has(idx) ? 'opacity-0' : 'opacity-100'}`}
+                      style={{ transitionDuration: `${fading.has(idx) ? CLOSE_FADE_MS : OPEN_FADE_MS}ms` }}
+                    >
                       {item.description && (
                         <p className="m-0 mt-2 font-sans text-lg md:text-xl opacity-90">
                           {item.description}
@@ -236,18 +224,17 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
                     {item.icon ? (
                       <Icon
                         icon={item.icon}
-                        className={`text-7xl md:text-9xl ${
-                          item.icon?.startsWith('custom:')
-                            ? (isDark ? 'filter invert-[12%]' : 'filter invert-[88%]')
-                            : (isDark ? 'text-cloud' : 'text-primary')
-                        }`}
+                        className={`text-7xl md:text-9xl ${item.icon?.startsWith('custom:')
+                          ? (isDark ? 'filter invert-[12%]' : 'filter invert-[88%]')
+                          : (isDark ? 'text-cloud' : 'text-primary')
+                          }`}
                       />
                     ) : (
                       <span className="text-xs font-specs opacity-70">PRJ</span>
                     )}
                   </div>
                 ) : (
-                  <div className="h-20 w-28 shrink-0" aria-hidden></div>
+                  <div className="h-32 w-32 shrink-0" aria-hidden></div>
                 )}
               </div>
             </div>
