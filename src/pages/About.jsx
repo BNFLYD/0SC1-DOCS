@@ -11,7 +11,7 @@ import Toast from "../components/UI/Toast"
 import profile from "../assets/yo.jpg"
 import hornero from "../assets/hornero.svg"
 import osci from "../assets/sprite.svg";
-import { useOutletContext } from "react-router-dom"
+import { useOutletContext, useLocation } from "react-router-dom"
 
 // Componente para la imagen con intersection observer
 // Añade prioridad de descarga y tamaño intrínseco para evitar CLS
@@ -122,12 +122,12 @@ const About = () => {
     if (isScrolling) return; // Evitar múltiples scrolls simultáneos
 
     setIsScrolling(true);
-    const navbarHeight = 80; // Altura aproximada del navbar
+    const navbarHeight = 80;
     const elementPosition = element.getBoundingClientRect().top;
     const offsetPosition = elementPosition + window.pageYOffset - navbarHeight;
     const startPosition = window.pageYOffset;
     const distance = offsetPosition - startPosition;
-    const duration = 1000; // Duración en ms
+    const duration = 1000;
     let start = null;
 
     const animation = (currentTime) => {
@@ -155,6 +155,20 @@ const About = () => {
   }, [isScrolling, setIsScrolling]);
 
   const images = [profile, osci, hornero]
+
+  // Scroll automático si viene con hash (#projects)
+  const location = useLocation()
+  useEffect(() => {
+    if (location.hash === '#projects') {
+      const el = sectionRefs?.projects?.current
+      if (el) {
+        // esperar un tick para asegurar layout
+        setTimeout(() => smoothScrollTo(el), 0)
+      }
+    }
+    // Solo al montar para evitar repeticiones en navegaciones internas
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Project cards content
   const projectItems = useMemo(() => ([
@@ -493,9 +507,28 @@ const About = () => {
               </div>
             </div>
           </div>
-          <div className={`flex justify-center pt-3 object-contain animate-float transition-opacity duration-500 ${showWhoamiContent ? 'opacity-100' : 'opacity-0'}`}>
-            <Icon icon="gravity-ui:chevron-down-wide" width="40" height="40" className={`${isDark ? 'text-cloud' : 'text-primary'}`} />
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              const el = sectionRefs?.skills?.current;
+              if (el) smoothScrollTo(el);
+            }}
+            aria-label="move to skills"
+            className={[
+              "w-full flex items-center justify-center pt-3",
+              "transition-opacity duration-500",
+              showWhoamiContent? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+              "motion-safe:animate-float motion-reduce:animate-none",
+              "transform motion-safe:hover:-translate-y-0.5 transition-transform"
+            ].join(" ")}
+          >
+            <Icon
+              icon="gravity-ui:chevron-down-wide"
+              width="40"
+              height="40"
+              className={`${isDark ? 'text-cloud' : 'text-primary'} block mx-auto`}
+            />
+          </button>
         </section>
 
         {/* Sección de habilidades */}
@@ -518,7 +551,7 @@ const About = () => {
                 <div key={category.title} className="space-y-2">
                   {/* Título de la categoría */}
                   <h3
-                    className={`text-xl md:text-2xl font-specs font-semibold tracking-wide pb-2 border-b ${isDark ? "border-white/20" : "border-black/20"
+                    className={`text-xl md:text-2xl font-sans font-semibold tracking-wide pb-2 border-b ${isDark ? "border-white/20" : "border-black/20"
                       }`}
                   >
                     {(() => {
@@ -562,9 +595,28 @@ const About = () => {
               ))}
             </div>
           </div>
-          <div className={`flex justify-center pt-3 object-contain animate-float transition-opacity duration-500 ${sections.skills.showContent ? 'opacity-100' : 'opacity-0'}`}>
-                <Icon icon="gravity-ui:chevron-down-wide" width="40" height="40" className={`${isDark ? 'text-cloud' : 'text-primary'}`} />
-              </div>
+          <button
+            type="button"
+            onClick={() => {
+              const el = sectionRefs?.experience?.current;
+              if (el) smoothScrollTo(el);
+            }}
+            aria-label="move to experience"
+            className={[
+              "w-full flex items-center justify-center pt-3",
+              "transition-opacity duration-500",
+              sections.skills.showContent ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+              "motion-safe:animate-float motion-reduce:animate-none",
+              "transform motion-safe:hover:-translate-y-0.5 transition-transform"
+            ].join(" ")}
+          >
+            <Icon
+              icon="gravity-ui:chevron-down-wide"
+              width="40"
+              height="40"
+              className={`${isDark ? 'text-cloud' : 'text-primary'} block mx-auto`}
+            />
+          </button>
         </section>
 
         {/* Sección de experiencia */}
@@ -591,9 +643,28 @@ const About = () => {
                 </div>
               </div>
             </div>
-            <div className={`flex justify-center pt-3 object-contain animate-float transition-opacity duration-500 ${sections.experience.showContent ? 'opacity-100' : 'opacity-0'}`}>
-                <Icon icon="gravity-ui:chevron-down-wide" width="40" height="40" className={`${isDark ? 'text-cloud' : 'text-primary'}`} />
-              </div>
+            <button
+              type="button"
+              onClick={() => {
+                const el = sectionRefs?.projects?.current;
+                if (el) smoothScrollTo(el);
+              }}
+              aria-label="move to projects"
+              className={[
+                "w-full flex items-center justify-center pt-3",
+                "transition-opacity duration-500",
+                sections.experience.showContent ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+                "motion-safe:animate-float motion-reduce:animate-none",
+                "transform motion-safe:hover:-translate-y-0.5 transition-transform"
+              ].join(" ")}
+            >
+              <Icon
+                icon="gravity-ui:chevron-down-wide"
+                width="40"
+                height="40"
+                className={`${isDark ? 'text-cloud' : 'text-primary'} block mx-auto`}
+              />
+            </button>
           </div>
         </section>
 
@@ -614,6 +685,7 @@ const About = () => {
 
             <div className={`transition-opacity duration-500 ${sections.projects.showContent ? "opacity-100" : "opacity-0"}`}>
               <ProjectCards
+                key={sections.projects.isVisible ? 'projects-visible' : 'projects-hidden'}
                 items={projectItems}
                 isDark={isDark}
                 columns={{ base: 1, md: 2, lg: 3 }}
@@ -621,6 +693,7 @@ const About = () => {
             </div>
           </div>
         </section>
+        <div className="h-40"></div>
       </main>
     </div>
   )

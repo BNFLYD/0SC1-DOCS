@@ -37,7 +37,7 @@ const ChannelButtons = ({ activeChannel, onChannelChange, isDark, t }) => {
               >
 
               </button>
-              <span className={`text-sm font-mono2 ${isDark ? "text-white" : "text-black"}`}>
+              <span className={`text-sm font-code ${isDark ? "text-secondary" : "text-primary"}`}>
                 {channel.label}
               </span>
             </div>

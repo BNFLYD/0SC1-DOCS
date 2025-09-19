@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import TerminalText from "../UI/TerminalText"
 
 const ProjectsChannel = ({ language, isDark, t }) => {
@@ -23,7 +24,7 @@ const ProjectsChannel = ({ language, isDark, t }) => {
           ))}
         </ul>
       </div>
-      <button
+      <Link
         className={`
           relative inline-flex items-center justify-center
           mt-2 px-3 border rounded-sm text-base self-start
@@ -38,9 +39,11 @@ const ProjectsChannel = ({ language, isDark, t }) => {
           bg-no-repeat bg-center [background-size:0%_0%]
           hover:[background-size:140%_140%]
         `}
+        to="/about#projects"
+        aria-label="Go to About projects section"
       >
         <span className="relative z-10">{t?.projects || 'Projects'} ↗</span>
-      </button>
+      </Link>
     </div>
   )
 }

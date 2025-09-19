@@ -1,8 +1,8 @@
 import { useMemo, useState, useEffect, useRef } from "react"
 import { useOutletContext, useLocation, useNavigate } from "react-router-dom"
-import { Icon } from "@iconify/react"
-import CodeCopyButton from "../components/MarkDownUI/CodeCopyButton"
 import { Scrollbar } from "../components/UI/Scrollbar"
+import PostCard from "../components/UI/PostCards"
+import CodeCopyButton from "../components/MarkDownUI/CodeCopyButton"
 
 // Parse YYYY-MM-DD as a local date (avoids UTC shift showing previous day)
 function parseLocalDate(iso) {
@@ -263,7 +263,7 @@ function Blog() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
       {/* Controles: búsqueda y filtros */}
-      <div className="mb-8 flex flex-col gap-4 space-y-4 pt-24">
+      <div className="mb-8 flex flex-col gap-2 space-y-4 pt-24">
         {/** Simple inline i18n for labels (fallback if no t-keys) */}
         {(() => {
           return null
@@ -277,7 +277,7 @@ function Blog() {
             de: "Suche nach Titel, Zusammenfassung oder Tag...",
             ja: "タイトル・要約・タグで検索...",
           }[language] || "Search by title, excerpt or tag..."}
-          className={`w-full px-8 py-3 rounded-xl outline-none font-mono text-md ${isDark
+          className={`w-full px-8 py-3 rounded-xl outline-none font-sans text-lg ${isDark
             ? "bg-primary text-white placeholder-white/40"
             : "bg-secondary text-black placeholder-black/40"
             }`}
@@ -285,114 +285,78 @@ function Blog() {
 
         <div className="flex flex-wrap gap-2 items-center">
           <button
-            className={`px-3 py-1 rounded-lg text-sm font-bold border transition-colors ${!activeTag
-              ? isDark
-                ? "border-white/80 bg-white text-black"
-                : "border-black/80 bg-black text-white"
-              : isDark
-                ? "border-white/40 text-white hover:bg-white/10"
-                : "border-black/40 text-black hover:bg-black/5"
-              }`}
+            className={`relative isolate overflow-hidden my-1 px-3 py-1 rounded-lg text-sm font-sans font-bold
+              transition-colors duration-300
+              before:content-[''] before:absolute before:inset-0 before:rounded-full
+              before:scale-0 hover:before:scale-150 before:transition-transform before:duration-300 before:ease-out before:origin-[var(--ox)_var(--oy)]
+              ${isDark ? 'bg-primary text-white hover:text-primary before:bg-cloud' : 'bg-secondary text-primary hover:text-secondary before:bg-primary'}`}
+            onMouseMove={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect()
+              const ox = ((e.clientX - rect.left) / rect.width) * 100
+              const oy = ((e.clientY - rect.top) / rect.height) * 100
+              e.currentTarget.style.setProperty('--ox', `${ox}%`)
+              e.currentTarget.style.setProperty('--oy', `${oy}%`)
+            }}
             onClick={() => setActiveTag("")}
           >
-            {{
-              es: "Todos",
-              en: "All",
-              de: "Alle",
-              ja: "すべて",
-            }[language] || "All"}
+            <span className="relative z-10">
+              {{
+                es: "Todos",
+                en: "All",
+                de: "Alle",
+                ja: "すべて",
+              }[language] || "All"}
+            </span>
           </button>
           {allTags.map((tag) => (
             <button
               key={tag}
-              className={`px-3 py-1 rounded-md text-xs font-bold border transition-colors ${activeTag === tag
-                ? isDark
-                  ? "border-white/80 bg-white text-black"
-                  : "border-black/80 bg-black text-white"
-                : isDark
-                  ? "border-white/40 text-white hover:bg-white/10"
-                  : "border-black/40 text-black hover:bg-black/5"
-                }`}
+              className={`relative isolate overflow-hidden my-1 px-3 py-1 rounded-lg text-sm font-sans font-bold
+                transition-colors duration-300
+                before:content-[''] before:absolute before:inset-0 before:rounded-full
+                before:scale-0 hover:before:scale-150 before:transition-transform before:duration-300 before:ease-out before:origin-[var(--ox)_var(--oy)]
+                ${isDark ? 'bg-primary text-white hover:text-primary before:bg-cloud' : 'bg-secondary text-primary hover:text-secondary before:bg-primary'}`}
+              onMouseMove={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect()
+                const ox = ((e.clientX - rect.left) / rect.width) * 100
+                const oy = ((e.clientY - rect.top) / rect.height) * 100
+                e.currentTarget.style.setProperty('--ox', `${ox}%`)
+                e.currentTarget.style.setProperty('--oy', `${oy}%`)
+              }}
               onClick={() => setActiveTag(tag)}
             >
-              #{tag}
+              <span className="relative z-10">
+                #{tag}
+              </span>
             </button>
           ))}
         </div>
       </div>
 
       {/* Listado de posts: máx 4 cards de alto y scroll interno SOLO cuando no hay post abierto */}
-      <div id="post-list" className={`relative space-y-6 pr-2 ${expandedSlug ? "" : "overflow-y-auto max-h-[35rem]"}`}>
+      <div id="post-list" className={`relative space-y-4 ${expandedSlug ? "" : "overflow-y-auto max-h-[35rem] rounded-2xl"}`}>
         {visiblePosts.map((post) => {
           const isOpen = expandedSlug === post.slug
           const Comp = post.Component
+          const postView = { ...post, _dateText: formatDateLong(post._date, language) }
           return (
-            <div id={`card-${post.slug}`} key={post.slug} className="relative">
-              <div
-                className={`rounded-2xl overflow-hidden transition-colors ${isDark ? "bg-primary" : "bg-secondary"}`}
+            <div key={post.slug} >
+              <PostCard
+                post={postView}
+                isDark={isDark}
+                isOpen={isOpen}
+                language={language}
+                copiedSlug={copiedSlug}
+                onToggle={toggleExpanded}
+                onShare={sharePost}
               >
-                {/* Miniatura / Header */}
-                <div
-                  className={`w-full p-5 min-h-[7rem] flex items-center gap-4 cursor-pointer`}
-                  role="button"
-                  tabIndex={0}
-                  aria-expanded={isOpen}
-                  onClick={() => toggleExpanded(post.slug)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      toggleExpanded(post.slug)
-                    }
-                  }}
-                >
-                  {/* Cover simple (si hubiera) */}
-                  <div className="h-20 w-28 rounded-md bg-current/10 shrink-0 overflow-hidden flex items-center justify-center">
-                    {post.icon ? (
-                      <Icon icon={post.icon} className={`text-7xl hover:text-feather opacity-80 ${isDark ? "text-white" : "text-black"}`} />
-                    ) : (
-                      <span className="text-xs font-mono opacity-70">{post.tags?.[0] || "MDX"}</span>
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-mono text-lg font-bold">
-                      {post.title}
-                    </h3>
-                    {post.subtitle && (
-                      <p className="font-mono text-sm font-semibold opacity-80">
-                        {post.subtitle}
-                      </p>
-                    )}
-                    <p className="font-mono text-sm line-clamp-2">
-                      {post.excerpt}
-                    </p>
-                    <p className="font-mono text-xs mt-1">
-                      {formatDateLong(post._date, language)}
-                      {post.tags?.length ? ` · ${post.tags.join(", ")}` : ""}
-                    </p>
-                  </div>
-                  {/* Acciones a la derecha: caret + compartir */}
-                  <div className="ml-4 shrink-0 flex items-center gap-2">
-                    <button
-                      type="button"
-                      aria-label={language === 'es' ? 'Compartir enlace' : 'Share link'}
-                      className={`w-10 h-10 transition-colors flex items-center justify-center text-6xl ${isDark ? 'text-white hover:text-feather' : 'text-black hover:text-feather'}`}
-                      onClick={(e) => { e.stopPropagation(); sharePost(post.slug, post.title) }}
-                      title={copiedSlug === post.slug ? (language === 'es' ? 'Copiado' : 'Copied') : (language === 'es' ? 'Compartir' : 'Share')}
-                    >
-                      <Icon icon="tabler:link"/>
-                    </button>
-                  </div>
-                </div>
-
-                {isOpen && Comp && (
-                  <div id={`post-${post.slug}`} className="min-w-0">
-                    <CollapsibleProse isDark={isDark} postSlug={post.slug}>
-                      <Comp />
-                      <CodeCopyButton />
-                    </CollapsibleProse>
-                  </div>
+                {Comp && (
+                  <CollapsibleProse isDark={isDark} postSlug={post.slug}>
+                    <Comp />
+                    <CodeCopyButton />
+                  </CollapsibleProse>
                 )}
-              </div>
+              </PostCard>
               {/* Scrollbar totalmente fuera del card, a la derecha (post mode con defaults) */}
               {isOpen && (
                 <Scrollbar targetId={`post-${post.slug}`} />
@@ -416,7 +380,7 @@ function Blog() {
             targetId="post-list"
             container
             rightOffsetPx={16}
-            topPadPx={366}
+            topPadPx={368}
             bottomPadPx={140}
           />
         )}

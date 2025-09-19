@@ -411,7 +411,7 @@ export default function ContactForm({ isDark, onCardOpenChange, t }) {
               transition-colors duration-300
               before:content-[''] before:absolute before:inset-0 before:rounded-full
               before:scale-0 hover:before:scale-150 before:transition-transform before:duration-300 before:ease-out before:origin-[var(--ox)_var(--oy)]
-              ${isDark ? 'bg-void text-white hover:text-black before:bg-white' : 'bg-cloud text-black hover:text-white before:bg-black'}`}
+              ${isDark ? 'bg-void text-white hover:text-primary before:bg-cloud' : 'bg-cloud text-primary hover:text-secondary before:bg-primary'}`}
             onMouseMove={(e) => {
               const rect = e.currentTarget.getBoundingClientRect()
               const ox = ((e.clientX - rect.left) / rect.width) * 100

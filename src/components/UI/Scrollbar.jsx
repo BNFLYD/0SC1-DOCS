@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 
-export function Scrollbar({ targetId, container = false, rightOffsetPx = 24, topPadPx = 366, bottomPadPx = 50 }) {
+export function Scrollbar({ targetId, container = false, rightOffsetPx = 16, topPadPx = 368, bottomPadPx = 50 }) {
   const trackRef = useRef(null)
   const thumbRef = useRef(null)
   const [thumbTop, setThumbTop] = useState(0)

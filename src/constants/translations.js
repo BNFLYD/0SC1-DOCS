@@ -88,10 +88,10 @@ export const translations = {
       skills: {
         title: "htop skills",
         categories: {
-          general: "Habilidades",
-          backend: "Backend",
-          frontend: "Frontend",
-          ai: "Inteligencia Artificial"
+          general: "HABILIDADES",
+          backend: "BACKEND",
+          frontend: "FRONTEND",
+          ai: "INTELIGENCIA ARTIFICIAL"
         },
         toasts: {
           javascript: "El lenguaje de la web, ideal para el desarrollo de apps y sitios facilmente desplegables y de alto rendimiento, sobre todo con ES6+, mi lenguaje favorito",
@@ -237,10 +237,10 @@ export const translations = {
       skills: {
         title: "htop skills",
         categories: {
-          general: "Skills",
-          backend: "Backend",
-          frontend: "Frontend",
-          ai: "Artificial Intelligence"
+          general: "SKILLS",
+          backend: "BACKEND",
+          frontend: "FRONTEND",
+          ai: "ARTIFICIAL INTELLIGENCE"
         },
         toasts: {
           javascript: "The language of the web, ideal for building easily deployable, high‑performance apps and sites—especially with ES6+. My favorite language.",
@@ -379,7 +379,7 @@ export const translations = {
       contact: { title: "Kontakt", email: "Email", linkedin: "LinkedIn", github: "GitHub" },
       skills: {
         title: "htop skills",
-        categories: { general: "Fähigkeiten", backend: "Backend", frontend: "Frontend", ai: "Künstliche Intelligenz" },
+        categories: { general: "FÄHIGKEITEN", backend: "BACKEND", frontend: "FRONTEND", ai: "KÜNSTLICHE INTELLIGENZ" },
         toasts: {
           javascript: "Die Sprache des Webs – ideal für leicht deploybare, performante Apps und Sites, besonders mit ES6+. Meine Lieblingssprache.",
           python: "Dynamisch und flexibel mit riesigem Bibliotheks‑Ökosystem – insbesondere für Data Science und KI/ML. Heute die Sprache der KI.",

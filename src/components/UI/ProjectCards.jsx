@@ -110,7 +110,8 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
       // Close the same card
       setAnimating(true)
       closeCard(i, () => {
-        setActiveIndex(null)
+        // Limpiar solo si aún corresponde a esta card
+        setActiveIndex(curr => (curr === i ? null : curr))
         setAnimating(false)
       })
       return
@@ -119,11 +120,15 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
     if (activeIndex !== null && activeIndex !== i) {
       setAnimating(true)
       const prev = activeIndex
-      closeCard(prev, () => { setActiveIndex(null) })
+      // Establecer intención actual de inmediato al nuevo índice
+      setActiveIndex(i)
+      // Cerrar la anterior y limpiar solo si aún era la activa
+      closeCard(prev, () => { setActiveIndex(curr => (curr === prev ? null : curr)) })
       openCard(i)
       return
     }
-    // No active: open directly
+    // No había activa: abrir directamente y fijar intención
+    setActiveIndex(i)
     openCard(i)
   }
 
@@ -194,6 +199,8 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
                           target="_blank"
                           rel="noopener noreferrer"
                           role="button"
+                          onClick={(e) => { e.stopPropagation() }}
+                          onMouseDown={(e) => { e.stopPropagation() }}
                           className={`relative isolate overflow-hidden block w-fit self-start px-3 py-2 rounded-lg text-sm font-bold mt-0
                             transition-colors duration-300 font-sans
                             before:content-[''] before:absolute before:inset-0 before:rounded-full before:z-0
@@ -249,7 +256,7 @@ ProjectCards.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
-    icon: PropTypes.string, // Iconify name, e.g., 'ph:target-duotone'
+    icon: PropTypes.string,
     href: PropTypes.string,
     target: PropTypes.string,
     rel: PropTypes.string,
