@@ -5,6 +5,9 @@ import App from './App.jsx'
 import './index.css'
 import { UserProvider } from './context/UserContext.jsx'
 import { Auth0Provider } from './context/Auth0Context.jsx'
+import registerCustomIcons from './assets/icons/registerCustomIcons.js'
+
+registerCustomIcons();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

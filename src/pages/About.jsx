@@ -11,7 +11,6 @@ import Toast from "../components/UI/Toast"
 import profile from "../assets/yo.jpg"
 import hornero from "../assets/hornero.svg"
 import osci from "../assets/sprite.svg";
-import registerCustomIcons from "../assets/icons/registerCustomIcons"
 import { useOutletContext } from "react-router-dom"
 
 // Componente para la imagen con intersection observer
@@ -81,10 +80,6 @@ const About = () => {
     }
   }, [safeSetIsMuttActive])
 
-  // Registrar iconos personalizados (centralizado en assets)
-  useEffect(() => {
-    registerCustomIcons()
-  }, [])
 
   // Función para manejar el cambio de texto y mostrar/ocultar el formulario
   const handleMailClick = () => {
@@ -165,14 +160,14 @@ const About = () => {
   const projectItems = useMemo(() => ([
     {
       title: "BlackSun",
-      description: "Diseño funcional alineado al negocio.",
+      description: "Dashboard interactivo de muestra.",
       tecnologies: "Next.js, Tailwind.css",
       access: "https://github.com/0SC1/black-sun",
       icon: "custom:blacksun",
     },
     {
       title: "Hornero",
-      description: "Buenas prácticas, disciplina y gobierno de datos.",
+      description: "Servicio de desarrollo web para tu negocio.",
       tecnologies: "React.js, Tailwind.css",
       access: "https://github.com/0SC1/hornero",
       icon: "custom:hornero",

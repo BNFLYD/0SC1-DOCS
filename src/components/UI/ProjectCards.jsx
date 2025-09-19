@@ -207,7 +207,7 @@ const ProjectCards = ({ items = [], isDark = false, columns, className = "" }) =
                             e.currentTarget.style.setProperty('--oy', `${oy}%`)
                           }}
                         >
-                          <span className="relative z-10">Acceso ↗</span>
+                          <span className="relative z-10">Visitar ↗</span>
                         </a>
                       )}
                     </div>
