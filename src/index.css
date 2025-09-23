@@ -39,16 +39,16 @@
 
   /* Typography */
   .heading-primary {
-    @apply text-4xl font-mono font-bold mb-4;
+    @apply text-4xl font-bold mb-4;
   }
 
   .text-body {
-    @apply text-lg font-mono opacity-80;
+    @apply text-lg opacity-80;
   }
 
   /* Navigation */
   .nav-link {
-    @apply font-mono text-sm uppercase tracking-wider relative group;
+    @apply text-sm uppercase tracking-wider relative group;
   }
 
   .nav-link-underline {
@@ -71,7 +71,7 @@
   }
 
   .prose pre code {
-    @apply font-mono text-base block mx-8;
+    @apply font-code text-lg block mx-8;
   }
 
   /* Images inside prose (MDX) */
@@ -81,7 +81,7 @@
 
   .prose code:not(pre code) {
     /* Inline code: use feather background in both themes */
-    @apply font-mono text-sm px-1 py-0.5 rounded bg-feather/35 dark:bg-feather/35;
+    @apply font-code text-sm px-1 py-0.5 rounded bg-feather/35 dark:bg-feather/35;
   }
 
   /* Collapsible nested lists animation */
@@ -98,13 +98,12 @@
     transform: translateY(0);
   }
 
-  /* Force mono font for all prose content */
-  .prose {
-    @apply font-mono;
-  }
 
-  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-    @apply font-mono;
+  .prose h1, .prose h2, .prose h3{
+    @apply font-sans;
+  }
+  .prose h4, .prose h5, .prose h6 {
+    @apply font-specs text-lg font-thin text-feather;
   }
 
   /* Remove top padding from H2s inside prose and MDX-rich content */
@@ -137,11 +136,11 @@
   }
 
   .prose p, .prose li {
-    @apply font-mono text-lg;
+    @apply font-sans text-xl;
   }
 
   .prose blockquote {
-    @apply font-mono;
+    @apply font-sans text-xl;
   }
 
   /* rehype-pretty-code dual theme mapping: pick which custom property to use */
@@ -157,7 +156,7 @@
 
   /* Code block title styling - position inside the visual code block */
   [data-rehype-pretty-code-title] {
-    @apply font-mono font-bold text-xl px-4 py-3 border-b border-feather/10 rounded-t-2xl text-center;
+    @apply font-mono font-semibold text-xl px-4 py-3 border-b border-feather/10 rounded-t-2xl text-center;
     margin: 0 !important;
     margin-bottom: -1px !important;
     color: #ffffff !important;
@@ -684,5 +683,3 @@
   /* And the next paragraph inline so text continues on the same line */
   .prose p:has(> .mdx-inline-icons) + p { display: inline; }
 }
-
- 
